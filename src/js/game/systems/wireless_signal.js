@@ -13,10 +13,11 @@ import { FormElementInput, FormElementItemChooser } from "../../core/modal_dialo
 import { fillInLinkIntoTranslation } from "../../core/utils";
 import { T } from "../../translations";
 import { Entity } from "../entity";
-import { THEME} from "../theme";
+import { THEME } from "../theme";
 import { WirelessSignalComponent } from "../components/wireless_signal";
 import { enumDirectionToAngle, Vector } from "../../core/vector";
 import { drawRotatedSprite } from "../../core/draw_utils";
+import { DrawParameters } from "../../core/draw_parameters";
 
 /** @type {Object<ItemType, number>} */
 const enumTypeToSize = {
@@ -42,12 +43,12 @@ export class WirelessSignalSystem extends GameSystemWithFilter {
             if (!entity.components.WirelessCode) {
                 continue;
             }
-            
+
             const wirelessCode = entity.components.WirelessCode.wireless_code;
-            const parts = wirelessCode.split('/');
+            const parts = wirelessCode.split("/");
 
             // Define List Again
-            
+
             if (!this.wirelessInputList[parts[0]]) {
                 this.wirelessInputList[parts[0]] = [];
             }
@@ -74,7 +75,7 @@ export class WirelessSignalSystem extends GameSystemWithFilter {
 
                 const pinsComp = senderEntity.components.WiredPins;
                 const input_network = pinsComp.slots[1].linkedNetwork;
-                const outputCode = senderEntity.components.WirelessCode.wireless_code.split('/')[0];
+                const outputCode = senderEntity.components.WirelessCode.wireless_code.split("/")[0];
                 const receiverEntities = this.wirelessOutputList[outputCode];
 
                 if (!input_network) {
@@ -84,12 +85,12 @@ export class WirelessSignalSystem extends GameSystemWithFilter {
                 if (!receiverEntities) {
                     continue;
                 }
-    
+
                 for (let j = 0; j < receiverEntities.length; ++j) {
                     const receiverEntity = receiverEntities[j];
 
                     // Set Outputs
-    
+
                     const receiverOutput = receiverEntity.components.WiredPins.slots[0];
                     if (input_network) {
                         receiverOutput.value = input_network.currentValue;
@@ -128,12 +129,12 @@ export class WirelessSignalSystem extends GameSystemWithFilter {
     }
 
     testVal(val) {
-        const parts = val.split('/');
+        const parts = val.split("/");
         if (parts.length != 2) {
             return false;
         }
 
-        if (parts[0] == '' || parts[1] == '') {
+        if (parts[0] == "" || parts[1] == "") {
             return false;
         }
 
@@ -150,6 +151,7 @@ export class WirelessSignalSystem extends GameSystemWithFilter {
             const uid = entity.uid;
             const signalValueInput = new FormElementInput({
                 id: "channelValue",
+                // eslint-disable-next-line prettier/prettier
                 label: fillInLinkIntoTranslation(T.dialogs.editChannelForWS.descShortKey, THIRDPARTY_URLS.shapeViewer),
                 placeholder: "",
                 defaultValue: "",
@@ -247,12 +249,12 @@ export class WirelessSignalSystem extends GameSystemWithFilter {
      * @param {number=} width
      */
     drawStroked(ctx, text, x, y, width = undefined) {
-        ctx.font = '15px Sans-serif';
-        ctx.strokeStyle = 'black';
+        ctx.font = "15px Sans-serif";
+        ctx.strokeStyle = "black";
         ctx.lineWidth = 1;
-        ctx.miterLimit=2
+        ctx.miterLimit = 2;
         ctx.strokeText(text, x, y, width);
-        ctx.fillStyle = 'white';
+        ctx.fillStyle = "white";
         ctx.fillText(text, x, y, width);
     }
 
@@ -266,8 +268,10 @@ export class WirelessSignalSystem extends GameSystemWithFilter {
         for (let i = 0; i < contents.length; ++i) {
             const entity = contents[i];
             if (entity.components.WirelessSignal) {
-                const wirelessSignalWire = Loader.getSprite("sprites/buildings/wireless_buildings-wireless_signal(wire).png");
-                const staticComp = entity.components.StaticMapEntity
+                const wirelessSignalWire = Loader.getSprite(
+                    "sprites/buildings/wireless_buildings-wireless_signal(wire).png"
+                );
+                const staticComp = entity.components.StaticMapEntity;
                 const origin = staticComp.origin;
                 const tileSize = globalConfig.tileSize;
                 const slot = entity.components.WiredPins.slots[0];
@@ -312,12 +316,60 @@ export class WirelessSignalSystem extends GameSystemWithFilter {
                     const mousePosition = this.root.app.mousePosition;
                     const worldPos = this.root.camera.screenToWorld(mousePosition);
                     const tile = worldPos.toTileSpace().toWorldSpace();
-                    
-                    this.drawStroked(parameters.context, below.toString(), worldPos.x + 5, worldPos.y + 5)
+
+                    this.drawStroked(parameters.context, below.toString(), worldPos.x + 5, worldPos.y + 5);
                     parameters.context.strokeStyle = THEME.map.colorBlindPickerTile;
                     parameters.context.beginPath();
                     parameters.context.rect(tile.x, tile.y, globalConfig.tileSize, globalConfig.tileSize);
                     parameters.context.stroke();
+                }
+            }
+        }
+    }
+
+    /**
+     * Draws a given chunk
+     * @param {import("../../core/draw_utils").DrawParameters} parameters
+     * @param {MapChunkView} chunk
+     */
+    drawSignalChunk(parameters, chunk) {
+        const contents = chunk.containedEntitiesByLayer.regular;
+        for (let i = 0; i < contents.length; ++i) {
+            const entity = contents[i];
+
+            for (const code in this.wirelessInputList) {
+                const senderEntities = this.wirelessInputList[code];
+
+                for (let i = 0; i < senderEntities.length; ++i) {
+                    const senderEntity = senderEntities[i];
+
+                    const pinsComp = senderEntity.components.WiredPins;
+                    const input_network = pinsComp.slots[1].linkedNetwork;
+                    const outputCode = senderEntity.components.WirelessCode.wireless_code.split("/")[0];
+                    const receiverEntities = this.wirelessOutputList[outputCode];
+
+                    if (!input_network) {
+                        continue;
+                    }
+
+                    if (!receiverEntities) {
+                        continue;
+                    }
+
+                    for (let j = 0; j < receiverEntities.length; ++j) {
+                        const receiverEntity = receiverEntities[j];
+                        const receiverOrigin = receiverEntity.components.StaticMapEntity.origin;
+                        const origin = entity.components.StaticMapEntity.origin;
+
+                        const ctx = parameters.context;
+
+                        ctx.beginPath();
+                        ctx.moveTo(origin.x, origin.y);
+                        ctx.lineTo(receiverOrigin.x, receiverOrigin.y);
+                        ctx.stroke();
+
+                        // Set Outputs
+                    }
                 }
             }
         }

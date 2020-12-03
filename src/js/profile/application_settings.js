@@ -289,18 +289,18 @@ export const allApplicationSettings = [
 ];
 
 for (let k in globalConfig.mods) {
-    if (k.startsWith('_')) continue;
-        const mod = globalConfig.mods[k];
-        const setting = new BoolSetting(mod, enumCategories.modBrowser, (app, value) => {
-            globalConfig.mods[k] = value;
-        });
-        setting.validate = () => true;
-        if (!T.settings.labels[mod]) {
-            T.settings.labels[mod] = {
-                title : mod.replace(/(?!^)([A-Z])/g, " $1"),
-                description: mod.replace(/(?!^)([A-Z])/g, " $1"),
-            }
-        }
+    if (k.startsWith("_")) continue;
+    const mod = globalConfig.mods[k];
+    const setting = new BoolSetting(mod, enumCategories.modBrowser, (app, value) => {
+        globalConfig.mods[k] = value;
+    });
+    setting.validate = () => true;
+    if (!T.settings.labels[mod]) {
+        T.settings.labels[mod] = {
+            title: mod.replace(/(?!^)([A-Z])/g, " $1"),
+            description: mod.replace(/(?!^)([A-Z])/g, " $1"),
+        };
+    }
     allApplicationSettings.push(setting);
 }
 
@@ -390,7 +390,7 @@ export class ApplicationSettings extends ReadWriteProxy {
      * @param {string} key
      */
     getSetting(key) {
-        if (!key.startsWith('mod_')) {
+        if (!key.startsWith("mod_")) {
             //assert(this.getAllSettings().hasOwnProperty(key), "Setting not known: " + key);
         }
         return this.getAllSettings()[key];

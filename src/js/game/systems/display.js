@@ -84,6 +84,7 @@ export class DisplaySystem extends GameSystemWithFilter {
                         globalConfig.tileSize
                     );
                 } else if (value.getItemType() === "shape") {
+                    // @ts-ignore
                     const visibleDisplayMod = parameters.root.app.settings.getAllSettings().visibleDisplayMod;
                     let radius = 30;
                     if (visibleDisplayMod) {

@@ -481,4 +481,39 @@ export class WirelessDisplaySystem extends GameSystemWithFilter {
             }
         }
     }
+
+    /**
+     * Draws a given chunk
+     * @param {import("../../core/draw_utils").DrawParameters} parameters
+     * @param {MapChunkView} chunk
+     */
+    drawSignalChunk(parameters, chunk) {
+        const contents = chunk.containedEntitiesByLayer.regular;
+        for (let i = 0; i < contents.length; ++i) {
+            const entity = contents[i];
+            if (entity.components.WirelessCode) {
+                const sender = this.wirelessMachineList[entity.components.WirelessCode.wireless_code];
+
+                if (sender) {
+                    const origin = entity.components.StaticMapEntity.origin;
+                    const senderOrigin = sender.components.StaticMapEntity.origin;
+
+                    const tileSize = globalConfig.tileSize;
+
+                    const ctx = parameters.context;
+
+                    ctx.beginPath();
+                    ctx.strokeStyle = "blue";
+                    ctx.lineWidth = 1;
+                    ctx.miterLimit = 2;
+                    ctx.moveTo(origin.x * tileSize + tileSize / 2, origin.y * tileSize + tileSize / 2);
+                    ctx.lineTo(
+                        senderOrigin.x * tileSize + tileSize / 2,
+                        senderOrigin.y * tileSize + tileSize / 2
+                    );
+                    ctx.stroke();
+                }
+            }
+        }
+    }
 }

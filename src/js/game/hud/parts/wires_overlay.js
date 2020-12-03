@@ -17,6 +17,9 @@ export class HUDWiresOverlay extends BaseHUDPart {
     initialize() {
         // Probably not the best location, but the one which makes most sense
         this.root.keyMapper.getBinding(KEYMAPPINGS.ingame.switchLayers).add(this.switchLayers, this);
+        this.root.keyMapper
+            .getBinding(KEYMAPPINGS.ingame.switchSignalLayer)
+            .add(this.switchSignalLayer, this);
         this.root.keyMapper.getBinding(KEYMAPPINGS.placement.copyWireValue).add(this.copyWireValue, this);
 
         this.generateTilePattern();
@@ -35,18 +38,27 @@ export class HUDWiresOverlay extends BaseHUDPart {
                     (G_IS_DEV && globalConfig.debug.allBuildingsUnlocked)
                 ) {
                     this.root.currentLayer = "wires";
-                } else {
-                    this.root.currentLayer = "regular";
                 }
                 break;
             case "wires":
+                this.root.currentLayer = "regular";
+                break;
+        }
+        this.root.signals.editModeChanged.dispatch(this.root.currentLayer);
+    }
+
+    switchSignalLayer() {
+        // @ts-ignore
+        if (!this.root.app.settings.getAllSettings().wirelessBuildingsMod) {
+            return;
+        }
+        switch (this.root.currentLayer) {
+            case "regular":
                 if (
                     this.root.hubGoals.isRewardUnlocked(enumHubGoalRewards.reward_wires_painter_and_levers) ||
                     (G_IS_DEV && globalConfig.debug.allBuildingsUnlocked)
                 ) {
                     this.root.currentLayer = "signal";
-                } else {
-                    this.root.currentLayer = "regular";
                 }
                 break;
             case "signal":

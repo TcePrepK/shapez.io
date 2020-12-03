@@ -120,8 +120,12 @@ export class MapChunkView extends MapChunk {
             originalH: overlaySize,
         });
 
+        // @ts-ignore
+        if (this.root.app.settings.getAllSettings().wirelessBuildingsMod) {
+            this.root.systemMgr.systems.wirelessDisplay.drawChunkOverlay(parameters, this);
+        }
+
         this.root.systemMgr.systems.display.drawChunkOverlay(parameters, this);
-        this.root.systemMgr.systems.wirelessDisplay.drawChunkOverlay(parameters, this);
         parameters.context.imageSmoothingEnabled = true;
         const resourcesScale = this.root.app.settings.getAllSettings().mapResourcesScale;
 
@@ -327,8 +331,11 @@ export class MapChunkView extends MapChunk {
      */
     drawSignalForegroundLayer(parameters) {
         const systems = this.root.systemMgr.systems;
-        systems.wire.drawChunk(parameters, this);
-        systems.staticMapEntities.drawWiresChunk(parameters, this);
-        systems.wiredPins.drawChunk(parameters, this);
+
+        // @ts-ignore
+        if (this.root.app.settings.getAllSettings().wirelessBuildingsMod) {
+            systems.wirelessSignal.drawSignalChunk(parameters, this);
+            systems.wirelessDisplay.drawSignalChunk(parameters, this);
+        }
     }
 }
