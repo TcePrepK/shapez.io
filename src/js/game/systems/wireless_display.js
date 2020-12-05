@@ -270,6 +270,11 @@ export class WirelessDisplaySystem extends GameSystemWithFilter {
                         continue;
                     }
 
+                    if (network.currentValue == null) {
+                        possibleItems.push("dead");
+                        continue;
+                    }
+
                     const value = this.getDisplayItem(network.currentValue);
 
                     if (value) {

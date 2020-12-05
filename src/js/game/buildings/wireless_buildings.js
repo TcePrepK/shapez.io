@@ -8,7 +8,6 @@ import { enumHubGoalRewards } from "../tutorial_goals";
 import { QuadSenderComponent } from "../components/quad_sender";
 import { WirelessCodeComponent } from "../components/wireless_code";
 
-
 /** @enum {string} */
 export const enumWirelessBuildingsVariants = {
     remote_control: "remote_control",
@@ -24,10 +23,18 @@ export class MetaWirelessBuildingsBuilding extends MetaBuilding {
         return "#aaaaaa";
     }
 
+    getIsRotateable(variant) {
+        if (variant == enumWirelessBuildingsVariants.remote_control) {
+            return true;
+        }
+        return false;
+    }
+
     /**
      * @param {GameRoot} root
      */
     getIsUnlocked(root) {
+        // @ts-ignore
         if (root.app.settings.getAllSettings().wirelessBuildingsMod) {
             return root.hubGoals.isRewardUnlocked(enumHubGoalRewards.reward_display);
         }
@@ -35,9 +42,9 @@ export class MetaWirelessBuildingsBuilding extends MetaBuilding {
 
     getAvailableVariants() {
         return [
-            defaultBuildingVariant, 
-            enumWirelessBuildingsVariants.remote_control, 
-            enumWirelessBuildingsVariants.quad_sender, 
+            defaultBuildingVariant,
+            enumWirelessBuildingsVariants.remote_control,
+            enumWirelessBuildingsVariants.quad_sender,
         ];
     }
 

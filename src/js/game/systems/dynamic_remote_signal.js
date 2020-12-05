@@ -30,7 +30,7 @@ export class DynamicRemoteSignalSystem extends GameSystemWithFilter {
             // Define Lists Again
 
             if (adressNetwork) {
-                const value  = adressNetwork.currentValue;
+                const value = adressNetwork.currentValue;
                 if (value) {
                     if (!this.wirelessSignalList[value.getAsCopyableKey()]) {
                         this.wirelessSignalList[value.getAsCopyableKey()] = [];
@@ -58,7 +58,7 @@ export class DynamicRemoteSignalSystem extends GameSystemWithFilter {
                 if (!receiverEntities) {
                     continue;
                 }
-    
+
                 for (let j = 0; j < receiverEntities.length; ++j) {
                     const receiverEntity = receiverEntities[j];
 
@@ -67,7 +67,7 @@ export class DynamicRemoteSignalSystem extends GameSystemWithFilter {
                     }
 
                     // Set Outputs
-    
+
                     const receiverOutput = receiverEntity.components.WiredPins.slots[0];
                     if (input_network) {
                         receiverOutput.value = input_network.currentValue;
@@ -96,7 +96,7 @@ export class DynamicRemoteSignalSystem extends GameSystemWithFilter {
                     continue;
                 }
             }
-            
+
             if (nullInputs === Entities.length || Entities.length === 1) {
                 for (let i = 0; i < Entities.length; ++i) {
                     const entity = Entities[i];
@@ -108,6 +108,45 @@ export class DynamicRemoteSignalSystem extends GameSystemWithFilter {
                     const entity = Entities[i];
                     const output = entity.components.WiredPins.slots[0];
                     output.value = null;
+                }
+            }
+        }
+    }
+
+    /**
+     * Draws a given chunk
+     * @param {import("../../core/draw_utils").DrawParameters} parameters
+     * @param {MapChunkView} chunk
+     */
+    drawWiresChunk(parameters, chunk) {
+        const contents = chunk.containedEntitiesByLayer.wires;
+        for (let i = 0; i < contents.length; ++i) {
+            const entity = contents[i];
+            if (entity.components.DynamicRemoteSignal) {
+                const staticComp = entity.components.StaticMapEntity;
+                const slot = entity.components.WiredPins.slots[0];
+                const tile = staticComp.localTileToWorld(slot.pos);
+                const worldPos = tile.toWorldSpaceCenterOfTile();
+                const effectiveRotation = Math.radians(
+                    staticComp.rotation + enumDirectionToAngle[slot.direction]
+                );
+
+                if (!chunk.tileSpaceRectangle.containsPoint(tile.x, tile.y)) {
+                    // Doesn't belong to this chunk
+                    continue;
+                }
+
+                // Draw contained item to visualize whats emitted
+                const value = slot.value;
+                if (value) {
+                    const offset = new Vector(0, 0).rotated(effectiveRotation);
+
+                    value.drawItemCenteredClipped(
+                        worldPos.x + offset.x,
+                        worldPos.y + offset.y,
+                        parameters,
+                        enumTypeToSize[value.getItemType()]
+                    );
                 }
             }
         }

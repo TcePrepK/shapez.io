@@ -8,7 +8,6 @@ import { WirelessSignalComponent } from "../components/wireless_signal";
 import { DynamicRemoteSignalComponent } from "../components/dynamic_remote_signal";
 import { WirelessCodeComponent } from "../components/wireless_code";
 
-
 /** @enum {string} */
 export const enumSignalTransportVariants = {
     dynamic_remote_signal: "dynamic_remote_signal",
@@ -33,7 +32,7 @@ export class MetaSignalTransportBuilding extends MetaBuilding {
 
     getAvailableVariants() {
         return [
-            defaultBuildingVariant, 
+            defaultBuildingVariant,
             enumSignalTransportVariants.dynamic_remote_signal,
             enumSignalTransportVariants.dynamic_remote_signal_reversed,
         ];
@@ -44,11 +43,10 @@ export class MetaSignalTransportBuilding extends MetaBuilding {
     }
 
     getShowWiresLayerPreview() {
-        return true;
+        return false;
     }
 
-    setupEntityComponents(entity) {
-    }
+    setupEntityComponents(entity) {}
 
     /** @returns {"wires"} **/
     getLayer() {
@@ -83,7 +81,7 @@ export class MetaSignalTransportBuilding extends MetaBuilding {
                         pos: new Vector(0, 0),
                         direction: enumDirection.bottom,
                         type: enumPinSlotType.logicalAcceptor,
-                    }
+                    },
                 ]);
                 break;
             case enumSignalTransportVariants.dynamic_remote_signal_reversed:
@@ -108,11 +106,11 @@ export class MetaSignalTransportBuilding extends MetaBuilding {
                     {
                         pos: new Vector(0, 0),
                         direction:
-                        variant === enumSignalTransportVariants.dynamic_remote_signal
-                            ? enumDirection.left
-                            : enumDirection.right,
+                            variant === enumSignalTransportVariants.dynamic_remote_signal
+                                ? enumDirection.left
+                                : enumDirection.right,
                         type: enumPinSlotType.logicalAcceptor,
-                    }
+                    },
                 ]);
                 break;
             default:

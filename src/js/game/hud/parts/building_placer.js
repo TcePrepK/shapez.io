@@ -66,7 +66,7 @@ export class HUDBuildingPlacer extends HUDBuildingPlacerLogic {
                 const buildingShapeKey = enumBuildingList[i].shape;
                 enumBuildingToShapeKey[enumBuildingList[i].building] = buildingShapeKey;
             }
-    
+
             // Defines Costs Of All Buildings
             for (let i = 0; i < enumBuildingList.length; ++i) {
                 const buildingCost = enumBuildingList[i].cost;
@@ -143,7 +143,11 @@ export class HUDBuildingPlacer extends HUDBuildingPlacerLogic {
 
         const variant = this.currentVariant.get();
 
-        if (T.buildings[metaBuilding.id][variant] && (!T.buildings[metaBuilding.id][variant].name || !T.buildings[metaBuilding.id][variant].description)) {
+        if (
+            T.buildings[metaBuilding.id][variant] &&
+            (!T.buildings[metaBuilding.id][variant].name ||
+                !T.buildings[metaBuilding.id][variant].description)
+        ) {
             T.buildings[metaBuilding.id][variant].name = "undefined";
             T.buildings[metaBuilding.id][variant].description = "undefined";
         }
@@ -230,17 +234,19 @@ export class HUDBuildingPlacer extends HUDBuildingPlacerLogic {
             }
 
             if (!enumBuildingToShape[metaBuilding.id]) {
-                enumBuildingToShape[metaBuilding.id] = this.root.shapeDefinitionMgr.getShapeFromShortKey(enumBuildingToShapeKey[metaBuilding.id]).generateAsCanvas(80);
+                enumBuildingToShape[metaBuilding.id] = this.root.shapeDefinitionMgr
+                    .getShapeFromShortKey(enumBuildingToShapeKey[metaBuilding.id])
+                    .generateAsCanvas(80);
             }
 
             if (!enumBuildingToCost[metaBuilding.id]) {
                 enumBuildingToCost[metaBuilding.id] = 0;
             }
-    
+
             this.shapeKey = enumBuildingToShapeKey[metaBuilding.id];
             this.shape = enumBuildingToShape[metaBuilding.id];
             this.cost = enumBuildingToCost[metaBuilding.id];
-    
+
             this.costDraw = makeDiv(this.costDisplayParent, null, ["draw"], "");
             if (!this.costLabel || !this.costLabel.parentElement) {
                 this.costLabel = makeDiv(this.costDisplayParent, null, ["label"], "Building Cost");
@@ -302,13 +308,16 @@ export class HUDBuildingPlacer extends HUDBuildingPlacerLogic {
     }
 
     /**
-     * @param {string} building 
+     * @param {string} building
      */
     canAfford(building) {
         if (!this.survivalMod) {
             return true;
         }
-        return this.root.hubGoals.getShapesStoredByKey(enumBuildingToShapeKey[building]) >= enumBuildingToCost[building];
+        return (
+            this.root.hubGoals.getShapesStoredByKey(enumBuildingToShapeKey[building]) >=
+            enumBuildingToCost[building]
+        );
     }
 
     /**
@@ -336,7 +345,12 @@ export class HUDBuildingPlacer extends HUDBuildingPlacerLogic {
             return;
         }
 
-        if (this.costDisplayText && metaBuilding.id != "belt" && metaBuilding.id != "wire" && this.survivalMod) {
+        if (
+            this.costDisplayText &&
+            metaBuilding.id != "belt" &&
+            metaBuilding.id != "wire" &&
+            this.survivalMod
+        ) {
             this.costDisplayParent.classList.toggle("canAfford", this.canAfford(metaBuilding.id));
         }
 
@@ -444,7 +458,8 @@ export class HUDBuildingPlacer extends HUDBuildingPlacerLogic {
             rotationVariant
         );
 
-        var canBuild = this.root.logic.checkCanPlaceEntity(this.fakeEntity) && this.canAfford(metaBuilding.id);
+        var canBuild =
+            this.root.logic.checkCanPlaceEntity(this.fakeEntity) && this.canAfford(metaBuilding.id);
 
         // Fade in / out
         parameters.context.lineWidth = 1;

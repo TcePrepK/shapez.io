@@ -268,29 +268,13 @@ export class WirelessSignalSystem extends GameSystemWithFilter {
         for (let i = 0; i < contents.length; ++i) {
             const entity = contents[i];
             if (entity.components.WirelessSignal) {
-                const wirelessSignalWire = Loader.getSprite(
-                    "sprites/buildings/wireless_buildings-wireless_signal(wire).png"
-                );
                 const staticComp = entity.components.StaticMapEntity;
-                const origin = staticComp.origin;
-                const tileSize = globalConfig.tileSize;
                 const slot = entity.components.WiredPins.slots[0];
                 const tile = staticComp.localTileToWorld(slot.pos);
                 const worldPos = tile.toWorldSpaceCenterOfTile();
                 const effectiveRotation = Math.radians(
                     staticComp.rotation + enumDirectionToAngle[slot.direction]
                 );
-
-                drawRotatedSprite({
-                    parameters,
-                    sprite: wirelessSignalWire,
-                    x: origin.x * tileSize + tileSize / 2,
-                    y: origin.y * tileSize + tileSize / 2,
-                    angle: effectiveRotation,
-                    size: tileSize,
-                    offsetX: 0,
-                    offsetY: 0,
-                });
 
                 if (!chunk.tileSpaceRectangle.containsPoint(tile.x, tile.y)) {
                     // Doesn't belong to this chunk
@@ -300,7 +284,7 @@ export class WirelessSignalSystem extends GameSystemWithFilter {
                 // Draw contained item to visualize whats emitted
                 const value = slot.value;
                 if (value) {
-                    const offset = new Vector(0, -6.5).rotated(effectiveRotation);
+                    const offset = new Vector(0, 0).rotated(effectiveRotation);
 
                     value.drawItemCenteredClipped(
                         worldPos.x + offset.x,
@@ -364,6 +348,11 @@ export class WirelessSignalSystem extends GameSystemWithFilter {
                         const ctx = parameters.context;
 
                         ctx.beginPath();
+                        ctx.strokeStyle = "yellow";
+                        ctx.shadowColor = "black";
+                        ctx.shadowBlur = 6;
+                        ctx.shadowOffsetX = 6;
+                        ctx.shadowOffsetY = 6;
                         ctx.moveTo(origin.x, origin.y);
                         ctx.lineTo(receiverOrigin.x, receiverOrigin.y);
                         ctx.stroke();

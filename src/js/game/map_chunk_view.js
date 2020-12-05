@@ -322,6 +322,7 @@ export class MapChunkView extends MapChunk {
         if (this.root.app.settings.getAllSettings().wirelessBuildingsMod) {
             systems.wirelessSignal.drawWiresChunk(parameters, this);
             systems.wirelessDisplay.drawWiresChunk(parameters, this);
+            systems.dynamicRemoteSignal.drawWiresChunk(parameters, this);
         }
     }
 

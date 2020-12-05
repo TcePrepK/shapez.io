@@ -1,5 +1,16 @@
 export const CHANGELOG = [
     {
+        version: "Mod Browser 0.2",
+        date: "27.11.2020",
+        entries: [
+            "Added signal transport buildings!",
+            "Changed Some Sprites",
+            "Some bug fixes",
+            "Please backup your file on you pc everytime you want to refresh page. This version isn't stable at all!",
+            "If you find any bug or want to suggest something, please ping me on shapez.io server (@Shrimp The Shrimp#9776)",
+        ],
+    },
+    {
         version: "Mod Browser 0.11",
         date: "27.11.2020",
         entries: [

@@ -164,7 +164,11 @@ export class WiredPinsSystem extends GameSystemWithFilter {
                 continue;
             }
 
-            if (entity.components.WirelessSignal || entity.components.QuadSender) {
+            if (
+                entity.components.WirelessSignal ||
+                entity.components.QuadSender ||
+                entity.components.DynamicRemoteSignal
+            ) {
                 continue;
             }
 
