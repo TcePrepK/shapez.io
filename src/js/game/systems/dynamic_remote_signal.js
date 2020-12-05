@@ -69,11 +69,28 @@ export class DynamicRemoteSignalSystem extends GameSystemWithFilter {
                     // Set Outputs
 
                     const receiverOutput = receiverEntity.components.WiredPins.slots[0];
-                    if (input_network) {
+                    if (input_network && input_network.currentValue != null) {
                         receiverOutput.value = input_network.currentValue;
-                    } else {
-                        receiverOutput.value = null;
                     }
+                }
+
+                let nullInputs = 0;
+                for (let j = 0; j < receiverEntities.length; ++j) {
+                    const receiverEntity = receiverEntities[j];
+
+                    const receiverInput = receiverEntity.components.WiredPins.slots[1];
+
+                    if (receiverEntity == entity) {
+                        continue;
+                    }
+
+                    if (receiverInput.linkedNetwork == null) {
+                        nullInputs++;
+                    }
+                }
+
+                if (pinsComp.slots[1] && nullInputs == receiverEntities.length - 1) {
+                    pinsComp.slots[0].value = null;
                 }
             }
         }
@@ -92,6 +109,11 @@ export class DynamicRemoteSignalSystem extends GameSystemWithFilter {
                 const input_network = pinsComp.slots[1].linkedNetwork;
 
                 if (!input_network) {
+                    nullInputs++;
+                    continue;
+                }
+
+                if (input_network.currentValue == null) {
                     nullInputs++;
                     continue;
                 }
