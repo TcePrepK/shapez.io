@@ -131,6 +131,9 @@ export class GameRoot {
         /** @type {Layer} */
         this.currentLayer = "regular";
 
+        /** @type {Boolean} */
+        this.nextToolbar = false;
+
         /** @type {GameMode} */
         this.gameMode = null;
 

@@ -115,7 +115,7 @@ export class GameSystemManager {
 
             /** @type {ProgrammableBalancerSystem} */
             programmableBalancer: null,
-        
+
             /** @type {AutoBalancerSystem} */
             autoBalancer: null,
 
@@ -191,7 +191,7 @@ export class GameSystemManager {
         add("itemProcessorOverlays", ItemProcessorOverlaysSystem);
 
         // ModZ
-        
+
         this.addModZ();
 
         logger.log("📦 There are", this.systemUpdateOrder.length, "game systems");

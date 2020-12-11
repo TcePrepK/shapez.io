@@ -1,12 +1,31 @@
+import { parseJsonText } from "typescript";
+import { parse } from "yaml";
+import { boolOptions } from "yaml/types";
+import { RandomNumberGenerator } from "../../core/rng";
+import { enumDirectionToAngle, Vector } from "../../core/vector";
 import { BaseItem } from "../base_item";
-import { enumColors } from "../colors";
+import {
+    enumColors,
+    enumColorToOctal,
+    enumColorToShortcode,
+    enumOctalToColor,
+    enumShortcodeToColor,
+} from "../colors";
 import { enumLogicGateType, LogicGateComponent } from "../components/logic_gate";
 import { enumPinSlotType } from "../components/wired_pins";
 import { GameSystemWithFilter } from "../game_system_with_filter";
 import { BOOL_FALSE_SINGLETON, BOOL_TRUE_SINGLETON, BooleanItem, isTruthyItem } from "../items/boolean_item";
 import { ColorItem, COLOR_ITEM_SINGLETONS } from "../items/color_item";
 import { ShapeItem } from "../items/shape_item";
+import { MapChunkView } from "../map_chunk_view";
 import { ShapeDefinition } from "../shape_definition";
+
+/** @type {Object<ItemType, number>} */
+const enumTypeToSize = {
+    boolean: 9,
+    shape: 14,
+    color: 14,
+};
 
 export class LogicGateSystem extends GameSystemWithFilter {
     constructor(root) {
@@ -26,6 +45,8 @@ export class LogicGateSystem extends GameSystemWithFilter {
             [enumLogicGateType.compare]: this.compute_COMPARE.bind(this),
             [enumLogicGateType.stacker]: this.compute_STACKER.bind(this),
             [enumLogicGateType.painter]: this.compute_PAINTER.bind(this),
+
+            [enumLogicGateType.math]: this.compute_MATH.bind(this),
         };
     }
 
@@ -71,7 +92,11 @@ export class LogicGateSystem extends GameSystemWithFilter {
             }
 
             // Compute actual result
-            const result = this.boundOperations[logicComp.type](slotValues);
+            const result = this.boundOperations[logicComp.type](
+                slotValues,
+                logicComp.operation,
+                logicComp.difficulty
+            );
 
             if (Array.isArray(result)) {
                 let resultIndex = 0;
@@ -352,6 +377,364 @@ export class LogicGateSystem extends GameSystemWithFilter {
 
             default: {
                 assertAlways(false, "Bad item type: " + itemA.getItemType());
+            }
+        }
+    }
+
+    /**
+     * @param {Array<BaseItem|null>} parameters
+     * @param {string=} operation
+     * @param {string=} difficulty
+     */
+    compute_MATH(parameters, operation, difficulty) {
+        let itemA = parameters[0];
+        let itemB = parameters[1];
+
+        if (difficulty == "basic") {
+            if (!itemA || !itemB) {
+                // Empty
+                return null;
+            }
+        } else {
+            if (!itemA) {
+                // Empty
+                return null;
+            }
+
+            itemB = itemA;
+        }
+
+        if (itemA.getItemType() != itemB.getItemType()) {
+            return null;
+        }
+
+        if (itemA.getAsCopyableKey().length > 16 + 1 || itemB.getAsCopyableKey().length > 16 + 1) {
+            return null;
+        }
+
+        const valueA = itemA.getAsCopyableKey();
+        const valueB = itemB.getAsCopyableKey();
+
+        if (itemA.getItemType() === "color") {
+            const numberA = enumColorToOctal[valueA].valueOf();
+            const numberB = enumColorToOctal[valueB].valueOf();
+
+            let resNum = this.compute_basic_MATH(numberA, numberB, operation);
+
+            // If number is outputable via color, output via color otherwise use shapez
+            if (parseInt(resNum) <= 7) {
+                return COLOR_ITEM_SINGLETONS[enumOctalToColor[resNum]];
+            } else {
+                const shape = this.generateShapeWithNumber(resNum, false);
+
+                if (!shape) {
+                    return null;
+                }
+
+                const definition = this.root.shapeDefinitionMgr.getShapeFromShortKey(shape);
+                return this.root.shapeDefinitionMgr.getShapeItemFromDefinition(definition);
+            }
+        } else {
+            const partsA = valueA.split(":");
+            const partsB = valueB.split(":");
+
+            if (partsA.length > 2 || partsB.length > 2) {
+                return null;
+            }
+
+            // Found numberA
+            let numberA = "";
+            for (let i = 0; i < partsA.length; ++i) {
+                const layerA = partsA[i];
+
+                for (let j = 0; j < 4; ++j) {
+                    let colorA = layerA[2 * j + 1];
+                    let shapeA = layerA[2 * j];
+
+                    if (colorA == "-") {
+                        colorA = "u";
+                    }
+
+                    if (
+                        j > 0 &&
+                        (shapeA == "S" || shapeA == "W") &&
+                        (layerA[2 * (j - 1)] == "C" || layerA[2 * (j - 1)] == "R")
+                    ) {
+                        numberA += ".";
+                    }
+
+                    const valueA = enumColorToOctal[enumShortcodeToColor[colorA]];
+
+                    numberA += valueA;
+                }
+            }
+
+            // Found numberB
+            let numberB = "";
+            for (let i = 0; i < partsB.length; ++i) {
+                const layerB = partsB[i];
+
+                for (let j = 0; j < 4; ++j) {
+                    let colorB = layerB[2 * j + 1];
+                    let shapeB = layerB[2 * j];
+
+                    if (colorB == "-") {
+                        colorB = "u";
+                    }
+
+                    if (
+                        j > 0 &&
+                        (shapeB == "S" || shapeB == "W") &&
+                        (layerB[2 * (j - 1)] == "C" || layerB[2 * (j - 1)] == "R")
+                    ) {
+                        numberB += ".";
+                    }
+
+                    const valueB = enumColorToOctal[enumShortcodeToColor[colorB]];
+
+                    numberB += valueB;
+                }
+            }
+
+            if (operation == "division" && (numberB == "0000" || numberB == "00000000")) {
+                return null;
+            }
+
+            // Found last layer
+            const lastLayerA = partsA[partsA.length - 1];
+            const lastLayerB = partsB[partsB.length - 1];
+
+            // Found last corner shape
+            const lastShapeA = lastLayerA[lastLayerA.length - 2];
+            const lastShapeB = lastLayerB[lastLayerB.length - 2];
+
+            // If it is rectangle it is negative
+            if (lastShapeA == "R" || lastShapeA == "W") {
+                numberA = "-" + numberA;
+            }
+
+            if (lastShapeB == "R" || lastShapeB == "W") {
+                numberB = "-" + numberB;
+            }
+
+            const layerPartsA = lastLayerA.split(".");
+            const layerPartsB = lastLayerB.split(".");
+            // If it is rectangle it is negative
+            if (operation == "powerof" && (layerPartsA.length > 1 || layerPartsB.length > 1)) {
+                return null;
+            }
+
+            // Found real number just for sign
+            let resNum = this.compute_basic_MATH(numberA, numberB, operation);
+
+            if (resNum === null) {
+                console.log("ASd");
+                return null;
+            }
+
+            if (resNum == "Infinity" || resNum == "-Infinity") {
+                return BOOL_TRUE_SINGLETON;
+            }
+
+            if (resNum == "NaN") {
+                return null;
+            }
+
+            // Test sign
+            let negative = false;
+            if (resNum[0] == "-") {
+                negative = true;
+                resNum = resNum.slice(1);
+            }
+
+            const shape = this.generateShapeWithNumber(resNum, negative);
+
+            if (!shape) {
+                return null;
+            }
+
+            const definition = this.root.shapeDefinitionMgr.getShapeFromShortKey(shape);
+            return this.root.shapeDefinitionMgr.getShapeItemFromDefinition(definition);
+        }
+    }
+
+    /**
+     * @param {string} numberA
+     * @param {string} numberB
+     * @param {string=} operation
+     */
+    compute_basic_MATH(numberA, numberB, operation) {
+        let resNum;
+        let a = parseFloat(numberA);
+        let b = parseFloat(numberB);
+        switch (operation) {
+            case "addition":
+                resNum = parseFloat((a + b).toFixed(4)).toString();
+                break;
+            case "subtraction":
+                resNum = parseFloat((a - b).toFixed(4)).toString();
+                break;
+            case "multiplication":
+                resNum = parseFloat((a * b).toFixed(4)).toString();
+                break;
+            case "division":
+                resNum = parseFloat((a / b).toFixed(4)).toString();
+                break;
+            case "modulo":
+                resNum = parseFloat((a % b).toFixed(4)).toString();
+                break;
+            case "powerof":
+                resNum = Math.pow(a, b).toFixed(4).toString();
+                break;
+            case "cos":
+                resNum = parseFloat(Math.cos((parseInt(numberA, 8) * Math.PI) / 180).toFixed(4)).toString(8);
+                break;
+            case "cot":
+                resNum = parseFloat(
+                    (1 / Math.tan((parseInt(numberA, 8) * Math.PI) / 180)).toFixed(4)
+                ).toString(8);
+                break;
+            case "csc":
+                resNum = parseFloat(
+                    (1 / Math.sin((parseInt(numberA, 8) * Math.PI) / 180)).toFixed(4)
+                ).toString(8);
+                break;
+            case "log":
+                resNum = parseFloat(Math.log((parseInt(numberA, 8) * Math.PI) / 180).toFixed(4)).toString(8);
+                break;
+            case "sec":
+                resNum = parseFloat(
+                    (1 / Math.cos((parseInt(numberA, 8) * Math.PI) / 180)).toFixed(4)
+                ).toString(8);
+                break;
+            case "sin":
+                resNum = parseFloat(Math.sin((parseInt(numberA, 8) * Math.PI) / 180).toFixed(4)).toString(8);
+                break;
+            case "sqrt":
+                resNum = parseFloat(Math.sqrt(parseInt(numberA, 8)).toFixed(4)).toString(8);
+                break;
+            case "tan":
+                resNum = parseFloat(Math.tan((parseInt(numberA, 8) * Math.PI) / 180).toFixed(4)).toString(8);
+                break;
+            default:
+                resNum = null;
+                break;
+        }
+        if (resNum.split(".") && resNum.split(".")[1] == "0000") {
+            resNum = resNum.split(".")[0];
+        }
+
+        if (resNum.split(".")[1]) {
+            resNum = resNum.split(".")[0] + "." + resNum.split(".")[1].slice(1, 5);
+        }
+        return resNum;
+    }
+
+    /**
+     * Generates shape code from the givin number
+     * @param {string} resNum
+     * @param {boolean} negative
+     */
+    generateShapeWithNumber(resNum, negative) {
+        // Find floating num
+        const parts = resNum.split(".");
+        let floating = false;
+        let floatingNum;
+        if (parts.length > 1) {
+            floating = true;
+            floatingNum = parts[1].length;
+            resNum = parts.join("");
+        }
+
+        if (resNum.length < 4) {
+            // Make result same lenght as shapez
+            while (resNum.length < 4) {
+                resNum = "0" + resNum;
+            }
+        } else if (resNum.length > 4 && resNum.length < 8) {
+            while (resNum.length < 8) {
+                resNum = "0" + resNum;
+            }
+        } else if (resNum.length > 8 && resNum.length < 12) {
+            while (resNum.length < 12) {
+                resNum = "0" + resNum;
+            }
+        } else if (resNum.length > 12 && resNum.length < 16) {
+            while (resNum.length < 16) {
+                resNum = "0" + resNum;
+            }
+        } else if (resNum.length > 16) {
+            if (resNum.split(".").length > 1) {
+                const a = resNum.slice(1, resNum.split(".")[1].length);
+            } else {
+                return null;
+            }
+        }
+
+        // Find and return final shape
+        let shape = "";
+        let point = false;
+        for (let j = 0; j < resNum.length; ++j) {
+            const number = resNum[j];
+            const color = enumColorToShortcode[enumOctalToColor[number]];
+
+            // Test is it floating or not
+            if (floating && resNum.length - j <= floatingNum) {
+                point = true;
+            }
+
+            if (j < resNum.length) {
+                if (!point) {
+                    if (!negative) {
+                        shape += "C" + color;
+                    } else {
+                        shape += "R" + color;
+                    }
+                } else {
+                    if (!negative) {
+                        shape += "S" + color;
+                    } else {
+                        shape += "W" + color;
+                    }
+                }
+            }
+
+            if ((j + 1) % 4 == 0 && j != resNum.length - 1) {
+                shape += ":";
+            }
+        }
+        return shape;
+    }
+
+    /**
+     * Draws a given chunk
+     * @param {import("../../core/draw_utils").DrawParameters} parameters
+     * @param {MapChunkView} chunk
+     */
+    drawWiresChunk(parameters, chunk) {
+        const contents = chunk.containedEntitiesByLayer.wires;
+        for (let i = 0; i < contents.length; ++i) {
+            const entity = contents[i];
+            if (entity.components.LogicGate && entity.components.LogicGate.type == enumLogicGateType.math) {
+                const staticComp = entity.components.StaticMapEntity;
+                const slot = entity.components.WiredPins.slots[0];
+                const tile = staticComp.localTileToWorld(slot.pos);
+                const worldPos = tile.toWorldSpaceCenterOfTile();
+                const effectiveRotation = Math.radians(
+                    staticComp.rotation + enumDirectionToAngle[slot.direction]
+                );
+
+                // Draw contained item to visualize whats emitted
+                const value = slot.value;
+                if (value) {
+                    const offset = new Vector(0, -5.5).rotated(effectiveRotation);
+                    value.drawItemCenteredClipped(
+                        worldPos.x + offset.x,
+                        worldPos.y + offset.y,
+                        parameters,
+                        enumTypeToSize[value.getItemType()]
+                    );
+                }
             }
         }
     }

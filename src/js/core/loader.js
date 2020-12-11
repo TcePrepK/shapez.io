@@ -38,17 +38,21 @@ class LoaderImpl {
     getSpriteInternal(key) {
         let sprite = this.sprites.get(key);
         if (!sprite) {
-            if (!missingSpriteIds[key]) {
-                // Only show error once
-                missingSpriteIds[key] = true;
-                logger.error("Sprite '" + key + "' not found!");
-            }
+            const parts = key.split("/");
             sprite = this.sprites.get("sprites/buildings/placeholder.png");
-            //return this.spriteNotFoundSprite;
+            if (parts[2] && parts[2].split("_")[1] == "math") {
+                sprite = this.sprites.get("sprites/math/" + parts[2]);
+            } else {
+                if (!missingSpriteIds[key]) {
+                    // Only show error once
+                    missingSpriteIds[key] = true;
+                    logger.error("Sprite '" + key + "' not found!");
+                }
+            }
         }
         return sprite;
     }
-    
+
     /**
      * Returns an atlas sprite from the cache
      * @param {string} key

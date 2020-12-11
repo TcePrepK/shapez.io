@@ -98,7 +98,7 @@ export const globalConfig = {
 
     rendering: {},
     debug: require("./config.local").default,
-    mods : [
+    mods: [
         "sandboxMod",
         "survivalMod",
         "visibleDisplayMod",
@@ -106,7 +106,10 @@ export const globalConfig = {
         "wirelessBuildingsMod",
         "moreBalancerMod",
         "moreFiltersMod",
+        "mathGatesMod",
     ],
+
+    mathToolBar: false,
 
     // Secret vars
     info: {

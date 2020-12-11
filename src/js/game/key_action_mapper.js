@@ -79,6 +79,11 @@ export const KEYMAPPINGS = {
         analyzer: { keyCode: key("6") },
         comparator: { keyCode: key("7") },
         transistor: { keyCode: key("8") },
+
+        // Math toolbar
+        toolbar_changer: { keyCode: key("1") },
+        basic_math_gates: { keyCode: key("4") },
+        complex_math_gates: { keyCode: key("5") },
     },
 
     placement: {
@@ -377,7 +382,7 @@ export class KeyActionMapper {
                 if (G_IS_DEV) {
                     // Sanity
                     if (!T.keybindings.mappings[key]) {
-                        assertAlways(false, "Keybinding " + key + " has no translation!");
+                        T.keybindings.mappings[key] = "Nothing defined";
                     }
                 }
             }

@@ -14,12 +14,14 @@ import { MetaDisplayBuilding } from "../../buildings/display";
 import { MetaWirelessBuildingsBuilding } from "../../buildings/wireless_buildings";
 import { MetaStorageBuilding } from "../../buildings/storage";
 import { MetaSignalTransportBuilding } from "../../buildings/signal_transport";
+import { MetaToolbarChangerBuilding } from "../../buildings/toolbar_changer";
 
 export class HUDWiresToolbar extends HUDBaseToolbar {
     constructor(root) {
         const wirelessBuildingsMod = root.app.settings.getAllSettings().wirelessBuildingsMod;
         super(root, {
             primaryBuildings: [
+                MetaToolbarChangerBuilding,
                 MetaWireBuilding,
                 MetaWireTunnelBuilding,
                 MetaConstantSignalBuilding,
@@ -39,9 +41,12 @@ export class HUDWiresToolbar extends HUDBaseToolbar {
                 ...(wirelessBuildingsMod ? [MetaSignalTransportBuilding] : []),
             ],
             visibilityCondition: () =>
-                !this.root.camera.getIsMapOverlayActive() && this.root.currentLayer === "wires",
+                !this.root.camera.getIsMapOverlayActive() &&
+                this.root.currentLayer === "wires" &&
+                !this.root.nextToolbar,
             htmlElementId: "ingame_HUD_wires_toolbar",
             layer: "wires",
+            nextToolbar: true,
         });
     }
 }

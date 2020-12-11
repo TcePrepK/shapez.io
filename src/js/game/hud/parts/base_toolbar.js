@@ -17,10 +17,18 @@ export class HUDBaseToolbar extends BaseHUDPart {
      * @param {function} param0.visibilityCondition
      * @param {string} param0.htmlElementId
      * @param {Layer=} param0.layer
+     * @param {boolean=} param0.nextToolbar
      */
     constructor(
         root,
-        { primaryBuildings, secondaryBuildings = [], visibilityCondition, htmlElementId, layer = "regular" }
+        {
+            primaryBuildings,
+            secondaryBuildings = [],
+            visibilityCondition,
+            htmlElementId,
+            layer = "regular",
+            nextToolbar = false,
+        }
     ) {
         super(root);
 
@@ -38,6 +46,8 @@ export class HUDBaseToolbar extends BaseHUDPart {
          * index: number
          * }>} */
         this.buildingHandles = {};
+
+        this.nextToolbar = nextToolbar;
     }
 
     /**
@@ -89,11 +99,19 @@ export class HUDBaseToolbar extends BaseHUDPart {
             itemContainer.setAttribute("data-icon", "building_icons/" + metaBuilding.getId() + ".png");
             itemContainer.setAttribute("data-id", metaBuilding.getId());
 
-            binding.add(() => this.selectBuildingForPlacement(metaBuilding));
+            if (metaBuilding.id != "toolbar_changer") {
+                binding.add(() => this.selectBuildingForPlacement(metaBuilding));
 
-            this.trackClicks(itemContainer, () => this.selectBuildingForPlacement(metaBuilding), {
-                clickSound: null,
-            });
+                this.trackClicks(itemContainer, () => this.selectBuildingForPlacement(metaBuilding), {
+                    clickSound: null,
+                });
+            } else {
+                binding.add(() => this.swapIntoNextToolbar());
+
+                this.trackClicks(itemContainer, () => this.swapIntoNextToolbar(), {
+                    clickSound: null,
+                });
+            }
 
             this.buildingHandles[metaBuilding.id] = {
                 metaBuilding,
@@ -225,5 +243,20 @@ export class HUDBaseToolbar extends BaseHUDPart {
         this.root.soundProxy.playUiClick();
         this.root.hud.signals.buildingSelectedForPlacement.dispatch(metaBuilding);
         this.onSelectedPlacementBuildingChanged(metaBuilding);
+    }
+
+    swapIntoNextToolbar() {
+        if (!this.visibilityCondition()) {
+            // Not active
+            return;
+        }
+
+        if (this.root.nextToolbar) {
+            this.root.nextToolbar = false;
+        } else {
+            this.root.nextToolbar = true;
+        }
+
+        this.root.soundProxy.playUiClick();
     }
 }

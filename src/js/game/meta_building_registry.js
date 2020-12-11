@@ -35,6 +35,9 @@ import { defaultBuildingVariant } from "./meta_building";
 
 import { enumWirelessBuildingsVariants, MetaWirelessBuildingsBuilding } from "./buildings/wireless_buildings";
 import { enumSignalTransportVariants, MetaSignalTransportBuilding } from "./buildings/signal_transport";
+import { MetaToolbarChangerBuilding } from "./buildings/toolbar_changer";
+import { enumBasicMathGateVariants, MetaBasicMathGatesBuilding } from "./buildings/basic_math_gates";
+import { enumComplexMathGateVariants, MetaComplexMathGatesBuilding } from "./buildings/complex_math_gates";
 
 const logger = createLogger("building_registry");
 
@@ -69,6 +72,9 @@ export function initMetaBuildingRegistry() {
 
     gMetaBuildingRegistry.register(MetaWirelessBuildingsBuilding);
     gMetaBuildingRegistry.register(MetaSignalTransportBuilding);
+    gMetaBuildingRegistry.register(MetaToolbarChangerBuilding);
+    gMetaBuildingRegistry.register(MetaBasicMathGatesBuilding);
+    gMetaBuildingRegistry.register(MetaComplexMathGatesBuilding);
 
     // Belt
     registerBuildingVariant(1, MetaBeltBuilding, defaultBuildingVariant, 0);
@@ -131,7 +137,7 @@ export function initMetaBuildingRegistry() {
     registerBuildingVariant(52, MetaWireBuilding, enumWireVariant.second, 0);
     registerBuildingVariant(53, MetaWireBuilding, enumWireVariant.second, 1);
     registerBuildingVariant(54, MetaWireBuilding, enumWireVariant.second, 2);
-	registerBuildingVariant(55, MetaWireBuilding, enumWireVariant.second, 3);
+    registerBuildingVariant(55, MetaWireBuilding, enumWireVariant.second, 3);
 
     // Constant signal
     registerBuildingVariant(31, MetaConstantSignalBuilding);
@@ -186,7 +192,7 @@ export function initMetaBuildingRegistry() {
     registerBuildingVariant(10000007, MetaWireTunnelBuilding, enumWireTunnelVariants.Straight);
     registerBuildingVariant(10000008, MetaWireTunnelBuilding, enumWireTunnelVariants.DoubleElbow);
 
-	// Wire
+    // Wire
     registerBuildingVariant(10000002, MetaWireBuilding, enumWireVariant.third, 0);
     registerBuildingVariant(10000003, MetaWireBuilding, enumWireVariant.third, 1);
     registerBuildingVariant(10000004, MetaWireBuilding, enumWireVariant.third, 2);
@@ -205,8 +211,27 @@ export function initMetaBuildingRegistry() {
     // More Wireless Buildings
     registerBuildingVariant(-1, MetaWirelessBuildingsBuilding, enumWirelessBuildingsVariants.quad_sender);
     registerBuildingVariant(-1, MetaSignalTransportBuilding);
-    registerBuildingVariant(-1, MetaSignalTransportBuilding, enumSignalTransportVariants.dynamic_remote_signal);
-    registerBuildingVariant(-1, MetaSignalTransportBuilding, enumSignalTransportVariants.dynamic_remote_signal_reversed);
+    registerBuildingVariant(
+        -1,
+        MetaSignalTransportBuilding,
+        enumSignalTransportVariants.dynamic_remote_signal
+    );
+    registerBuildingVariant(
+        -1,
+        MetaSignalTransportBuilding,
+        enumSignalTransportVariants.dynamic_remote_signal_reversed
+    );
+
+    // Next Layer Building
+    registerBuildingVariant(-1, MetaToolbarChangerBuilding);
+
+    for (const variant in enumBasicMathGateVariants) {
+        registerBuildingVariant(-1, MetaBasicMathGatesBuilding, variant);
+    }
+
+    for (const variant in enumComplexMathGateVariants) {
+        registerBuildingVariant(-1, MetaComplexMathGatesBuilding, variant);
+    }
 
     // Propagate instances
     for (const key in gBuildingVariants) {
@@ -233,18 +258,27 @@ export function initMetaBuildingRegistry() {
             const id = metaBuilding.getId();
             if (!["hub"].includes(id)) {
                 if (!KEYMAPPINGS.buildings[id]) {
-                    assertAlways(
-                        false,
+                    console.error(
                         "Building " + id + " has no keybinding assigned! Add it to key_action_mapper.js"
                     );
+                    KEYMAPPINGS.buildings[id] = {
+                        id: id,
+                        keyCode: 111,
+                    };
                 }
 
                 if (!T.buildings[id]) {
-                    assertAlways(false, "Translation for building " + id + " missing!");
+                    console.error("Translation for building " + id + " missing!");
+                    T.buildings[id] = {
+                        default: {
+                            name: "Nothing defined",
+                            description: "Nothing defined.",
+                        },
+                    };
                 }
 
                 if (!T.buildings[id].default) {
-                    assertAlways(false, "Translation for building " + id + " missing (default variant)!");
+                    assertAlways(true, "Translation for building " + id + " missing (default variant)!");
                 }
             }
         });

@@ -53,6 +53,11 @@ export class MetaSignalTransportBuilding extends MetaBuilding {
         return "wires";
     }
 
+    getRenderPins() {
+        // We already have it included
+        return false;
+    }
+
     /**
      *
      * @param {Entity} entity

@@ -9,7 +9,6 @@ import { ExplainedResult } from "../core/explained_result";
 import { THEMES, applyGameTheme } from "../game/theme";
 import { T } from "../translations";
 import { LANGUAGES } from "../languages";
-import { enumBalancerVariants } from "../game/buildings/balancer";
 import { globalConfig } from "../core/config";
 
 const logger = createLogger("application_settings");

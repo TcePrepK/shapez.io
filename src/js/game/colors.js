@@ -1,4 +1,30 @@
 /** @enum {string} */
+export const enumColorToOctal = {
+    uncolored: "0",
+
+    red: "1",
+    green: "2",
+    blue: "3",
+    yellow: "4",
+    purple: "5",
+    cyan: "6",
+    white: "7",
+};
+
+/** @enum {string} */
+export const enumOctalToColor = {
+    0: "uncolored",
+
+    1: "red",
+    2: "green",
+    3: "blue",
+    4: "yellow",
+    5: "purple",
+    6: "cyan",
+    7: "white",
+};
+
+/** @enum {string} */
 export const enumColors = {
     red: "red",
     green: "green",

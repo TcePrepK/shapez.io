@@ -792,6 +792,57 @@ buildings:
             name: Item Producer
             description: Available in sandbox mode only, outputs the given signal from the wires layer on the regular layer.
 
+    toolbar_changer:
+        default:
+            name:
+            description:
+
+    basic_math_gates:
+        default:
+            name: &basic_math_gates Addition
+            description: Virtually cuts the shape into two halves.
+
+        multiplication:
+            name: Multiplication
+            description: Virtually cuts the shape into two halves.
+
+        subtraction:
+            name: Subtraction
+            description: Virtually rotates the shape clockwise.
+
+        division:
+            name: Division
+            description: Virtually extracts the topmost layer to the right output and the remaining ones to the left.
+
+        modulo:
+            name: Modulo
+            description: Virtually stacks the right shape onto the left.
+
+        powerof:
+            name: Powerof
+            description: Virtually paints the shape from the bottom input with the color on the right input.
+
+    complex_math_gates:
+        default:
+            name: &complex_math_gates Cos
+            description: Virtually cuts the shape into two halves.
+
+        subtraction:
+            name: Subtraction
+            description: Virtually rotates the shape clockwise.
+
+        division:
+            name: Division
+            description: Virtually extracts the topmost layer to the right output and the remaining ones to the left.
+
+        modulo:
+            name: Modulo
+            description: Virtually stacks the right shape onto the left.
+
+        powerof:
+            name: Powerof
+            description: Virtually paints the shape from the bottom input with the color on the right input.
+
 storyRewards:
     # Those are the rewards gained from completing the store
     reward_cutter_and_trash:

@@ -141,9 +141,7 @@ export class MetaBuilding {
                 ".png"
         );
         if (sprite.spriteName == "not-found") {
-            return Loader.getSprite(
-                "sprites/buildings/placeholder.png"
-            );
+            return Loader.getSprite("sprites/buildings/placeholder.png");
         }
         return Loader.getSprite(
             "sprites/buildings/" +
@@ -221,7 +219,16 @@ export class MetaBuilding {
      * @param {object=} param0.DisplayComp
      * @param {object=} param0.BalancerComp
      */
-    createEntity({ root, origin, rotation, originalRotation, rotationVariant, variant, DisplayComp, BalancerComp}) {
+    createEntity({
+        root,
+        origin,
+        rotation,
+        originalRotation,
+        rotationVariant,
+        variant,
+        DisplayComp,
+        BalancerComp,
+    }) {
         const entity = new Entity(root);
         entity.layer = this.getLayer();
         entity.addComponent(

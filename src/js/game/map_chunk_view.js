@@ -324,6 +324,11 @@ export class MapChunkView extends MapChunk {
             systems.wirelessDisplay.drawWiresChunk(parameters, this);
             systems.dynamicRemoteSignal.drawWiresChunk(parameters, this);
         }
+
+        // @ts-ignore
+        if (this.root.app.settings.getAllSettings().mathGatesMod) {
+            systems.logicGate.drawWiresChunk(parameters, this);
+        }
     }
 
     /**

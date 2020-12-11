@@ -1,6 +1,6 @@
 $buildings: belt, cutter, miner, mixer, painter, rotater, balancer, stacker, trash, underground_belt, wire,
     constant_signal, logic_gate, lever, filter, wire_tunnel, display, hub, wireless_buildings, signal_transport, virtual_processor, reader, storage,
-    transistor, analyzer, comparator, item_producer;
+    transistor, analyzer, comparator, item_producer, toolbar_changer, basic_math_gates, complex_math_gates;
 
 @each $building in $buildings {
     [data-icon="building_icons/#{$building}.png"] {
@@ -11,15 +11,21 @@ $buildings: belt, cutter, miner, mixer, painter, rotater, balancer, stacker, tra
 
 $buildingsAndVariants: belt, balancer, underground_belt, underground_belt-tier2, miner, miner-chainable,
     cutter, cutter-quad, rotater, rotater-ccw, stacker, mixer, painter-double, painter-quad, trash, storage,
-    reader, rotater-rotate180, display, hub, wireless_buildings, wireless_buildings-remote_control, wireless_buildings-quad_sender, signal_transport,
-    signal_transport-dynamic_remote_signal, signal_transport-dynamic_remote_signal_reversed, constant_signal, wire, wire_tunnel, logic_gate-or, logic_gate-not,
-    logic_gate-xor, analyzer, virtual_processor-rotater, virtual_processor-unstacker, item_producer,
-    virtual_processor-stacker, virtual_processor-painter, wire-second, wire-third, painter, painter-mirrored, comparator;
+    reader, rotater-rotate180, display, hub, wireless_buildings, wireless_buildings-remote_control, wireless_buildings-quad_sender, 
+    signal_transport, signal_transport-dynamic_remote_signal, signal_transport-dynamic_remote_signal_reversed, constant_signal, wire, 
+    wire_tunnel, logic_gate-or, logic_gate-not, logic_gate-xor, analyzer, virtual_processor-rotater, virtual_processor-unstacker, 
+    item_producer, virtual_processor-stacker, virtual_processor-painter, wire-second, wire-third, painter, painter-mirrored, comparator;
 @each $building in $buildingsAndVariants {
     [data-icon="building_tutorials/#{$building}.png"] {
         /* @load-async */
         background-image: uiResource("res/ui/building_tutorials/#{$building}.png") !important;
     }
+}
+
+[data-icon="building_tutorials/basic_math_gates.png"],
+[data-icon="building_tutorials/basic_math_gates-multiplication.png"] {
+    /* @load-async */
+    background-image: uiResource("res/ui/building_tutorials/math_gates.png") !important;
 }
 
 [data-icon="building_tutorials/balancer-merger.png"],

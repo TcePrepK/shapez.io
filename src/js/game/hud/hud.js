@@ -52,7 +52,7 @@ import { HUDTutorialVideoOffer } from "./parts/tutorial_video_offer";
 
 // ModZ
 import { HUDSignalOverlay } from "./parts/signal_overlay";
-import { HUDSignalToolbar } from "./parts/signal_toolbar";
+import { HUDMathToolbar } from "./parts/math_toolbar";
 
 export class GameHUD {
     /**
@@ -96,7 +96,7 @@ export class GameHUD {
             leverToggle: new HUDLeverToggle(this.root),
 
             // ModZ
-            signalToolbar: new HUDSignalToolbar(this.root),
+            mathToolbar: new HUDMathToolbar(this.root),
 
             // Must always exist
             pinnedShapes: new HUDPinnedShapes(this.root),

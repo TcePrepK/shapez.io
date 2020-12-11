@@ -4,6 +4,7 @@ import { drawRotatedSprite } from "../../core/draw_utils";
 import { Loader } from "../../core/loader";
 import { STOP_PROPAGATION } from "../../core/signal";
 import { enumDirectionToAngle, Vector } from "../../core/vector";
+import { enumLogicGateType } from "../components/logic_gate";
 import { enumPinSlotType, WiredPinsComponent } from "../components/wired_pins";
 import { Entity } from "../entity";
 import { GameSystemWithFilter } from "../game_system_with_filter";
@@ -165,9 +166,8 @@ export class WiredPinsSystem extends GameSystemWithFilter {
             }
 
             if (
-                entity.components.WirelessSignal ||
                 entity.components.QuadSender ||
-                entity.components.DynamicRemoteSignal
+                (entity.components.LogicGate && entity.components.LogicGate.type == enumLogicGateType.math)
             ) {
                 continue;
             }
@@ -198,6 +198,7 @@ export class WiredPinsSystem extends GameSystemWithFilter {
 
                 if (staticComp.getMetaBuilding().getRenderPins()) {
                     this.sprite = this.pinSprites[slot.type];
+                    // @ts-ignore
                     this.visibleDisplayMod = this.root.app.settings.getAllSettings().visibleDisplayMod;
                     if (staticComp.getMetaBuilding().id == "display" && this.visibleDisplayMod) {
                         this.sprite = Loader.getSprite("sprites/wires/display_logical_acceptor.png");
