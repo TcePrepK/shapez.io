@@ -19,9 +19,10 @@ import { MetaToolbarChangerBuilding } from "../../buildings/toolbar_changer";
 export class HUDWiresToolbar extends HUDBaseToolbar {
     constructor(root) {
         const wirelessBuildingsMod = root.app.settings.getAllSettings().wirelessBuildingsMod;
+        const mathGatesMod = root.app.settings.getAllSettings().mathGatesMod;
         super(root, {
             primaryBuildings: [
-                MetaToolbarChangerBuilding,
+                ...(mathGatesMod ? [MetaToolbarChangerBuilding] : []),
                 MetaWireBuilding,
                 MetaWireTunnelBuilding,
                 MetaConstantSignalBuilding,

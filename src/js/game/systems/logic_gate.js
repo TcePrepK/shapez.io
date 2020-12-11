@@ -19,6 +19,7 @@ import { ColorItem, COLOR_ITEM_SINGLETONS } from "../items/color_item";
 import { ShapeItem } from "../items/shape_item";
 import { MapChunkView } from "../map_chunk_view";
 import { ShapeDefinition } from "../shape_definition";
+import { createLogger } from "../../core/logging";
 
 /** @type {Object<ItemType, number>} */
 const enumTypeToSize = {
@@ -425,7 +426,7 @@ export class LogicGateSystem extends GameSystemWithFilter {
             if (parseInt(resNum) <= 7) {
                 return COLOR_ITEM_SINGLETONS[enumOctalToColor[resNum]];
             } else {
-                const shape = this.generateShapeWithNumber(resNum, false);
+                const shape = this.generateShapeWithNumber(resNum, false, numberA, numberB, operation);
 
                 if (!shape) {
                     return null;
@@ -444,55 +445,45 @@ export class LogicGateSystem extends GameSystemWithFilter {
 
             // Found numberA
             let numberA = "";
-            for (let i = 0; i < partsA.length; ++i) {
-                const layerA = partsA[i];
+            const layerA = partsA.join("");
+            for (let j = 0; j < layerA.length / 2; ++j) {
+                let colorA = layerA[2 * j + 1];
 
-                for (let j = 0; j < 4; ++j) {
-                    let colorA = layerA[2 * j + 1];
-                    let shapeA = layerA[2 * j];
+                if (colorA == "-") {
+                    colorA = "u";
+                }
 
-                    if (colorA == "-") {
-                        colorA = "u";
-                    }
+                const valueA = enumColorToOctal[enumShortcodeToColor[colorA]];
 
-                    if (
-                        j > 0 &&
-                        (shapeA == "S" || shapeA == "W") &&
-                        (layerA[2 * (j - 1)] == "C" || layerA[2 * (j - 1)] == "R")
-                    ) {
-                        numberA += ".";
-                    }
+                numberA += valueA;
 
-                    const valueA = enumColorToOctal[enumShortcodeToColor[colorA]];
-
-                    numberA += valueA;
+                if (
+                    (layerA[2 * j] == "C" || layerA[2 * j] == "R") &&
+                    (layerA[2 * j + 2] == "S" || layerA[2 * j + 2] == "W")
+                ) {
+                    numberA += ".";
                 }
             }
 
             // Found numberB
             let numberB = "";
-            for (let i = 0; i < partsB.length; ++i) {
-                const layerB = partsB[i];
+            const layerB = partsB.join("");
+            for (let j = 0; j < layerB.length / 2; ++j) {
+                let colorB = layerB[2 * j + 1];
 
-                for (let j = 0; j < 4; ++j) {
-                    let colorB = layerB[2 * j + 1];
-                    let shapeB = layerB[2 * j];
+                if (colorB == "-") {
+                    colorB = "u";
+                }
 
-                    if (colorB == "-") {
-                        colorB = "u";
-                    }
+                const valueB = enumColorToOctal[enumShortcodeToColor[colorB]];
 
-                    if (
-                        j > 0 &&
-                        (shapeB == "S" || shapeB == "W") &&
-                        (layerB[2 * (j - 1)] == "C" || layerB[2 * (j - 1)] == "R")
-                    ) {
-                        numberB += ".";
-                    }
+                numberB += valueB;
 
-                    const valueB = enumColorToOctal[enumShortcodeToColor[colorB]];
-
-                    numberB += valueB;
+                if (
+                    (layerB[2 * j] == "C" || layerB[2 * j] == "R") &&
+                    (layerB[2 * j + 2] == "S" || layerB[2 * j + 2] == "W")
+                ) {
+                    numberB += ".";
                 }
             }
 
@@ -528,7 +519,6 @@ export class LogicGateSystem extends GameSystemWithFilter {
             let resNum = this.compute_basic_MATH(numberA, numberB, operation);
 
             if (resNum === null) {
-                console.log("ASd");
                 return null;
             }
 
@@ -547,7 +537,7 @@ export class LogicGateSystem extends GameSystemWithFilter {
                 resNum = resNum.slice(1);
             }
 
-            const shape = this.generateShapeWithNumber(resNum, negative);
+            const shape = this.generateShapeWithNumber(resNum, negative, numberA, numberB, operation);
 
             if (!shape) {
                 return null;
@@ -569,19 +559,19 @@ export class LogicGateSystem extends GameSystemWithFilter {
         let b = parseFloat(numberB);
         switch (operation) {
             case "addition":
-                resNum = parseFloat((a + b).toFixed(4)).toString();
+                resNum = parseFloat((a + b).toFixed(4)).toString(8);
                 break;
             case "subtraction":
-                resNum = parseFloat((a - b).toFixed(4)).toString();
+                resNum = parseFloat((a - b).toFixed(4)).toString(8);
                 break;
             case "multiplication":
-                resNum = parseFloat((a * b).toFixed(4)).toString();
+                resNum = parseFloat((a * b).toFixed(4)).toString(8);
                 break;
             case "division":
-                resNum = parseFloat((a / b).toFixed(4)).toString();
+                resNum = parseFloat((a / b).toFixed(4)).toString(8);
                 break;
             case "modulo":
-                resNum = parseFloat((a % b).toFixed(4)).toString();
+                resNum = parseFloat((a % b).toFixed(4)).toString(8);
                 break;
             case "powerof":
                 resNum = Math.pow(a, b).toFixed(4).toString();
@@ -625,8 +615,9 @@ export class LogicGateSystem extends GameSystemWithFilter {
         }
 
         if (resNum.split(".")[1]) {
-            resNum = resNum.split(".")[0] + "." + resNum.split(".")[1].slice(1, 5);
+            resNum = resNum.split(".")[0] + "." + resNum.split(".")[1].slice(0, 5);
         }
+        console.log(resNum);
         return resNum;
     }
 
@@ -635,7 +626,7 @@ export class LogicGateSystem extends GameSystemWithFilter {
      * @param {string} resNum
      * @param {boolean} negative
      */
-    generateShapeWithNumber(resNum, negative) {
+    generateShapeWithNumber(resNum, negative, numberA, numberB, operation) {
         // Find floating num
         const parts = resNum.split(".");
         let floating = false;
@@ -677,6 +668,16 @@ export class LogicGateSystem extends GameSystemWithFilter {
         for (let j = 0; j < resNum.length; ++j) {
             const number = resNum[j];
             const color = enumColorToShortcode[enumOctalToColor[number]];
+
+            assert(
+                color,
+                "Illegal number! You have tried " +
+                    operation +
+                    " operation on these 2 numbers: " +
+                    numberA +
+                    " and " +
+                    numberB
+            );
 
             // Test is it floating or not
             if (floating && resNum.length - j <= floatingNum) {
