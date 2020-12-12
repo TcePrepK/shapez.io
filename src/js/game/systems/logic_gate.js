@@ -555,26 +555,74 @@ export class LogicGateSystem extends GameSystemWithFilter {
      */
     compute_basic_MATH(numberA, numberB, operation) {
         let resNum;
-        let a = parseFloat(numberA);
-        let b = parseFloat(numberB);
+
+        let a = parseFloat(numberA).toString();
+        let b = parseFloat(numberB).toString();
+
+        let lenghtA = a.split(".")[0].length;
+        let lenghtB = b.split(".")[0].length;
+
+        let pointlessA = parseFloat(numberA.split(".").join("")).toString();
+        let pointlessB = parseFloat(numberB.split(".").join("")).toString();
+
+        let fixedA = 0;
+        for (let i = 0; i < pointlessA.length; ++i) {
+            const digit = pointlessA[i];
+
+            fixedA += Number(digit) * Math.pow(8, lenghtA - 1 - i);
+        }
+
+        let fixedB = 0;
+        for (let i = 0; i < pointlessB.length; ++i) {
+            const digit = pointlessB[i];
+
+            fixedB += Number(digit) * Math.pow(8, lenghtB - 1 - i);
+        }
+
+        /* if (partsA[1] && !partsB[1]) {
+            partsB[1] = "";
+            while (partsB[1].length < partsA[1].length) {
+                partsB[1] += "0";
+            }
+            fixedA = partsA.join("");
+            fixedB = partsB.join("");
+        } else if (!partsA[1] && partsB[1]) {
+            partsA[1] = "";
+            while (partsA[1].length < partsB[1].length) {
+                partsA[1] += "0";
+            }
+            fixedA = partsA.join("");
+            fixedB = partsB.join("");
+        } else if (partsA[1] && partsB[1]) {
+            while (partsA[1].length < partsB[1].length) {
+                partsA[1] += "0";
+            }
+
+            while (partsB[1].length < partsA[1].length) {
+                partsB[1] += "0";
+            }
+            fixedA = partsA.join("");
+            fixedB = partsB.join("");
+        } */
+
         switch (operation) {
             case "addition":
-                resNum = parseFloat((a + b).toFixed(4)).toString(8);
+                resNum = parseFloat((fixedA + fixedB).toFixed(4)).toString(8);
                 break;
             case "subtraction":
-                resNum = parseFloat((a - b).toFixed(4)).toString(8);
+                resNum = parseFloat((fixedA - fixedB).toFixed(4)).toString(8);
                 break;
             case "multiplication":
-                resNum = parseFloat((a * b).toFixed(4)).toString(8);
+                resNum = parseFloat((fixedA * fixedB).toFixed(4)).toString(8);
                 break;
             case "division":
-                resNum = parseFloat((a / b).toFixed(4)).toString(8);
+                resNum = parseFloat((fixedA / fixedB).toFixed(4)).toString(8);
                 break;
             case "modulo":
-                resNum = parseFloat((a % b).toFixed(4)).toString(8);
+                resNum = parseFloat((fixedA % fixedB).toFixed(4)).toString(8);
                 break;
             case "powerof":
-                resNum = Math.pow(a, b).toFixed(4).toString();
+                resNum = parseFloat(Math.pow(fixedA, fixedB).toFixed(4)).toString(8);
                 break;
             case "cos":
                 resNum = parseFloat(Math.cos((parseInt(numberA, 8) * Math.PI) / 180).toFixed(4)).toString(8);
@@ -610,14 +658,22 @@ export class LogicGateSystem extends GameSystemWithFilter {
                 resNum = null;
                 break;
         }
-        if (resNum.split(".") && resNum.split(".")[1] == "0000") {
+
+        if (resNum.split(".") && Number(resNum.split(".")[1]) == 0) {
             resNum = resNum.split(".")[0];
         }
 
         if (resNum.split(".")[1]) {
             resNum = resNum.split(".")[0] + "." + resNum.split(".")[1].slice(0, 5);
         }
-        console.log(resNum);
+
+        if (resNum.split(".")[1]) {
+            while (resNum.split(".")[1].length < 4) {
+                resNum += "0";
+            }
+        }
+
+        //console.log(resNum);
         return resNum;
     }
 
