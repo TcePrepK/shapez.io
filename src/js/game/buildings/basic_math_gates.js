@@ -13,6 +13,8 @@ export const enumBasicMathGateVariants = {
     division: "division",
     modulo: "modulo",
     powerof: "powerof",
+    greater: "greater",
+    less: "less",
 };
 
 export class MetaBasicMathGatesBuilding extends MetaBuilding {
@@ -34,14 +36,11 @@ export class MetaBasicMathGatesBuilding extends MetaBuilding {
     getAvailableVariants(root) {
         // @ts-ignore
         if (root.app.settings.getAllSettings().mathGatesMod) {
-            return [
-                defaultBuildingVariant,
-                enumBasicMathGateVariants.multiplication,
-                enumBasicMathGateVariants.subtraction,
-                enumBasicMathGateVariants.division,
-                enumBasicMathGateVariants.modulo,
-                enumBasicMathGateVariants.powerof,
-            ];
+            let arr = [];
+            for (const variant in enumBasicMathGateVariants) {
+                arr.push(variant);
+            }
+            return arr;
         }
     }
 

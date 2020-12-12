@@ -422,6 +422,10 @@ export class LogicGateSystem extends GameSystemWithFilter {
 
             let resNum = this.compute_basic_MATH(numberA, numberB, operation);
 
+            if (typeof resNum != "string") {
+                return resNum;
+            }
+
             // If number is outputable via color, output via color otherwise use shapez
             if (parseInt(resNum) <= 7) {
                 return COLOR_ITEM_SINGLETONS[enumOctalToColor[resNum]];
@@ -518,7 +522,7 @@ export class LogicGateSystem extends GameSystemWithFilter {
             // Found real number just for sign
             let resNum = this.compute_basic_MATH(numberA, numberB, operation);
 
-            if (resNum === null) {
+            if (resNum === null || resNum == "NaN") {
                 return null;
             }
 
@@ -526,8 +530,8 @@ export class LogicGateSystem extends GameSystemWithFilter {
                 return BOOL_TRUE_SINGLETON;
             }
 
-            if (resNum == "NaN") {
-                return null;
+            if (typeof resNum != "string") {
+                return resNum;
             }
 
             // Test sign
@@ -651,6 +655,10 @@ export class LogicGateSystem extends GameSystemWithFilter {
             case "tan":
                 resNum = parseFloat(Math.tan((parseInt(numberA, 8) * Math.PI) / 180).toFixed(4)).toString(8);
                 break;
+            case "greater":
+                return fixedA > fixedB ? BOOL_TRUE_SINGLETON : BOOL_FALSE_SINGLETON;
+            case "less":
+                return fixedA < fixedB ? BOOL_TRUE_SINGLETON : BOOL_FALSE_SINGLETON;
             default:
                 resNum = null;
                 break;
