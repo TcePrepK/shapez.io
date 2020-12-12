@@ -562,48 +562,45 @@ export class LogicGateSystem extends GameSystemWithFilter {
         let lenghtA = a.split(".")[0].length;
         let lenghtB = b.split(".")[0].length;
 
-        let pointlessA = parseFloat(numberA.split(".").join("")).toString();
-        let pointlessB = parseFloat(numberB.split(".").join("")).toString();
+        let pureA = parseFloat(numberA.split(".").join("")).toString();
+        let pureB = parseFloat(numberB.split(".").join("")).toString();
+
+        let negativeA = false;
+        let negativeB = false;
+
+        if (pureA[0] == "-") {
+            negativeA = true;
+            pureA = pureA.slice(1);
+            lenghtA -= 1;
+        }
+
+        if (pureB[0] == "-") {
+            negativeB = true;
+            pureB = pureB.slice(1);
+            lenghtB -= 1;
+        }
 
         let fixedA = 0;
-        for (let i = 0; i < pointlessA.length; ++i) {
-            const digit = pointlessA[i];
+        for (let i = 0; i < pureA.length; ++i) {
+            const digit = pureA[i];
 
             fixedA += Number(digit) * Math.pow(8, lenghtA - 1 - i);
         }
 
         let fixedB = 0;
-        for (let i = 0; i < pointlessB.length; ++i) {
-            const digit = pointlessB[i];
+        for (let i = 0; i < pureB.length; ++i) {
+            const digit = pureB[i];
 
             fixedB += Number(digit) * Math.pow(8, lenghtB - 1 - i);
         }
 
-        /* if (partsA[1] && !partsB[1]) {
-            partsB[1] = "";
-            while (partsB[1].length < partsA[1].length) {
-                partsB[1] += "0";
-            }
-            fixedA = partsA.join("");
-            fixedB = partsB.join("");
-        } else if (!partsA[1] && partsB[1]) {
-            partsA[1] = "";
-            while (partsA[1].length < partsB[1].length) {
-                partsA[1] += "0";
-            }
-            fixedA = partsA.join("");
-            fixedB = partsB.join("");
-        } else if (partsA[1] && partsB[1]) {
-            while (partsA[1].length < partsB[1].length) {
-                partsA[1] += "0";
-            }
+        if (negativeA) {
+            fixedA *= -1;
+        }
 
-            while (partsB[1].length < partsA[1].length) {
-                partsB[1] += "0";
-            }
-            fixedA = partsA.join("");
-            fixedB = partsB.join("");
-        } */
+        if (negativeB) {
+            fixedB *= -1;
+        }
 
         switch (operation) {
             case "addition":
