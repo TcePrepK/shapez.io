@@ -233,6 +233,15 @@ export function initMetaBuildingRegistry() {
         registerBuildingVariant(-1, MetaComplexMathGatesBuilding, variant);
     }
 
+    // Better Virtual Processing
+    registerBuildingVariant(-1, MetaVirtualProcessorBuilding, enumVirtualProcessorVariants.stacker_inverse);
+    registerBuildingVariant(-1, MetaVirtualProcessorBuilding, enumVirtualProcessorVariants.smart_stacker);
+    registerBuildingVariant(
+        -1,
+        MetaVirtualProcessorBuilding,
+        enumVirtualProcessorVariants.smart_stacker_inverse
+    );
+
     // Propagate instances
     for (const key in gBuildingVariants) {
         gBuildingVariants[key].metaInstance = gMetaBuildingRegistry.findByClass(

@@ -107,6 +107,7 @@ export const globalConfig = {
         "moreBalancerMod",
         "moreFiltersMod",
         "mathGatesMod",
+        "betterVirtualProcessing",
     ],
 
     mathToolBar: false,

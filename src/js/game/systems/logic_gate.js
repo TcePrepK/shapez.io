@@ -48,6 +48,7 @@ export class LogicGateSystem extends GameSystemWithFilter {
             [enumLogicGateType.painter]: this.compute_PAINTER.bind(this),
 
             [enumLogicGateType.math]: this.compute_MATH.bind(this),
+            [enumLogicGateType.smart_stacker]: this.compute_smart_STACKER.bind(this),
         };
     }
 
@@ -297,6 +298,43 @@ export class LogicGateSystem extends GameSystemWithFilter {
 
         if (!lowerItem || !upperItem) {
             // Empty
+            return null;
+        }
+
+        if (lowerItem.getItemType() !== "shape" || upperItem.getItemType() !== "shape") {
+            // Bad type
+            return null;
+        }
+
+        const stackedShape = this.root.shapeDefinitionMgr.shapeActionStack(
+            /** @type {ShapeItem} */ (lowerItem).definition,
+            /** @type {ShapeItem} */ (upperItem).definition
+        );
+
+        return this.root.shapeDefinitionMgr.getShapeItemFromDefinition(stackedShape);
+    }
+
+    /**
+     * @param {Array<BaseItem|null>} parameters
+     * @returns {BaseItem}
+     */
+    compute_smart_STACKER(parameters) {
+        const lowerItem = parameters[0];
+        const upperItem = parameters[1];
+
+        if (lowerItem && !upperItem) {
+            if (lowerItem.getItemType() == "shape") {
+                return lowerItem;
+            } else {
+                return null;
+            }
+        } else if (!lowerItem && upperItem) {
+            if (upperItem.getItemType() == "shape") {
+                return upperItem;
+            } else {
+                return null;
+            }
+        } else if (!lowerItem && !upperItem) {
             return null;
         }
 

@@ -281,6 +281,7 @@ export class ShapeDefinition extends BasicSerializableObject {
     drawCentered(x, y, parameters, diameter = 20) {
         const dpi = smoothenDpi(globalConfig.shapesSharpness * parameters.zoomLevel);
 
+        // @ts-ignore
         const visibleDisplayMod = parameters.root.app.settings.getAllSettings().visibleDisplayMod;
 
         if (!this.bufferGenerator && !visibleDisplayMod) {
@@ -327,7 +328,7 @@ export class ShapeDefinition extends BasicSerializableObject {
         return canvas;
     }
 
-        /**
+    /**
      *
      * @param {HTMLCanvasElement} canvas
      * @param {CanvasRenderingContext2D} context

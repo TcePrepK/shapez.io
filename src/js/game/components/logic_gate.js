@@ -19,6 +19,7 @@ export const enumLogicGateType = {
     // ModZ
 
     math: "math",
+    smart_stacker: "smart_stacker",
 };
 
 export class LogicGateComponent extends Component {
@@ -30,8 +31,8 @@ export class LogicGateComponent extends Component {
      *
      * @param {object} param0
      * @param {enumLogicGateType=} param0.type
-     * @param {string} param0.operation
-     * @param {string} param0.difficulty
+     * @param {string=} param0.operation
+     * @param {string=} param0.difficulty
      */
     constructor({ type = enumLogicGateType.and, operation, difficulty }) {
         super();

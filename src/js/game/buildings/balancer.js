@@ -60,7 +60,7 @@ export class MetaBalancerBuilding extends MetaBuilding {
     getIsRotateable(variant) {
         if (variant == enumBalancerVariants.programmableBalancer) {
             return false;
-        } 
+        }
         return true;
     }
 
@@ -109,6 +109,7 @@ export class MetaBalancerBuilding extends MetaBuilding {
      * @param {GameRoot} root
      */
     getAvailableVariants(root) {
+        // @ts-ignore
         this.moreBalancerMod = root.app.settings.getAllSettings().moreBalancerMod;
 
         let available = [defaultBuildingVariant];
@@ -122,7 +123,11 @@ export class MetaBalancerBuilding extends MetaBuilding {
         }
 
         if (this.moreBalancerMod && root.hubGoals.isRewardUnlocked(enumHubGoalRewards.reward_merger)) {
-            available.push(enumBalancerVariants.programmableBalancer, enumBalancerVariants.autoBalancer, enumBalancerVariants.beltSwapper);
+            available.push(
+                enumBalancerVariants.programmableBalancer,
+                enumBalancerVariants.autoBalancer,
+                enumBalancerVariants.beltSwapper
+            );
         }
 
         return available;
@@ -192,7 +197,7 @@ export class MetaBalancerBuilding extends MetaBuilding {
                     { pos: new Vector(0, 0), direction: enumDirection.top },
                     { pos: new Vector(1, 0), direction: enumDirection.top },
                 ];
-                
+
                 break;
             }
             case enumBalancerVariants.merger:
@@ -254,21 +259,25 @@ export class MetaBalancerBuilding extends MetaBuilding {
             case enumBalancerVariants.programmableBalancer: {
                 entity.components.ItemEjector.setSlots([]);
 
-                if (!entity.components.ProgrammableBalancer && variant == enumBalancerVariants.programmableBalancer) {
+                if (
+                    !entity.components.ProgrammableBalancer &&
+                    variant == enumBalancerVariants.programmableBalancer
+                ) {
                     entity.addComponent(new ProgrammableBalancerComponent());
                 } else if (!entity.components.AutoBalancer && variant == enumBalancerVariants.autoBalancer) {
                     entity.addComponent(new AutoBalancerComponent());
                 }
 
-                entity.components.ItemAcceptor.setSlots([{ 
-                    pos: new Vector(0, 0), 
-                    directions: [
-                        enumDirection.top,
-                        enumDirection.right,
-                        enumDirection.bottom,
-                        enumDirection.left,
-                    ] 
-                },
+                entity.components.ItemAcceptor.setSlots([
+                    {
+                        pos: new Vector(0, 0),
+                        directions: [
+                            enumDirection.top,
+                            enumDirection.right,
+                            enumDirection.bottom,
+                            enumDirection.left,
+                        ],
+                    },
                 ]);
 
                 entity.components.BeltUnderlays.underlays = [
