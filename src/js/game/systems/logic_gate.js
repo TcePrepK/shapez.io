@@ -664,34 +664,28 @@ export class LogicGateSystem extends GameSystemWithFilter {
                 resNum = parseFloat(Math.pow(fixedA, fixedB).toFixed(4)).toString(8);
                 break;
             case "cos":
-                resNum = parseFloat(Math.cos((parseInt(numberA, 8) * Math.PI) / 180).toFixed(4)).toString(8);
+                resNum = parseFloat(Math.cos((fixedA * Math.PI) / 180).toFixed(4)).toString(8);
                 break;
             case "cot":
-                resNum = parseFloat(
-                    (1 / Math.tan((parseInt(numberA, 8) * Math.PI) / 180)).toFixed(4)
-                ).toString(8);
+                resNum = parseFloat((1 / Math.tan((fixedA * Math.PI) / 180)).toFixed(4)).toString(8);
                 break;
             case "csc":
-                resNum = parseFloat(
-                    (1 / Math.sin((parseInt(numberA, 8) * Math.PI) / 180)).toFixed(4)
-                ).toString(8);
+                resNum = parseFloat((1 / Math.sin((fixedA * Math.PI) / 180)).toFixed(4)).toString(8);
                 break;
             case "log":
-                resNum = parseFloat(Math.log((parseInt(numberA, 8) * Math.PI) / 180).toFixed(4)).toString(8);
+                resNum = parseFloat(Math.log((fixedA * Math.PI) / 180).toFixed(4)).toString(8);
                 break;
             case "sec":
-                resNum = parseFloat(
-                    (1 / Math.cos((parseInt(numberA, 8) * Math.PI) / 180)).toFixed(4)
-                ).toString(8);
+                resNum = parseFloat((1 / Math.cos((fixedA * Math.PI) / 180)).toFixed(4)).toString(8);
                 break;
             case "sin":
-                resNum = parseFloat(Math.sin((parseInt(numberA, 8) * Math.PI) / 180).toFixed(4)).toString(8);
+                resNum = parseFloat(Math.sin((fixedA * Math.PI) / 180).toFixed(4)).toString(8);
                 break;
             case "sqrt":
-                resNum = parseFloat(Math.sqrt(parseInt(numberA, 8)).toFixed(4)).toString(8);
+                resNum = parseFloat(Math.sqrt(fixedA).toFixed(4)).toString(8);
                 break;
             case "tan":
-                resNum = parseFloat(Math.tan((parseInt(numberA, 8) * Math.PI) / 180).toFixed(4)).toString(8);
+                resNum = parseFloat(Math.tan((fixedA * Math.PI) / 180).toFixed(4)).toString(8);
                 break;
             case "greater":
                 return fixedA > fixedB ? BOOL_TRUE_SINGLETON : BOOL_FALSE_SINGLETON;
