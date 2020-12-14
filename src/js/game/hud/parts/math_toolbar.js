@@ -5,6 +5,7 @@ import { MetaWireBuilding } from "../../buildings/wire";
 import { MetaWireTunnelBuilding } from "../../buildings/wire_tunnel";
 import { MetaConstantSignalBuilding } from "../../buildings/constant_signal";
 import { MetaComplexMathGatesBuilding } from "../../buildings/complex_math_gates";
+import { MetaBetterVirtualProcessorBuilding } from "../../buildings/better_virtual_processing";
 
 export class HUDMathToolbar extends HUDBaseToolbar {
     constructor(root) {
@@ -16,6 +17,7 @@ export class HUDMathToolbar extends HUDBaseToolbar {
                 MetaConstantSignalBuilding,
                 MetaBasicMathGatesBuilding,
                 MetaComplexMathGatesBuilding,
+                MetaBetterVirtualProcessorBuilding,
             ],
             secondaryBuildings: [],
             visibilityCondition: () =>

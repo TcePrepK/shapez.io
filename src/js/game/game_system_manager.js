@@ -32,6 +32,7 @@ import { ProgrammableBalancerSystem } from "./systems/programmable_balancer";
 import { AutoBalancerSystem } from "./systems/auto_balancer";
 import { WirelessSignalSystem } from "./systems/wireless_signal";
 import { DynamicRemoteSignalSystem } from "./systems/dynamic_remote_signal";
+import { RamSystem } from "./systems/ram";
 
 const logger = createLogger("game_system_manager");
 
@@ -203,15 +204,22 @@ export class GameSystemManager {
             this.systemUpdateOrder.push(id);
         };
 
+        // @ts-ignore
         if (this.root.app.settings.getAllSettings().wirelessBuildingsMod) {
             add("wirelessDisplay", WirelessDisplaySystem);
             add("wirelessSignal", WirelessSignalSystem);
             add("dynamicRemoteSignal", DynamicRemoteSignalSystem);
         }
 
+        // @ts-ignore
         if (this.root.app.settings.getAllSettings().moreBalancerMod) {
             add("programmableBalancer", ProgrammableBalancerSystem);
             add("autoBalancer", AutoBalancerSystem);
+        }
+
+        // @ts-ignore
+        if (this.root.app.settings.getAllSettings().betterVirtualProcessing) {
+            add("ram", RamSystem);
         }
     }
 

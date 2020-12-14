@@ -38,6 +38,10 @@ import { enumSignalTransportVariants, MetaSignalTransportBuilding } from "./buil
 import { MetaToolbarChangerBuilding } from "./buildings/toolbar_changer";
 import { enumBasicMathGateVariants, MetaBasicMathGatesBuilding } from "./buildings/basic_math_gates";
 import { enumComplexMathGateVariants, MetaComplexMathGatesBuilding } from "./buildings/complex_math_gates";
+import {
+    enumBetterVirtualProcessorVariants,
+    MetaBetterVirtualProcessorBuilding,
+} from "./buildings/better_virtual_processing";
 
 const logger = createLogger("building_registry");
 
@@ -75,6 +79,7 @@ export function initMetaBuildingRegistry() {
     gMetaBuildingRegistry.register(MetaToolbarChangerBuilding);
     gMetaBuildingRegistry.register(MetaBasicMathGatesBuilding);
     gMetaBuildingRegistry.register(MetaComplexMathGatesBuilding);
+    gMetaBuildingRegistry.register(MetaBetterVirtualProcessorBuilding);
 
     // Belt
     registerBuildingVariant(1, MetaBeltBuilding, defaultBuildingVariant, 0);
@@ -235,12 +240,17 @@ export function initMetaBuildingRegistry() {
 
     // Better Virtual Processing
     registerBuildingVariant(-1, MetaVirtualProcessorBuilding, enumVirtualProcessorVariants.stacker_inverse);
-    registerBuildingVariant(-1, MetaVirtualProcessorBuilding, enumVirtualProcessorVariants.smart_stacker);
     registerBuildingVariant(
         -1,
-        MetaVirtualProcessorBuilding,
-        enumVirtualProcessorVariants.smart_stacker_inverse
+        MetaBetterVirtualProcessorBuilding,
+        enumBetterVirtualProcessorVariants.smart_stacker
     );
+    registerBuildingVariant(
+        -1,
+        MetaBetterVirtualProcessorBuilding,
+        enumBetterVirtualProcessorVariants.smart_stacker_inverse
+    );
+    registerBuildingVariant(-1, MetaBetterVirtualProcessorBuilding);
 
     // Propagate instances
     for (const key in gBuildingVariants) {
@@ -280,7 +290,7 @@ export function initMetaBuildingRegistry() {
                     console.error("Translation for building " + id + " missing!");
                     T.buildings[id] = {
                         default: {
-                            name: "Nothing defined",
+                            name: id,
                             description: "Nothing defined.",
                         },
                     };

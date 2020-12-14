@@ -167,7 +167,9 @@ export class WiredPinsSystem extends GameSystemWithFilter {
 
             if (
                 entity.components.QuadSender ||
-                (entity.components.LogicGate && entity.components.LogicGate.type == enumLogicGateType.math)
+                (entity.components.LogicGate && entity.components.LogicGate.type == enumLogicGateType.math) ||
+                entity.components.DynamicRemoteSignal ||
+                entity.components.WirelessSignal
             ) {
                 continue;
             }

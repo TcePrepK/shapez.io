@@ -20,6 +20,7 @@ export const enumLogicGateType = {
 
     math: "math",
     smart_stacker: "smart_stacker",
+    ram: "ram",
 };
 
 export class LogicGateComponent extends Component {

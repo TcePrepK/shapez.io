@@ -336,19 +336,19 @@ export class LogicGateSystem extends GameSystemWithFilter {
             }
         } else if (!lowerItem && !upperItem) {
             return null;
+        } else {
+            if (lowerItem.getItemType() !== "shape" || upperItem.getItemType() !== "shape") {
+                // Bad type
+                return null;
+            }
+
+            const stackedShape = this.root.shapeDefinitionMgr.shapeActionStack(
+                /** @type {ShapeItem} */ (lowerItem).definition,
+                /** @type {ShapeItem} */ (upperItem).definition
+            );
+
+            return this.root.shapeDefinitionMgr.getShapeItemFromDefinition(stackedShape);
         }
-
-        if (lowerItem.getItemType() !== "shape" || upperItem.getItemType() !== "shape") {
-            // Bad type
-            return null;
-        }
-
-        const stackedShape = this.root.shapeDefinitionMgr.shapeActionStack(
-            /** @type {ShapeItem} */ (lowerItem).definition,
-            /** @type {ShapeItem} */ (upperItem).definition
-        );
-
-        return this.root.shapeDefinitionMgr.getShapeItemFromDefinition(stackedShape);
     }
 
     /**
@@ -707,7 +707,7 @@ export class LogicGateSystem extends GameSystemWithFilter {
         }
 
         if (resNum.split(".")[1]) {
-            resNum = resNum.split(".")[0] + "." + resNum.split(".")[1].slice(0, 5);
+            resNum = resNum.split(".")[0] + "." + resNum.split(".")[1].slice(0, 4);
         }
 
         if (resNum.split(".")[1]) {
@@ -716,7 +716,6 @@ export class LogicGateSystem extends GameSystemWithFilter {
             }
         }
 
-        //console.log(resNum);
         return resNum;
     }
 

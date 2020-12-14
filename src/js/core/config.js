@@ -110,8 +110,6 @@ export const globalConfig = {
         "betterVirtualProcessing",
     ],
 
-    mathToolBar: false,
-
     // Secret vars
     info: {
         // Binary file salt

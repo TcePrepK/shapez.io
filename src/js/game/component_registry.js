@@ -31,6 +31,7 @@ import { AutoBalancerComponent } from "./components/auto_balancer";
 import { InverseFilterComponent } from "./components/inverse_filter";
 import { BeltSwapperComponent } from "./components/belt_swapper";
 import { DynamicRemoteSignalComponent } from "./components/dynamic_remote_signal";
+import { RamComponent } from "./components/ram";
 
 export function initComponentRegistry() {
     gComponentRegistry.register(StaticMapEntityComponent);
@@ -55,7 +56,7 @@ export function initComponentRegistry() {
     gComponentRegistry.register(ItemProducerComponent);
 
     // ModZ
-    
+
     gComponentRegistry.register(WirelessCodeComponent);
     gComponentRegistry.register(WirelessDisplayComponent);
     gComponentRegistry.register(QuadSenderComponent);
@@ -65,6 +66,7 @@ export function initComponentRegistry() {
     gComponentRegistry.register(InverseFilterComponent);
     gComponentRegistry.register(BeltSwapperComponent);
     gComponentRegistry.register(DynamicRemoteSignalComponent);
+    gComponentRegistry.register(RamComponent);
 
     // IMPORTANT ^^^^^ UPDATE ENTITY COMPONENT STORAGE AFTERWARDS
 

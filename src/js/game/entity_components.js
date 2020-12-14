@@ -31,6 +31,7 @@ import { BeltSwapperComponent } from "./components/belt_swapper";
 import { QuadSenderComponent } from "./components/quad_sender";
 import { WirelessSignalComponent } from "./components/wireless_signal";
 import { DynamicRemoteSignalComponent } from "./components/dynamic_remote_signal";
+import { RamComponent } from "./components/ram";
 
 /* typehints:end */
 
@@ -130,6 +131,9 @@ export class EntityComponentStorage {
 
         /** @type {DynamicRemoteSignalComponent} */
         this.DynamicRemoteSignal;
+
+        /** @type {RamComponent} */
+        this.Ram;
 
         /* typehints:end */
     }

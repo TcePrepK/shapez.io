@@ -17,8 +17,6 @@ export const enumVirtualProcessorVariants = {
     stacker: "stacker",
     painter: "painter",
     stacker_inverse: "stacker_inverse",
-    smart_stacker: "smart_stacker",
-    smart_stacker_inverse: "smart_stacker_inverse",
 };
 
 /** @enum {string} */
@@ -29,8 +27,6 @@ export const enumVariantToGate = {
     [enumVirtualProcessorVariants.stacker]: enumLogicGateType.stacker,
     [enumVirtualProcessorVariants.painter]: enumLogicGateType.painter,
     [enumVirtualProcessorVariants.stacker_inverse]: enumLogicGateType.stacker,
-    [enumVirtualProcessorVariants.smart_stacker]: enumLogicGateType.smart_stacker,
-    [enumVirtualProcessorVariants.smart_stacker_inverse]: enumLogicGateType.smart_stacker,
 };
 
 const colors = {
@@ -40,8 +36,6 @@ const colors = {
     [enumVirtualProcessorVariants.stacker]: new MetaStackerBuilding().getSilhouetteColor(),
     [enumVirtualProcessorVariants.painter]: new MetaPainterBuilding().getSilhouetteColor(),
     [enumVirtualProcessorVariants.stacker_inverse]: new MetaStackerBuilding().getSilhouetteColor(),
-    [enumVirtualProcessorVariants.smart_stacker]: new MetaStackerBuilding().getSilhouetteColor(),
-    [enumVirtualProcessorVariants.smart_stacker_inverse]: new MetaStackerBuilding().getSilhouetteColor(),
 };
 
 export class MetaVirtualProcessorBuilding extends MetaBuilding {
@@ -78,8 +72,6 @@ export class MetaVirtualProcessorBuilding extends MetaBuilding {
             ...(betterVirtualProcessing ? [enumVirtualProcessorVariants.stacker_inverse] : []),
             enumVirtualProcessorVariants.painter,
             enumVirtualProcessorVariants.unstacker,
-            ...(betterVirtualProcessing ? [enumVirtualProcessorVariants.smart_stacker] : []),
-            ...(betterVirtualProcessing ? [enumVirtualProcessorVariants.smart_stacker_inverse] : []),
         ];
     }
 
@@ -151,29 +143,6 @@ export class MetaVirtualProcessorBuilding extends MetaBuilding {
                         pos: new Vector(0, 0),
                         direction:
                             variant === enumVirtualProcessorVariants.stacker_inverse
-                                ? enumDirection.left
-                                : enumDirection.right,
-                        type: enumPinSlotType.logicalAcceptor,
-                    },
-                ]);
-                break;
-            }
-            case enumLogicGateType.smart_stacker: {
-                pinComp.setSlots([
-                    {
-                        pos: new Vector(0, 0),
-                        direction: enumDirection.top,
-                        type: enumPinSlotType.logicalEjector,
-                    },
-                    {
-                        pos: new Vector(0, 0),
-                        direction: enumDirection.bottom,
-                        type: enumPinSlotType.logicalAcceptor,
-                    },
-                    {
-                        pos: new Vector(0, 0),
-                        direction:
-                            variant === enumVirtualProcessorVariants.smart_stacker_inverse
                                 ? enumDirection.left
                                 : enumDirection.right,
                         type: enumPinSlotType.logicalAcceptor,
