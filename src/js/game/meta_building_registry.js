@@ -37,11 +37,15 @@ import { enumWirelessBuildingsVariants, MetaWirelessBuildingsBuilding } from "./
 import { enumSignalTransportVariants, MetaSignalTransportBuilding } from "./buildings/signal_transport";
 import { MetaToolbarChangerBuilding } from "./buildings/toolbar_changer";
 import { enumBasicMathGateVariants, MetaBasicMathGatesBuilding } from "./buildings/basic_math_gates";
-import { enumComplexMathGateVariants, MetaComplexMathGatesBuilding } from "./buildings/complex_math_gates";
+import {
+    enumComplexMathGateVariants,
+    enumGateToLogic,
+    MetaComplexMathGatesBuilding,
+} from "./buildings/complex_math_gates";
 import {
     enumBetterVirtualProcessorVariants,
     MetaBetterVirtualProcessorBuilding,
-} from "./buildings/better_virtual_processing";
+} from "./buildings/better_virtual_processor";
 
 const logger = createLogger("building_registry");
 
@@ -238,7 +242,7 @@ export function initMetaBuildingRegistry() {
         registerBuildingVariant(-1, MetaComplexMathGatesBuilding, variant);
     }
 
-    // Better Virtual Processing
+    // Better Virtual Processor
     registerBuildingVariant(-1, MetaVirtualProcessorBuilding, enumVirtualProcessorVariants.stacker_inverse);
     registerBuildingVariant(
         -1,
@@ -251,6 +255,9 @@ export function initMetaBuildingRegistry() {
         enumBetterVirtualProcessorVariants.smart_stacker_inverse
     );
     registerBuildingVariant(-1, MetaBetterVirtualProcessorBuilding);
+
+    // Round
+    registerBuildingVariant(-1, MetaComplexMathGatesBuilding, enumGateToLogic.round);
 
     // Propagate instances
     for (const key in gBuildingVariants) {

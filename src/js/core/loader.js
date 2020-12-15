@@ -39,15 +39,18 @@ class LoaderImpl {
         let sprite = this.sprites.get(key);
         if (!sprite) {
             const parts = key.split("/");
-            sprite = this.sprites.get("sprites/buildings/placeholder.png");
             if (parts[2] && parts[2].split("_")[1] == "math") {
                 sprite = this.sprites.get("sprites/math/" + parts[2]);
+                if (!sprite) {
+                    console.log(key);
+                    sprite = this.sprites.get("sprites/buildings/placeholder.png");
+                }
             } else {
                 if (!missingSpriteIds[key]) {
                     // Only show error once
                     missingSpriteIds[key] = true;
-                    logger.error("Sprite '" + key + "' not found!");
                 }
+                sprite = this.sprites.get("sprites/buildings/placeholder.png");
             }
         }
         return sprite;

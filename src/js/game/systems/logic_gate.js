@@ -604,8 +604,8 @@ export class LogicGateSystem extends GameSystemWithFilter {
         let lenghtA = a.split(".")[0].length;
         let lenghtB = b.split(".")[0].length;
 
-        let pureA = parseFloat(numberA.split(".").join("")).toString();
-        let pureB = parseFloat(numberB.split(".").join("")).toString();
+        let pureA = parseFloat(numberA).toString();
+        let pureB = parseFloat(numberB).toString();
 
         let negativeA = false;
         let negativeB = false;
@@ -626,12 +626,22 @@ export class LogicGateSystem extends GameSystemWithFilter {
         for (let i = 0; i < pureA.length; ++i) {
             const digit = pureA[i];
 
+            if (digit == ".") {
+                lenghtA++;
+                continue;
+            }
+
             fixedA += Number(digit) * Math.pow(8, lenghtA - 1 - i);
         }
 
         let fixedB = 0;
         for (let i = 0; i < pureB.length; ++i) {
             const digit = pureB[i];
+
+            if (digit == ".") {
+                lenghtB++;
+                continue;
+            }
 
             fixedB += Number(digit) * Math.pow(8, lenghtB - 1 - i);
         }
@@ -646,47 +656,49 @@ export class LogicGateSystem extends GameSystemWithFilter {
 
         switch (operation) {
             case "addition":
-                resNum = parseFloat((fixedA + fixedB).toFixed(4)).toString(8);
+                resNum = (fixedA + fixedB).toString(8);
                 break;
             case "subtraction":
-                resNum = parseFloat((fixedA - fixedB).toFixed(4)).toString(8);
+                resNum = (fixedA - fixedB).toString(8);
                 break;
             case "multiplication":
-                resNum = parseFloat((fixedA * fixedB).toFixed(4)).toString(8);
+                resNum = (fixedA * fixedB).toString(8);
                 break;
             case "division":
-                resNum = parseFloat((fixedA / fixedB).toFixed(4)).toString(8);
+                resNum = (fixedA / fixedB).toString(8);
                 break;
             case "modulo":
-                resNum = parseFloat((fixedA % fixedB).toFixed(4)).toString(8);
+                resNum = (fixedA % fixedB).toString(8);
                 break;
             case "powerof":
-                resNum = parseFloat(Math.pow(fixedA, fixedB).toFixed(4)).toString(8);
+                resNum = Math.pow(fixedA, fixedB).toString(8);
                 break;
             case "cos":
-                resNum = parseFloat(Math.cos((fixedA * Math.PI) / 180).toFixed(4)).toString(8);
+                resNum = Math.cos((fixedA * Math.PI) / 180).toString(8);
                 break;
             case "cot":
-                resNum = parseFloat((1 / Math.tan((fixedA * Math.PI) / 180)).toFixed(4)).toString(8);
+                resNum = (1 / Math.tan((fixedA * Math.PI) / 180)).toString(8);
                 break;
             case "csc":
-                resNum = parseFloat((1 / Math.sin((fixedA * Math.PI) / 180)).toFixed(4)).toString(8);
+                resNum = (1 / Math.sin((fixedA * Math.PI) / 180)).toString(8);
                 break;
             case "log":
-                resNum = parseFloat(Math.log((fixedA * Math.PI) / 180).toFixed(4)).toString(8);
+                resNum = Math.log((fixedA * Math.PI) / 180).toString(8);
                 break;
             case "sec":
-                resNum = parseFloat((1 / Math.cos((fixedA * Math.PI) / 180)).toFixed(4)).toString(8);
+                resNum = (1 / Math.cos((fixedA * Math.PI) / 180)).toString(8);
                 break;
             case "sin":
-                resNum = parseFloat(Math.sin((fixedA * Math.PI) / 180).toFixed(4)).toString(8);
+                resNum = Math.sin((fixedA * Math.PI) / 180).toString(8);
                 break;
             case "sqrt":
-                resNum = parseFloat(Math.sqrt(fixedA).toFixed(4)).toString(8);
+                resNum = Math.sqrt(fixedA).toString(8);
                 break;
             case "tan":
-                resNum = parseFloat(Math.tan((fixedA * Math.PI) / 180).toFixed(4)).toString(8);
+                resNum = Math.tan((fixedA * Math.PI) / 180).toString(8);
                 break;
+            case "round":
+                return Math.round(fixedA).toString(8);
             case "greater":
                 return fixedA > fixedB ? BOOL_TRUE_SINGLETON : BOOL_FALSE_SINGLETON;
             case "less":

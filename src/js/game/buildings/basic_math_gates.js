@@ -17,6 +17,17 @@ export const enumBasicMathGateVariants = {
     less: "less",
 };
 
+const variantList = {
+    default: "addition",
+    subtraction: "subtraction",
+    multiplication: "multiplication",
+    division: "division",
+    modulo: "modulo",
+    powerof: "powerof",
+    greater: "greater",
+    less: "less",
+};
+
 export class MetaBasicMathGatesBuilding extends MetaBuilding {
     constructor() {
         super("basic_math_gates");
@@ -37,7 +48,7 @@ export class MetaBasicMathGatesBuilding extends MetaBuilding {
         // @ts-ignore
         if (root.app.settings.getAllSettings().mathGatesMod) {
             let arr = [];
-            for (const variant in enumBasicMathGateVariants) {
+            for (const variant in variantList) {
                 arr.push(variant);
             }
             return arr;

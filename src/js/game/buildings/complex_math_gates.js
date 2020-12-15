@@ -17,6 +17,31 @@ export const enumComplexMathGateVariants = {
     tan: "tan",
 };
 
+/** @enum {string} */
+export const enumGateToLogic = {
+    default: "cos",
+    cot: "cot",
+    csc: "csc",
+    log: "log",
+    sec: "sec",
+    sin: "sin",
+    sqrt: "sqrt",
+    tan: "tan",
+    round: "round",
+};
+
+const variantList = {
+    sin: "sin",
+    default: "cos",
+    tan: "tan",
+    cot: "cot",
+    sec: "sec",
+    csc: "csc",
+    log: "log",
+    sqrt: "sqrt",
+    round: "round",
+};
+
 export class MetaComplexMathGatesBuilding extends MetaBuilding {
     constructor() {
         super("complex_math_gates");
@@ -37,7 +62,7 @@ export class MetaComplexMathGatesBuilding extends MetaBuilding {
         // @ts-ignore
         if (root.app.settings.getAllSettings().mathGatesMod) {
             let arr = [];
-            for (const variant in enumComplexMathGateVariants) {
+            for (const variant in variantList) {
                 arr.push(variant);
             }
             return arr;
@@ -98,7 +123,7 @@ export class MetaComplexMathGatesBuilding extends MetaBuilding {
         entity.addComponent(
             new LogicGateComponent({
                 type: enumLogicGateType.math,
-                operation: enumComplexMathGateVariants[variant],
+                operation: enumGateToLogic[variant],
                 difficulty: "hard",
             })
         );

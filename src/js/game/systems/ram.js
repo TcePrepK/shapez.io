@@ -17,7 +17,7 @@ export class RamSystem extends GameSystemWithFilter {
             }
 
             const value = network.currentValue;
-            if (value && value != BOOL_FALSE_SINGLETON) {
+            if (value) {
                 pinsComp.slots[0].value = value;
             }
         }

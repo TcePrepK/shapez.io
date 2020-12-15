@@ -88,3 +88,7 @@ for buildingId in buildings:
     if "wire-" in buildingId:
         continue
     generate_blueprint_sprite("buildings/" + buildingId + "", "blueprints/" + buildingId + "")
+
+math_gates = listdir("math")
+for buildingId in math_gates:
+    generate_blueprint_sprite("math/" + buildingId + "", "math_blueprints/" + buildingId + "")

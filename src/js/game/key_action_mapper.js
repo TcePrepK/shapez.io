@@ -84,6 +84,7 @@ export const KEYMAPPINGS = {
         toolbar_changer: { keyCode: key("1") },
         basic_math_gates: { keyCode: key("4") },
         complex_math_gates: { keyCode: key("5") },
+        better_virtual_processor: { keyCode: key("6") },
     },
 
     placement: {

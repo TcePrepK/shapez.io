@@ -802,13 +802,13 @@ buildings:
             name: &basic_math_gates Addition
             description: Virtually cuts the shape into two halves.
 
-        multiplication:
-            name: Multiplication
-            description: Virtually cuts the shape into two halves.
-
         subtraction:
             name: Subtraction
             description: Virtually rotates the shape clockwise.
+
+        multiplication:
+            name: Multiplication
+            description: Virtually cuts the shape into two halves.
 
         division:
             name: Division
@@ -823,25 +823,54 @@ buildings:
             description: Virtually paints the shape from the bottom input with the color on the right input.
 
     complex_math_gates:
+        sin:
+            name: Sin
+            description: Virtually rotates the shape clockwise.
+
         default:
             name: &complex_math_gates Cos
             description: Virtually cuts the shape into two halves.
 
-        subtraction:
-            name: Subtraction
-            description: Virtually rotates the shape clockwise.
-
-        division:
-            name: Division
+        tan:
+            name: Tan
             description: Virtually extracts the topmost layer to the right output and the remaining ones to the left.
 
-        modulo:
-            name: Modulo
+        cot:
+            name: Cot
             description: Virtually stacks the right shape onto the left.
 
-        powerof:
-            name: Powerof
+        sec:
+            name: Sec
             description: Virtually paints the shape from the bottom input with the color on the right input.
+
+        csc:
+            name: CsC
+            description: Virtually paints the shape from the bottom input with the color on the right input.
+
+        log:
+            name: Log
+            description: Virtually paints the shape from the bottom input with the color on the right input.
+
+        sqrt:
+            name: Sqrt
+            description: Virtually paints the shape from the bottom input with the color on the right input.
+        
+        round:
+            name: Round
+            description: Virtually paints the shape from the bottom input with the color on the right input.
+
+    better_virtual_processor:
+        default:
+            name: &better_virtual_processor Ram
+            description: Virtually cuts the shape into two halves.
+
+        smart_stacker:
+            name: Smart Stacker
+            description: Virtually extracts the topmost layer to the right output and the remaining ones to the left.
+
+        smart_stacker_inverse:
+            name: Smart Stacker
+            description: Virtually stacks the right shape onto the left.
 
 storyRewards:
     # Those are the rewards gained from completing the store
@@ -1298,6 +1327,7 @@ keybindings:
 
         wireless_buildings: *wireless_buildings
         signal_transport: *signal_transport
+        better_virtual_processor: *better_virtual_processor
         # ---
 
         pipette: Pipette
