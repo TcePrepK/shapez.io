@@ -4,7 +4,7 @@ import { BaseItem } from "../base_item";
 import { enumColors } from "../colors";
 import { WirelessDisplayComponent } from "../components/wireless_display";
 import { GameSystemWithFilter } from "../game_system_with_filter";
-import { isTrueItem } from "../items/boolean_item";
+import { BOOL_FALSE_SINGLETON, isTrueItem } from "../items/boolean_item";
 import { ColorItem, COLOR_ITEM_SINGLETONS } from "../items/color_item";
 import { MapChunkView } from "../map_chunk_view";
 import { THIRDPARTY_URLS } from "../../core/config";
@@ -271,6 +271,11 @@ export class WirelessDisplaySystem extends GameSystemWithFilter {
                     }
 
                     if (network.currentValue == null) {
+                        possibleItems.push("dead");
+                        continue;
+                    }
+
+                    if (network.currentValue == BOOL_FALSE_SINGLETON) {
                         possibleItems.push("dead");
                         continue;
                     }
