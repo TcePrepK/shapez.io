@@ -6,8 +6,6 @@ import { BasicSerializableObject, types } from "../savegame/serialization";
 import { createLogger } from "../core/logging";
 import { globalConfig } from "../core/config";
 import { enumBuildingToShapeKey, enumBuildingToCost } from "./hud/parts/building_placer";
-import { getBuildingDataFromCode, getCodeFromBuildingData } from "./building_codes";
-import { isEntityName } from "typescript";
 
 const logger = createLogger("entity_manager");
 

@@ -5,7 +5,6 @@ import { BasicSerializableObject, types } from "./serialization";
 
 import { Vector } from "../core/vector";
 import { round4Digits } from "../core/utils";
-import { convertCompilerOptionsFromJson } from "typescript";
 export const globalJsonSchemaDefs = {};
 
 /**

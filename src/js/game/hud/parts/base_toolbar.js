@@ -96,7 +96,6 @@ export class HUDBaseToolbar extends BaseHUDPart {
                 null,
                 ["building"]
             );
-            console.log(metaBuilding.getId());
             itemContainer.setAttribute("data-icon", "building_icons/" + metaBuilding.getId() + ".png");
             itemContainer.setAttribute("data-id", metaBuilding.getId());
 

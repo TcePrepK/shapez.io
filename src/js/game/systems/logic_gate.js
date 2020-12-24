@@ -1,7 +1,3 @@
-import { parseJsonText } from "typescript";
-import { parse } from "yaml";
-import { boolOptions } from "yaml/types";
-import { RandomNumberGenerator } from "../../core/rng";
 import { enumDirectionToAngle, Vector } from "../../core/vector";
 import { BaseItem } from "../base_item";
 import {
@@ -19,7 +15,6 @@ import { ColorItem, COLOR_ITEM_SINGLETONS } from "../items/color_item";
 import { ShapeItem } from "../items/shape_item";
 import { MapChunkView } from "../map_chunk_view";
 import { ShapeDefinition } from "../shape_definition";
-import { createLogger } from "../../core/logging";
 
 /** @type {Object<ItemType, number>} */
 const enumTypeToSize = {
