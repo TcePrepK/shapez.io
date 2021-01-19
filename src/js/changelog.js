@@ -1,6 +1,16 @@
 export const CHANGELOG = [
     {
-        version: "Mod Browser 0.2",
+        version: "Mod Browser v1.0 !",
+        date: "19.01.2021",
+        entries: [
+            "Math Mod is here ! With multiple new mods",
+            "Updated Base Code so fixed lots of bug !",
+            "Now you can import all save files",
+            "Fixed some important bugs about other mods",
+        ],
+    },
+    {
+        version: "Mod Browser v0.2",
         date: "27.11.2020",
         entries: [
             "Added signal transport buildings!",
@@ -11,7 +21,7 @@ export const CHANGELOG = [
         ],
     },
     {
-        version: "Mod Browser 0.11",
+        version: "Mod Browser v0.11",
         date: "27.11.2020",
         entries: [
             "Added wireless buildings",
@@ -22,7 +32,7 @@ export const CHANGELOG = [
         ],
     },
     {
-        version: "Mod Browser 0.1",
+        version: "Mod Browser v0.1",
         date: "04.11.2020",
         entries: [
             "All my mods merged with just 1 mod (except Colorz)",
