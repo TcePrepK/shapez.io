@@ -17,6 +17,7 @@ import { MetaHubBuilding } from "../../buildings/hub";
 import { enumBuildingToShapeKey, enumBuildingToCost, enumBuildingToShape } from "./building_placer";
 import { clamp, makeDiv, removeAllChildren } from "../../../core/utils";
 import { HubComponent } from "../../components/hub";
+import { safeModulo } from "../../../core/utils";
 
 /**
  * Contains all logic for the building placer - this doesn't include the rendering
@@ -27,12 +28,14 @@ export class HUDBuildingPlacerLogic extends BaseHUDPart {
      * @param {HTMLElement} parent
      */
     createElements(parent) {
+        // @ts-ignore
         this.survivalMod = this.root.app.settings.getAllSettings().survivalMod;
+        // @ts-ignore
         this.sandboxMod = this.root.app.settings.getAllSettings().sandboxMod;
-        
+
         this.costDisplayParent = makeDiv(parent, "ingame_HUD_BuildingCost", [], ``);
     }
-    
+
     /**
      * Initializes the logic
      * @see BaseHUDPart.initialize
@@ -369,7 +372,10 @@ export class HUDBuildingPlacerLogic extends BaseHUDPart {
         const extracted = getBuildingDataFromCode(buildingCode);
 
         // Disable pipetting the hub
-        if (extracted.metaInstance.getId() === gMetaBuildingRegistry.findByClass(MetaHubBuilding).getId() && !this.survivalMod) {
+        if (
+            extracted.metaInstance.getId() === gMetaBuildingRegistry.findByClass(MetaHubBuilding).getId() &&
+            !this.survivalMod
+        ) {
             this.currentMetaBuilding.set(null);
             return;
         }
@@ -424,7 +430,7 @@ export class HUDBuildingPlacerLogic extends BaseHUDPart {
         if (!metaBuilding) {
             return;
         }
-        
+
         const { rotation, rotationVariant } = metaBuilding.computeOptimalDirectionAndRotationVariantAtTile({
             root: this.root,
             tile,
@@ -446,7 +452,10 @@ export class HUDBuildingPlacerLogic extends BaseHUDPart {
             // Succesfully placed, find which entity we actually placed
             this.root.signals.entityManuallyPlaced.dispatch(entity);
             if (this.survivalMod) {
-                this.root.hubGoals.takeShapeByKey(enumBuildingToShapeKey[metaBuilding.id], enumBuildingToCost[metaBuilding.id]);
+                this.root.hubGoals.takeShapeByKey(
+                    enumBuildingToShapeKey[metaBuilding.id],
+                    enumBuildingToCost[metaBuilding.id]
+                );
             }
 
             // Check if we should flip the orientation (used for tunnels)
@@ -462,8 +471,8 @@ export class HUDBuildingPlacerLogic extends BaseHUDPart {
             // Check if we should stop placement
             if (
                 (!metaBuilding.getStayInPlacementMode() &&
-                !this.root.keyMapper.getBinding(KEYMAPPINGS.placementModifiers.placeMultiple).pressed &&
-                !this.root.app.settings.getAllSettings().alwaysMultiplace) ||
+                    !this.root.keyMapper.getBinding(KEYMAPPINGS.placementModifiers.placeMultiple).pressed &&
+                    !this.root.app.settings.getAllSettings().alwaysMultiplace) ||
                 (!this.canAfford(metaBuilding.id) && this.survivalMod)
             ) {
                 // Stop placement
@@ -489,7 +498,12 @@ export class HUDBuildingPlacerLogic extends BaseHUDPart {
                 index = 0;
                 console.warn("Invalid variant selected:", this.currentVariant.get());
             }
-            const newIndex = (index + 1) % availableVariants.length;
+            const direction = this.root.keyMapper.getBinding(KEYMAPPINGS.placement.rotateInverseModifier)
+                .pressed
+                ? -1
+                : 1;
+
+            const newIndex = safeModulo(index + direction, availableVariants.length);
             const newVariant = availableVariants[newIndex];
             this.setVariant(newVariant);
         }
@@ -584,7 +598,9 @@ export class HUDBuildingPlacerLogic extends BaseHUDPart {
         this.costContainer.appendChild(this.shape);
         this.costDisplayText.innerText = "" + this.cost;
 
-        const afford = this.root.hubGoals.getShapesStoredByKey(enumBuildingToShapeKey[building]) >= (enumBuildingToCost[building] * count);
+        const afford =
+            this.root.hubGoals.getShapesStoredByKey(enumBuildingToShapeKey[building]) >=
+            enumBuildingToCost[building] * count;
         this.costDisplayParent.classList.toggle("canAfford", afford);
     }
 
@@ -595,7 +611,10 @@ export class HUDBuildingPlacerLogic extends BaseHUDPart {
         if (!this.survivalMod) {
             return true;
         }
-        return this.root.hubGoals.getShapesStoredByKey(enumBuildingToShapeKey[building]) >= enumBuildingToCost[building];
+        return (
+            this.root.hubGoals.getShapesStoredByKey(enumBuildingToShapeKey[building]) >=
+            enumBuildingToCost[building]
+        );
     }
 
     /**
@@ -751,7 +770,7 @@ export class HUDBuildingPlacerLogic extends BaseHUDPart {
             } else {
                 this.root.soundProxy.playUiError();
             }
-            return STOP_PROPAGATION;   
+            return STOP_PROPAGATION;
         }
 
         // Deletion
