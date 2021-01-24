@@ -84,6 +84,8 @@ export const globalConfig = {
         painter: 1 / 6,
         painterDouble: 1 / 8,
         painterQuad: 1 / 2,
+        painterFluid: 1 / 2,
+        painterDoubleFluid: 1 / 4,
         mixer: 1 / 5,
         stacker: 1 / 8,
     },
