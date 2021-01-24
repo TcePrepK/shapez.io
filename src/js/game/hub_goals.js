@@ -517,6 +517,8 @@ export class HubGoals extends BasicSerializableObject {
             case enumItemProcessorTypes.mixer:
             case enumItemProcessorTypes.painter:
             case enumItemProcessorTypes.painterDouble:
+            case enumItemProcessorTypes.painterFluid:
+            case enumItemProcessorTypes.painterDoubleFluid:
             case enumItemProcessorTypes.painterQuad: {
                 assert(
                     globalConfig.buildingSpeeds[processorType],

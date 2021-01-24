@@ -15,7 +15,7 @@ import { enumHubGoalRewards } from "../tutorial_goals";
 import { WiredPinsComponent, enumPinSlotType } from "../components/wired_pins";
 
 /** @enum {string} */
-export const enumPainterVariants = { mirrored: "mirrored", double: "double", quad: "quad" };
+export const enumPainterVariants = { mirrored: "mirrored", double: "double", quad: "quad", fluid: "fluid", double_fluid: "double_fluid" };
 
 export class MetaPainterBuilding extends MetaBuilding {
     constructor() {
@@ -31,6 +31,10 @@ export class MetaPainterBuilding extends MetaBuilding {
                 return new Vector(2, 2);
             case enumPainterVariants.quad:
                 return new Vector(4, 1);
+            case enumPainterVariants.fluid:
+                return new Vector (2,1);
+            case enumPainterVariants.double_fluid:
+                return new Vector (2,2);
             default:
                 assertAlways(false, "Unknown painter variant: " + variant);
         }
@@ -60,6 +64,14 @@ export class MetaPainterBuilding extends MetaBuilding {
                 const speed = root.hubGoals.getProcessorBaseSpeed(enumItemProcessorTypes.painterQuad);
                 return [[T.ingame.buildingPlacement.infoTexts.speed, formatItemsPerSecond(speed)]];
             }
+            case enumPainterVariants.fluid: {
+                const speed = root.hubGoals.getProcessorBaseSpeed(enumItemProcessorTypes.painterFluid);
+                return [[T.ingame.buildingPlacement.infoTexts.speed, formatItemsPerSecond(speed)]];
+            }
+            case enumPainterVariants.double_fluid: {
+                const speed = root.hubGoals.getProcessorBaseSpeed(enumItemProcessorTypes.painterDoubleFluid);
+                return [[T.ingame.buildingPlacement.infoTexts.speed, formatItemsPerSecond(speed)]];
+            }
         }
     }
 
@@ -73,6 +85,12 @@ export class MetaPainterBuilding extends MetaBuilding {
         }
         if (root.hubGoals.isRewardUnlocked(enumHubGoalRewards.reward_wires_painter_and_levers)) {
             variants.push(enumPainterVariants.quad);
+        }
+        if (1==1){ // root.hubGoals.isRewardUnlocked(enumHubGoalRewards.reward_fluid_painter)
+            variants.push(enumPainterVariants.fluid); // root.hubGoals.isRewardUnlocked(enumHubGoalRewards.reward_fluid_painter)
+        }
+        if (1==1){ // root.hubGoals.isRewardUnlocked(enumHubGoalRewards.reward_fluid_painter_double)
+            variants.push(enumPainterVariants.double_fluid);
         }
         return variants;
     }
@@ -260,6 +278,90 @@ export class MetaPainterBuilding extends MetaBuilding {
 
                 break;
             }
+
+            case enumPainterVariants.fluid: {
+
+                // FLUID PAINTER
+                if (entity.components.WiredPins) {
+                    entity.removeComponent(WiredPinsComponent);
+                }
+
+                entity.components.ItemAcceptor.setSlots([
+                    {
+                        pos: new Vector(0,0),
+                        directions: [enumDirection.left],
+                        filter: "shape",
+                    },
+                    {
+                        pos: new Vector(1,0),
+                        directions: [enumDirection.bottom], //NOTE: might have to reverse direction
+                        filter: "shape"
+                    },
+                    {
+                        pos: new Vector(0,0),
+                        directions: [enumDirection.top],
+                        filter: "fluid"
+                    }
+                ]);
+
+                entity.components.ItemEjector.setSlots([
+                    {
+                        pos: new Vector(1,0),
+                        direction: enumDirection.right,
+                    },
+                ]);
+
+                entity.components.ItemProcessor.type = enumItemProcessorTypes.painter;
+                entity.components.ItemProcessor.processingRequirement = null;
+                entity.components.ItemProcessor.inputsPerCharge = 3;
+                break;
+            }
+
+            case enumPainterVariants.double_fluid: {
+
+                // DOUBLE FLUID PAINTER
+                if (entity.components.WiredPins) {
+                    entity.removeComponent(WiredPinsComponent);
+                }
+
+                entity.components.ItemAcceptor.setSlots([
+                    {
+                        pos: new Vector(0,0),
+                        directions: [enumDirection.left],
+                        filter: "shape",
+
+                    },
+                    {
+                        pos: new Vector(0,1),
+                        directions: [enumDirection.left],
+                        filter: "shape",
+                    },
+                    {
+                        pos: new Vector(1,0),
+                        directions: [enumDirection.top],
+                        filter: "color",
+                    },
+                    {
+                        pos: new Vector(0,1),
+                        directions: [enumDirection.bottom],
+                        filter: "fluid",
+
+                    },
+                ])
+
+                entity.components.ItemEjector.setSlots([
+                    {
+                        pos: new Vector(1,0),
+                        direction: enumDirection.right,
+                    },
+                ]);
+                entity.components.ItemProcessor.type = enumItemProcessorTypes.painter;
+                entity.components.ItemProcessor.processingRequirement = null;
+                entity.components.ItemProcessor.inputsPerCharge = 4;
+                break;
+            }
+
+
 
             default:
                 assertAlways(false, "Unknown painter variant: " + variant);
