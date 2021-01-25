@@ -358,7 +358,7 @@ export function generateLevelDefinitions(limitedVersion = false) {
                   // 17
                   // Double painter
                   {
-                      shape: "CbRbRbCb:CwCwCwCw:WbWbWbWb", // miner t4 (two variants)
+                      shape: "WrRgWrRg:CwCrCwCr:SgSgSgSg", // miner t4 (two variants)
                       required: 20000,
                       reward: enumHubGoalRewards.reward_painter_double,
                   },
@@ -366,7 +366,7 @@ export function generateLevelDefinitions(limitedVersion = false) {
                   // 18
                   // Rotater (180deg)
                   {
-                      shape: "Sg----Sg:CgCgCgCg:--CyCy--", // unused
+                      shape: "CbRbRbCb:CwCwCwCw:WbWbWbWb", // unused
                       required: 20000,
                       reward: enumHubGoalRewards.reward_rotater_180,
                   },

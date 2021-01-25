@@ -6,10 +6,13 @@ import { enumDirection, enumDirectionToVector, enumInvertedDirections, Vector } 
 import { getBuildingDataFromCode } from "./building_codes";
 import { enumWireVariant } from "./components/wire";
 import { Entity } from "./entity";
+import { FluidItem } from "./items/fluid_item";
 import { CHUNK_OVERLAY_RES } from "./map_chunk_view";
 import { MetaBuilding } from "./meta_building";
 import { GameRoot } from "./root";
 import { WireNetwork } from "./systems/wire";
+import { PipeNetwork } from "./systems/pipe";
+import { enumPipeVariant } from "./components/pipe";
 
 const logger = createLogger("ingame/logic");
 
@@ -72,6 +75,21 @@ export class GameLogic {
                     const metaClass = otherEntity.components.StaticMapEntity.getMetaBuilding();
                     if (!metaClass.getIsReplaceable()) {
                         // This one is a direct blocker
+                        return false;
+                    }
+                }
+
+                // Check if there is any fluid underneath it
+                const tile = this.root.map.getLowerLayerContentXY(x, y);
+                if (tile && tile.getItemType() === "fluid") {
+                    const metaClass = entity.components.StaticMapEntity.getMetaBuilding();
+                    if (!metaClass.isPlaceableToFluids(tile.getAsCopyableKey())) {
+                        return false;
+                    }
+                } else {
+                    const metaClass = entity.components.StaticMapEntity.getMetaBuilding();
+
+                    if (!metaClass.isPlaceableToGround()) {
                         return false;
                     }
                 }
@@ -185,7 +203,6 @@ export class GameLogic {
     }
 
     /**
-     *
      * Computes the flag for a given tile
      * @param {object} param0
      * @param {enumWireVariant} param0.wireVariant
@@ -286,6 +303,120 @@ export class GameLogic {
         }
 
         const pinsComp = entity.components.WiredPins;
+        if (pinsComp) {
+            const slots = pinsComp.slots;
+            for (let i = 0; i < slots.length; ++i) {
+                const slot = slots[i];
+                const slotLocalPos = staticComp.localTileToWorld(slot.pos);
+                if (slotLocalPos.equals(tile)) {
+                    canConnectAtAll = true;
+                    if (slot.linkedNetwork) {
+                        networks.add(slot.linkedNetwork);
+                    }
+                }
+            }
+        }
+
+        if (!canConnectAtAll) {
+            return null;
+        }
+
+        return Array.from(networks);
+    }
+
+    /**
+     * Computes the flag for a given tile
+     * @param {object} param0
+     * @param {enumPipeVariant} param0.pipeVariant
+     * @param {Vector} param0.tile The tile to check at
+     * @param {enumDirection} param0.edge The edge to check for
+     */
+    computePipeEdgeStatus({ pipeVariant, tile, edge }) {
+        const offset = enumDirectionToVector[edge];
+        const targetTile = tile.add(offset);
+
+        // Search for relevant pins
+        const pinEntities = this.root.map.getLayersContentsMultipleXY(targetTile.x, targetTile.y);
+
+        // Go over all entities which could have a pin
+        for (let i = 0; i < pinEntities.length; ++i) {
+            const pinEntity = pinEntities[i];
+            const pinComp = pinEntity.components.FluidPins;
+            const staticComp = pinEntity.components.StaticMapEntity;
+
+            // Skip those who don't have pins
+            if (!pinComp) {
+                continue;
+            }
+
+            // Go over all pins
+            const pins = pinComp.slots;
+            for (let k = 0; k < pinComp.slots.length; ++k) {
+                const pinSlot = pins[k];
+                const pinLocation = staticComp.localTileToWorld(pinSlot.pos);
+                const pinDirection = staticComp.localDirectionToWorld(pinSlot.direction);
+
+                // Check if the pin has the right location
+                if (!pinLocation.equals(targetTile)) {
+                    continue;
+                }
+
+                // Check if the pin has the right direction
+                if (pinDirection !== enumInvertedDirections[edge]) {
+                    continue;
+                }
+
+                // Found a pin!
+                return true;
+            }
+        }
+
+        // Now check if there's a connectable entity on the wires layer
+        const targetEntity = this.root.map.getTileContent(targetTile, "regular");
+        if (!targetEntity) {
+            return false;
+        }
+
+        // Check if its a pipe
+        const pipeComp = targetEntity.components.Pipe;
+        if (!pipeComp) {
+            return false;
+        }
+
+        // It's connected if its the same variant
+        return pipeComp.variant === pipeVariant;
+    }
+
+    /**
+     * Returns all wire networks this entity participates in on the given tile
+     * @param {Entity} entity
+     * @param {Vector} tile
+     * @returns {Array<PipeNetwork>|null} Null if the entity is never able to be connected at the given tile
+     */
+    getEntityPipeNetworks(entity, tile) {
+        let canConnectAtAll = false;
+
+        /** @type {Set<PipeNetwork>} */
+        const networks = new Set();
+
+        const staticComp = entity.components.StaticMapEntity;
+        const pipeComp = entity.components.Pipe;
+        if (pipeComp) {
+            canConnectAtAll = true;
+            if (pipeComp.linkedNetwork) {
+                networks.add(pipeComp.linkedNetwork);
+            }
+        }
+
+        const tunnelComp = entity.components.PipeTunnel;
+        if (tunnelComp) {
+            canConnectAtAll = true;
+            for (let i = 0; i < tunnelComp.linkedNetworks.length; ++i) {
+                networks.add(tunnelComp.linkedNetworks[i]);
+            }
+        }
+
+        const pinsComp = entity.components.FluidPins;
         if (pinsComp) {
             const slots = pinsComp.slots;
             for (let i = 0; i < slots.length; ++i) {

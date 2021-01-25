@@ -35,9 +35,9 @@ Your goal is to produce shapes by cutting, rotating, merging and painting parts 
 
 You can use [Gitpod](https://www.gitpod.io/) (an Online Open Source VS Code-like IDE which is free for Open Source) for working on issues and making PRs to this project. With a single click it will start a workspace and automatically:
 
-- clone the `shapez.io` repo.
-- install all of the dependencies.
-- start `gulp` in `gulp/` directory.
+-   clone the `shapez.io` repo.
+-   install all of the dependencies.
+-   start `gulp` in `gulp/` directory.
 
 [![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/from-referrer/)
 
@@ -130,3 +130,34 @@ For most assets I use Adobe Photoshop, you can find them <a href="//github.com/t
 All assets will be automatically rebuilt into the atlas once changed (Thanks to dengr1065!)
 
 <img src="https://i.imgur.com/W25Fkl0.png" alt="shapez.io Screenshot">
+
+
+# About sHape2O
+
+sHape2O, as the name suggests, is a very comprehensive mod expansion for tobspr's shapez.io, adding a vast fluid and pipe mechanic to the gamme that is quite unlike anything in the game so far.
+
+There is a myriad of resources and components yet to come, but the basic premises deals with utilizing a resource type known as <b>water</b>. Water is different from any other resource simply due to its exclusivity to what can be placed on it. There are only 3 buildings in the mod that are allowed to exist on water resource tiles, and nothing in the vanilla game that can exist on the non-wires layer is allowed to be built on water tiles, something that hasn't really been a limitation in the game as of now
+
+### Pipelines
+To utilize water resources, you need pumps and pipes. The unique part of this mod is that while there will be pipe and/or pump upgrades (TBD), they will not affect speed much like a belt upgrade will. Pipes utilize a new set of calculations to determine a <b>pressure value</b>, which determines the rate at which water flows through a given set of pipes. Furthermore, a pressure value is not set in stone once determined, as adjustments to the pumps supplying pipelines and addition and subtraction to a diverse set of buildings, mostly painters, can cause the flow rate to go up or down at a moment's notice! Indeed, the amount of water is not determined by mere upgrade tiers and throughput, but it's managing your arsenal of water tanks, pumps, and painter networks to achieve a highly optimized pressure throughout your network.
+
+### How to Apply your Pipe Networks for Maximum Efficiency
+Water is very potent resource. Much like wires, it isn't necessary to take full advantage of my modded components to play and "beat" the game, however, again, like wires, if one is able to harness the tools this mod gives them. they can create highly optimized and effcieint factories. Several Default painters have been replaced by water-enhanced variants that gain a +25% (TBD) productivity bonus if the water they receive stays within a given threshold.
+
+Additionally, a new subset of other buildings, such as a Hydropneumatic stacker and Water-Cooled Cutters utilize water resources, with this fixed productivity boost. However, one must utilize their pipes wisely, as they occupy space that would normally be reserved for belts. Additionally, there is negative productivity penalties for failure to supply enough water pressure, as well as overpressurizing, causing your pipes to backup and incurr backlog penalties. however the mod gives you a handful of tools to prevent either of these events from happening.
+
+### Enhanced Late Game Painters
+However, the crown jewels upon the sophisticated water pipeline network crown of the mod is a set of <b>brand new</b> painters. Ranging in size and efficiency from the microscopic, space efficient but not very speedy <b>Micropainters</b>, usd to create super compact painting setups at the cost of being half as efficient as their vanilla single and double painters.
+
+there is a few more painters I'll let you discover, but the biggest additions to the mod (literally) have to go to two buildings: The first being the <b>Double-Quad Painter</b>. This mammoth machine takes postive qualities of both DOuble and Quad Painters to mitigate the flaws of both, at the cost of chugging a <i>lot</i> of water.
+
+### SMART Quad Painter and Wires integrations
+The second late game painter is something the shapez.io prgrammers will have to look forward to obtaining, as proper pressure management and throughput will be heavily rewarded in shape2O. But I digress... anyway, The SMART Quad. The pinnacle of M.E.Me. technology, the SMART Quad makes itself stand out from it's vanilla bretheren via <b> pure automation</b>. That's right, this painter is heavily dependent on proper wires layer skills, as it cannot function without a valid shape code on the wires layer output. Additionally, while it cannot solve the Quad painter's iefficiency dilemma, the SMART Quad cross-references all shape and dye inputs to the given shape code, and either outright rejects any incorrect shapes, or expells any unused or unnecessary dye resources, which means that this machine has the potential of preventing your MAM on wasting hundreds of incorrect shape and dye patterns in the transition between freeplay levels.
+
+ However, it isn't cut and dry (pun not intended) to utilize such an incredibly, almost overpowered device. The SMART Quad is very strict in terms of pressure thresholds, requiring the most fluid throughput to function and having a <i>very</i> strict threshold in which it will not over or under pressurize. To prevent such failures, sHape2O comes equipped with a wide range of pipeline management buildings, such as Water Tanks, which can store a large quantity of excess water and prevent loss of pressure over distance, a set of splitter-mergers and valves to redirect and merge/distribute to all of your machines, pressure meters to keep a close eye on your pipelines, pressure sinks to expell any unwanted pressure, and much more. Several of the mod's buildings also has mandatory/optional wires layers inputs, to suit your automation needs.
+
+ ### A Huge Thank You
+
+I would like to issue a HUGE thank you to everyone that participated in all stages of this mod's development. Whether you were throwing out ideas and feedback on pre-development documentation, provided me with valuable sprites that make this mod more than just functional buildigns with no textures, were go-to prgrammers when I ran into coding snafus, or simply provided feedback in the multitude of open betas for the mod's public release, you were, are, and will always be treated as equally valauble to the completion of this collossal project. Wihtout you, JusticeForLevel17 (my first modding project), sHape2O (and it's many soon-to-be content updates), and more shapez.io modding projects to come would be simply figments of my overly active imagination!
+
+## Update 1.0 for sHape2O has a scheduled March 2021 release date.

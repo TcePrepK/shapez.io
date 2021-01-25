@@ -4,6 +4,7 @@ import { GameSystem } from "../game_system";
 import { MapChunkView } from "../map_chunk_view";
 import { THEME } from "../theme";
 import { drawSpriteClipped } from "../../core/draw_utils";
+import { FluidItem } from "../items/fluid_item";
 
 export class MapResourcesSystem extends GameSystem {
     /**
@@ -64,17 +65,41 @@ export class MapResourcesSystem extends GameSystem {
                     }
 
                     if (lowerItem) {
-                        const worldY = (chunk.tileY + y) * globalConfig.tileSize;
+                        if (lowerItem.getItemType() === "fluid") {
+                            let drawnPatches = [];
+                            for (let i = 0; i < chunk.patches.length; ++i) {
+                                const patch = chunk.patches[i];
+                                if (patch.item instanceof FluidItem) {
+                                    if (drawnPatches.indexOf(patch) > -1) {
+                                        continue;
+                                    }
 
-                        const destX = worldX + globalConfig.halfTileSize;
-                        const destY = worldY + globalConfig.halfTileSize;
+                                    const destX =
+                                        chunk.x * globalConfig.mapChunkWorldSize +
+                                        patch.pos.x * globalConfig.tileSize;
+                                    const destY =
+                                        chunk.y * globalConfig.mapChunkWorldSize +
+                                        patch.pos.y * globalConfig.tileSize;
+                                    const diameter = Math.min(80, 40 / parameters.zoomLevel);
 
-                        lowerItem.drawItemCenteredClipped(
-                            destX,
-                            destY,
-                            parameters,
-                            globalConfig.defaultItemDiameter
-                        );
+                                    patch.item.drawItemCenteredClipped(destX, destY, parameters, diameter);
+
+                                    drawnPatches.push(patch);
+                                }
+                            }
+                        } else {
+                            const worldY = (chunk.tileY + y) * globalConfig.tileSize;
+
+                            const destX = worldX + globalConfig.halfTileSize;
+                            const destY = worldY + globalConfig.halfTileSize;
+
+                            lowerItem.drawItemCenteredClipped(
+                                destX,
+                                destY,
+                                parameters,
+                                globalConfig.defaultItemDiameter
+                            );
+                        }
                     }
                 }
             }

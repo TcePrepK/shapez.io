@@ -1,9 +1,11 @@
 import { MetaBeltBuilding } from "../../buildings/belt";
+import { MetaPipeBuilding } from "../../buildings/pipe";
 import { MetaCutterBuilding } from "../../buildings/cutter";
 import { MetaDisplayBuilding } from "../../buildings/display";
 import { MetaFilterBuilding } from "../../buildings/filter";
 import { MetaLeverBuilding } from "../../buildings/lever";
 import { MetaMinerBuilding } from "../../buildings/miner";
+import { MetaPumpBuilding } from "../../buildings/pump";
 import { MetaMixerBuilding } from "../../buildings/mixer";
 import { MetaPainterBuilding } from "../../buildings/painter";
 import { MetaReaderBuilding } from "../../buildings/reader";
@@ -22,9 +24,11 @@ export class HUDBuildingsToolbar extends HUDBaseToolbar {
         super(root, {
             primaryBuildings: [
                 MetaBeltBuilding,
+                MetaPipeBuilding,
                 MetaBalancerBuilding,
                 MetaUndergroundBeltBuilding,
                 MetaMinerBuilding,
+                MetaPumpBuilding,
                 MetaCutterBuilding,
                 MetaRotaterBuilding,
                 MetaStackerBuilding,

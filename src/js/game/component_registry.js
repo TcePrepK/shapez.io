@@ -19,6 +19,11 @@ import { DisplayComponent } from "./components/display";
 import { BeltReaderComponent } from "./components/belt_reader";
 import { FilterComponent } from "./components/filter";
 import { ItemProducerComponent } from "./components/item_producer";
+import { FluidPinsComponent } from "./components/fluid_pins";
+import { FluidComponent } from "./components/fluid";
+import { PumpComponent } from "./components/pump";
+import { PipeComponent } from "./components/pipe";
+import { PipeTunnelComponent } from "./components/pipe_tunnel";
 
 export function initComponentRegistry() {
     gComponentRegistry.register(StaticMapEntityComponent);
@@ -41,6 +46,13 @@ export function initComponentRegistry() {
     gComponentRegistry.register(BeltReaderComponent);
     gComponentRegistry.register(FilterComponent);
     gComponentRegistry.register(ItemProducerComponent);
+
+    // Water Mod
+    gComponentRegistry.register(FluidPinsComponent);
+    gComponentRegistry.register(FluidComponent);
+    gComponentRegistry.register(PumpComponent);
+    gComponentRegistry.register(PipeComponent);
+    gComponentRegistry.register(PipeTunnelComponent);
 
     // IMPORTANT ^^^^^ UPDATE ENTITY COMPONENT STORAGE AFTERWARDS
 

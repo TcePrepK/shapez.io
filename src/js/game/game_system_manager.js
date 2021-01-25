@@ -24,6 +24,8 @@ import { ItemProcessorOverlaysSystem } from "./systems/item_processor_overlays";
 import { BeltReaderSystem } from "./systems/belt_reader";
 import { FilterSystem } from "./systems/filter";
 import { ItemProducerSystem } from "./systems/item_producer";
+import { PipeSystem } from "./systems/pipe";
+import { PumpSystem } from "./systems/pump";
 
 const logger = createLogger("game_system_manager");
 
@@ -39,6 +41,9 @@ export class GameSystemManager {
             /* typehints:start */
             /** @type {BeltSystem} */
             belt: null,
+
+            /** @type {PipeSystem} */
+            pipe: null,
 
             /** @type {ItemEjectorSystem} */
             itemEjector: null,
@@ -124,6 +129,8 @@ export class GameSystemManager {
 
         add("belt", BeltSystem);
 
+        add("pipe", PipeSystem);
+
         add("undergroundBelt", UndergroundBeltSystem);
 
         add("miner", MinerSystem);
@@ -164,6 +171,10 @@ export class GameSystemManager {
         add("display", DisplaySystem);
 
         add("itemProcessorOverlays", ItemProcessorOverlaysSystem);
+
+        add("Pipe", PipeSystem);
+
+        add("Pump", PumpSystem);
 
         logger.log("📦 There are", this.systemUpdateOrder.length, "game systems");
     }

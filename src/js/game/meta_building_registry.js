@@ -30,6 +30,9 @@ import { buildBuildingCodeCache, gBuildingVariants, registerBuildingVariant } fr
 import { enumWireVariant } from "./components/wire";
 import { KEYMAPPINGS } from "./key_action_mapper";
 import { defaultBuildingVariant } from "./meta_building";
+import { MetaPumpBuilding } from "./buildings/pump";
+import { MetaPipeBuilding } from "./buildings/pipe";
+import { enumPipeVariant } from "./components/pipe";
 
 const logger = createLogger("building_registry");
 
@@ -59,6 +62,8 @@ export function initMetaBuildingRegistry() {
     gMetaBuildingRegistry.register(MetaAnalyzerBuilding);
     gMetaBuildingRegistry.register(MetaComparatorBuilding);
     gMetaBuildingRegistry.register(MetaItemProducerBuilding);
+    gMetaBuildingRegistry.register(MetaPumpBuilding);
+    gMetaBuildingRegistry.register(MetaPipeBuilding);
 
     // Belt
     registerBuildingVariant(1, MetaBeltBuilding, defaultBuildingVariant, 0);
@@ -164,6 +169,17 @@ export function initMetaBuildingRegistry() {
 
     // Item producer
     registerBuildingVariant(61, MetaItemProducerBuilding);
+
+    // Water mod
+    registerBuildingVariant(10000, MetaPumpBuilding);
+    registerBuildingVariant(10001, MetaPipeBuilding, defaultBuildingVariant, 0);
+    registerBuildingVariant(10002, MetaPipeBuilding, defaultBuildingVariant, 1);
+    registerBuildingVariant(10003, MetaPipeBuilding, defaultBuildingVariant, 2);
+    registerBuildingVariant(10004, MetaPipeBuilding, defaultBuildingVariant, 3);
+    registerBuildingVariant(10005, MetaPipeBuilding, enumPipeVariant.industrial, 0);
+    registerBuildingVariant(10006, MetaPipeBuilding, enumPipeVariant.industrial, 1);
+    registerBuildingVariant(10007, MetaPipeBuilding, enumPipeVariant.industrial, 2);
+    registerBuildingVariant(10008, MetaPipeBuilding, enumPipeVariant.industrial, 3);
 
     // Propagate instances
     for (const key in gBuildingVariants) {

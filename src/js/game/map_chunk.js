@@ -10,6 +10,8 @@ import { COLOR_ITEM_SINGLETONS } from "./items/color_item";
 import { GameRoot } from "./root";
 import { enumSubShape } from "./shape_definition";
 import { Rectangle } from "../core/rectangle";
+import { FLUID_ITEM_SINGLETONS } from "./items/fluid_item";
+import { enumFluids } from "./items/fluid_item";
 
 const logger = createLogger("map_chunk");
 
@@ -172,6 +174,24 @@ export class MapChunk {
         this.internalGeneratePatch(rng, colorPatchSize, COLOR_ITEM_SINGLETONS[rng.choice(availableColors)]);
     }
 
+    internalGenerateFluidPatch(rng, fluidPatchSize, distanceToOriginInChunks) {
+        // First, determine available fluids
+        let availableFluids = [];
+        if (distanceToOriginInChunks > 10) {
+            for (const fluid in enumFluids) {
+                availableFluids.push(fluid);
+            }
+        }
+
+        if (availableFluids.length > 0) {
+            this.internalGeneratePatch(
+                rng,
+                fluidPatchSize,
+                FLUID_ITEM_SINGLETONS[rng.choice(availableFluids)]
+            );
+        }
+    }
+
     /**
      * Generates a shape patch
      * @param {RandomNumberGenerator} rng
@@ -280,6 +300,14 @@ export class MapChunk {
         if (rng.next() < colorPatchChance / 4) {
             const colorPatchSize = Math.max(2, Math.round(1 + clamp(distanceToOriginInChunks / 8, 0, 4)));
             this.internalGenerateColorPatch(rng, colorPatchSize, distanceToOriginInChunks);
+        }
+
+        // Determine how likely it is that there is a fluid patch
+        const fluidPatchChance = 0.9 - clamp(distanceToOriginInChunks / 25, 0, 1) * 0.5;
+
+        if (rng.next() < fluidPatchChance / 4) {
+            const fluidPatchSize = Math.max(2, Math.round(1 + clamp(distanceToOriginInChunks / 8, 0, 4)));
+            this.internalGenerateFluidPatch(rng, fluidPatchSize, distanceToOriginInChunks);
         }
 
         // Determine how likely it is that there is a shape patch
@@ -427,6 +455,7 @@ export class MapChunk {
      * @param {Entity=} contents
      * @param {Layer} layer
      */
+    // @ts-ignore
     setLayerContentFromWorldCords(tileX, tileY, contents, layer) {
         const localX = tileX - this.tileX;
         const localY = tileY - this.tileY;

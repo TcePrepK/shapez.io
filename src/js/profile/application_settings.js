@@ -324,6 +324,7 @@ class SettingsStorage {
         this.disableTileGrid = false;
         this.lowQualityTextures = false;
         this.simplifiedBelts = false;
+        this.simplifiedPipes = false;
         this.zoomToCursor = true;
         this.mapResourcesScale = 0.5;
 
@@ -662,6 +663,11 @@ export class ApplicationSettings extends ReadWriteProxy {
         if (data.version < 27) {
             data.settings.simplifiedBelts = false;
             data.version = 27;
+        }
+
+        if (data.version < 31) {
+            data.settings.simplifiedPipes = false;
+            data.version = 31;
         }
 
         if (data.version < 28) {

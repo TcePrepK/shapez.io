@@ -511,6 +511,9 @@ shopUpgrades:
     belt:
         name: Belts, Distributor & Tunnels
         description: Speed x<currentMult> → x<newMult>
+    pipe:
+        name: Pipes, Pumps & Tunnels
+        description: Speed x<currentMult> → x<newMult>
     miner:
         name: Extraction
         description: Speed x<currentMult> → x<newMult>
@@ -533,6 +536,20 @@ buildings:
         default:
             name: &belt Conveyor Belt
             description: Transports items, hold and drag to place multiple.
+
+    # Water mod
+    pump:
+        default:
+            name: &pump Pump
+            description: Extracts fluid.
+
+    pipe:
+        default:
+            name: &pipe Pipe
+            description: &pipe_desc Transports fluids, hold and drag to place multiple.
+        industrial:
+            name: *pipe
+            description: *pipe_desc
 
     # Internal name for the Extractor
     miner:
@@ -1157,6 +1174,10 @@ keybindings:
         analyzer: *analyzer
         comparator: *comparator
         item_producer: Item Producer (Sandbox)
+
+        # Water mod
+        pipe: *pipe
+        pump: *pump
         # ---
 
         pipette: Pipette

@@ -56,6 +56,10 @@ export const KEYMAPPINGS = {
         painter: { keyCode: key("9") },
         trash: { keyCode: key("0") },
 
+        // Water Mod
+        pump: { keyCode: key("192") },
+        pipe: { keyCode: key("191") },
+
         // Sandbox
         item_producer: { keyCode: key("L") },
 

@@ -68,6 +68,9 @@ export default {
     // Makes belts almost infinitely fast
     // instantBelts: true,
     // -----------------------------------------------------------------------------------
+    // Makes pipes almost infinitely fast
+    // instantPipes: true,
+    // -----------------------------------------------------------------------------------
     // Makes item processors almost infinitely fast
     // instantProcessors: true,
     // -----------------------------------------------------------------------------------
@@ -88,6 +91,9 @@ export default {
     // -----------------------------------------------------------------------------------
     // Whether to check belt paths
     // checkBeltPaths: true,
+    // -----------------------------------------------------------------------------------
+    // Whether to check pipes paths
+    // checkPipesPaths: true,
     // -----------------------------------------------------------------------------------
     // Whether to items / s instead of items / m in stats
     // detailedStatistics: true,

@@ -492,6 +492,14 @@ export class HubGoals extends BasicSerializableObject {
     }
 
     /**
+     * Miner speed
+     * @returns {number} items / sec
+     */
+    getPipeBaseSpeed() {
+        return globalConfig.pipeSpeedItemsPerSecond * this.upgradeImprovements.pipe;
+    }
+
+    /**
      * Processor speed
      * @param {enumItemProcessorTypes} processorType
      * @returns {number} items / sec
