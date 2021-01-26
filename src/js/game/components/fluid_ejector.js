@@ -28,7 +28,7 @@ export class FluidEjectorComponent extends Component {
         return {
             slots: types.fixedSizeArray(
                 types.structured({
-                    fluid: types.nullable(typeItemSingleton),
+                    item: types.nullable(typeItemSingleton),
                     progress: types.float,
                 })
             ),
@@ -125,7 +125,6 @@ export class FluidEjectorComponent extends Component {
         }
         this.slots[slotIndex].fluid = fluid;
         this.slots[slotIndex].progress = 0;
-        console.log("something");
         return true;
     }
 

@@ -334,7 +334,7 @@ export class FluidEjectorSystem extends GameSystemWithFilter {
                 if (nextPipePath) {
                     /*
                     If you imagine the track between the center of the building and the center of the first pipe as
-                    a range from 0 to 1:
+                    a range from 0 to 1:1
 
                            Building              Pipe
                     |         X         |         X         |

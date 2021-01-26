@@ -252,15 +252,10 @@ export class PipeSystem extends GameSystemWithFilter {
         const fromEntity = this.findSupplyingEntity(entity);
         const toEntity = this.findFollowUpEntity(entity);
 
-        // console.log(fromEntity);
-        // console.log(toEntity);
-
         // Check if we can add the entity to the previous path
         if (fromEntity) {
             const fromPath = fromEntity.components.Pipe.assignedPath;
             fromPath.extendOnEnd(entity);
-
-            // console.log(fromPath);
 
             // Check if we now can extend the current path by the next path
             if (toEntity) {

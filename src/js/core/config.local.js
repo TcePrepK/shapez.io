@@ -90,7 +90,7 @@ export default {
     // renderBeltPaths: true,
     // -----------------------------------------------------------------------------------
     // Whether to render belt paths
-    renderPipePaths: true,
+    // renderPipePaths: true,
     // -----------------------------------------------------------------------------------
     // Whether to check belt paths
     // checkBeltPaths: true,

@@ -289,7 +289,6 @@ export function deserializeSchema(obj, schema, data, baseclassErrorResult = null
             logger.error("Data", data, "has null value for", key, "(schema:", schema, ")");
             return "Non-nullable entry is null: " + key + " of class " + obj.constructor.name;
         }
-
         const errorStatus = schema[key].deserializeWithVerify(data[key], obj, key, obj.root || root);
         if (errorStatus) {
             logger.error(

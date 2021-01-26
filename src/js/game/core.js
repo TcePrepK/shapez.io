@@ -433,7 +433,7 @@ export class GameCore {
             systems.belt.drawBeltItems(params);
 
             // Pipe items
-            systems.pipe.drawBeltItems(params);
+            systems.pipe.drawPipeFluids(params);
 
             // Miner & Static map entities etc.
             root.map.drawForeground(params);
