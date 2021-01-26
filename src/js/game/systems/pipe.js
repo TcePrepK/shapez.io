@@ -48,10 +48,6 @@ export class PipeSystem extends GameSystemWithFilter {
         this.pipePaths = [];
     }
 
-    asd() {
-        console.log("something");
-    }
-
     /**
      * Serializes all pipe paths
      * @returns {Array<object>}
@@ -483,7 +479,7 @@ export class PipeSystem extends GameSystemWithFilter {
      */
     drawChunk(parameters, chunk) {
         // Limit speed to avoid pipes going backwards
-        const speedMultiplier = Math.min(this.root.hubGoals.getPipeBaseSpeed(), 10);
+        const speedMultiplier = Math.min(this.root.hubGoals.getBeltBaseSpeed(), 10);
         const contents = chunk.containedEntitiesByLayer.regular;
 
         if (this.root.app.settings.getAllSettings().simplifiedBelts) {

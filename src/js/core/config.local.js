@@ -87,7 +87,7 @@ export default {
     // renderChanges: true,
     // -----------------------------------------------------------------------------------
     // Whether to render belt paths
-    renderBeltPaths: true,
+    // renderBeltPaths: true,
     // -----------------------------------------------------------------------------------
     // Whether to render belt paths
     renderPipePaths: true,
@@ -96,7 +96,7 @@ export default {
     // checkBeltPaths: true,
     // -----------------------------------------------------------------------------------
     // Whether to check pipes paths
-    // checkPipesPaths: true,
+    // checkPipePaths: true,
     // -----------------------------------------------------------------------------------
     // Whether to items / s instead of items / m in stats
     // detailedStatistics: true,

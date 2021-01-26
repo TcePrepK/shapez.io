@@ -67,7 +67,7 @@ export const globalConfig = {
 
     itemSpacingOnBelts: 0.63,
 
-    itemSpacingOnPipes: 0.63,
+    fluidSpacingOnPipes: 0.63,
 
     wiresSpeedItemsPerSecond: 6,
 

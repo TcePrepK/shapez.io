@@ -3,6 +3,7 @@ import { gItemRegistry } from "../core/global_registries";
 import { BooleanItem, BOOL_TRUE_SINGLETON, BOOL_FALSE_SINGLETON } from "./items/boolean_item";
 import { ShapeItem } from "./items/shape_item";
 import { ColorItem, COLOR_ITEM_SINGLETONS } from "./items/color_item";
+import { FluidItem, FLUID_ITEM_SINGLETONS } from "./items/fluid_item";
 
 /**
  * Resolves items so we share instances
@@ -22,6 +23,9 @@ export function itemResolverSingleton(root, data) {
         }
         case ColorItem.getId(): {
             return COLOR_ITEM_SINGLETONS[itemData];
+        }
+        case FluidItem.getId(): {
+            return FLUID_ITEM_SINGLETONS[itemData];
         }
 
         default: {

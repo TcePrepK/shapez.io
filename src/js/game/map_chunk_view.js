@@ -58,6 +58,9 @@ export class MapChunkView extends MapChunk {
         systems.itemEjector.drawChunk(parameters, this);
         systems.itemAcceptor.drawChunk(parameters, this);
         systems.miner.drawChunk(parameters, this);
+        systems.fluidEjector.drawChunk(parameters, this);
+        systems.fluidAcceptor.drawChunk(parameters, this);
+        systems.pump.drawChunk(parameters, this);
     }
 
     /**

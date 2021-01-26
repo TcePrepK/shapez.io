@@ -26,6 +26,8 @@ import { FilterSystem } from "./systems/filter";
 import { ItemProducerSystem } from "./systems/item_producer";
 import { PipeSystem } from "./systems/pipe";
 import { PumpSystem } from "./systems/pump";
+import { FluidAcceptorSystem } from "./systems/fluid_acceptor";
+import { FluidEjectorSystem } from "./systems/fluid_ejector";
 
 const logger = createLogger("game_system_manager");
 
@@ -41,9 +43,6 @@ export class GameSystemManager {
             /* typehints:start */
             /** @type {BeltSystem} */
             belt: null,
-
-            /** @type {PipeSystem} */
-            pipe: null,
 
             /** @type {ItemEjectorSystem} */
             itemEjector: null,
@@ -104,6 +103,18 @@ export class GameSystemManager {
 
             /** @type {ItemProducerSystem} */
             itemProducer: null,
+
+            /** @type {PipeSystem} */
+            pipe: null,
+
+            /** @type {PumpSystem} */
+            pump: null,
+
+            /** @type {FluidAcceptorSystem} */
+            fluidAcceptor: null,
+
+            /** @type {FluidEjectorSystem} */
+            fluidEjector: null,
 
             /* typehints:end */
         };
@@ -170,9 +181,13 @@ export class GameSystemManager {
 
         add("itemProcessorOverlays", ItemProcessorOverlaysSystem);
 
+        add("fluidAcceptor", FluidAcceptorSystem);
+
         add("pipe", PipeSystem);
 
-        add("Pump", PumpSystem);
+        add("pump", PumpSystem);
+
+        add("fluidEjector", FluidEjectorSystem);
 
         logger.log("📦 There are", this.systemUpdateOrder.length, "game systems");
     }

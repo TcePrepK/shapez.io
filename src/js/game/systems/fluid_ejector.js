@@ -164,7 +164,7 @@ export class FluidEjectorSystem extends GameSystemWithFilter {
                     1,
                     sourceSlot.progress +
                         progressGrowth *
-                            this.root.hubGoals.getPipeBaseSpeed() *
+                            this.root.hubGoals.getMinerBaseSpeed() *
                             globalConfig.fluidSpacingOnPipes
                 );
 

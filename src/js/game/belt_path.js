@@ -499,8 +499,6 @@ export class BeltPath extends BasicSerializableObject {
         if (G_IS_DEV && globalConfig.debug.checkBeltPaths) {
             this.debug_checkIntegrity("extend-on-end");
         }
-
-        console.log(beltComp.assignedPath);
     }
 
     /**

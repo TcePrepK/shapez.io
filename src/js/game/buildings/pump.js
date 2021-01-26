@@ -3,6 +3,7 @@ import { Entity } from "../entity";
 import { MetaBuilding } from "../meta_building";
 import { GameRoot } from "../root";
 import { PumpComponent } from "../components/pump";
+import { FluidEjectorComponent } from "../components/fluid_ejector";
 
 export class MetaPumpBuilding extends MetaBuilding {
     constructor() {
@@ -36,32 +37,27 @@ export class MetaPumpBuilding extends MetaBuilding {
      */
     setupEntityComponents(entity) {
         entity.addComponent(new PumpComponent());
-        //     entity.addComponent(
-        //         new FluidPinsComponent({
-        //             slots: [
-        //                 {
-        //                     pos: new Vector(0, 0),
-        //                     direction: enumDirection.top,
-        //                     type: enumPinSlotType.fluidEjector,
-        //                 },
-        //                 {
-        //                     pos: new Vector(0, 0),
-        //                     direction: enumDirection.right,
-        //                     type: enumPinSlotType.fluidEjector,
-        //                 },
-        //                 {
-        //                     pos: new Vector(0, 0),
-        //                     direction: enumDirection.bottom,
-        //                     type: enumPinSlotType.fluidEjector,
-        //                 },
-        //                 {
-        //                     pos: new Vector(0, 0),
-        //                     direction: enumDirection.left,
-        //                     type: enumPinSlotType.fluidEjector,
-        //                 },
-        //             ],
-        //         })
-        //     );
-        // }
+        entity.addComponent(
+            new FluidEjectorComponent({
+                slots: [
+                    {
+                        pos: new Vector(0, 0),
+                        direction: enumDirection.top,
+                    },
+                    {
+                        pos: new Vector(0, 0),
+                        direction: enumDirection.right,
+                    },
+                    {
+                        pos: new Vector(0, 0),
+                        direction: enumDirection.bottom,
+                    },
+                    {
+                        pos: new Vector(0, 0),
+                        direction: enumDirection.left,
+                    },
+                ],
+            })
+        );
     }
 }

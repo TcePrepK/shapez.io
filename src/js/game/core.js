@@ -432,6 +432,9 @@ export class GameCore {
             // Belt items
             systems.belt.drawBeltItems(params);
 
+            // Pipe items
+            systems.pipe.drawBeltItems(params);
+
             // Miner & Static map entities etc.
             root.map.drawForeground(params);
 

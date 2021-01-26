@@ -125,6 +125,7 @@ export class FluidEjectorComponent extends Component {
         }
         this.slots[slotIndex].fluid = fluid;
         this.slots[slotIndex].progress = 0;
+        console.log("something");
         return true;
     }
 

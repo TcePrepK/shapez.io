@@ -117,22 +117,24 @@ export class MapChunk {
                     );
                 };
 
-                const val = valOnPoint(x, y);
+                let val = valOnPoint(x, y);
 
-                const waterLevel = -0.2;
+                const waterLevel = -0.18;
 
                 if (distance > distanceLimit * globalConfig.mapChunkSize) {
                     if (val < 0.4) {
+                        const color = noise.getColor(val);
                         if (val < waterLevel) {
-                            ++patchesDrawn;
-                            avgPos.x += offX;
-                            avgPos.y += offY;
-                            this.lowerLayer[offX][offY] = { item, color: noise.getColor(val) }; // noise.getColor(val), val };
+                            // ++patchesDrawn;
+                            // avgPos.x += offX;
+                            // avgPos.y += offY;
+                            this.lowerLayer[offX][offY] = { item, color };
                         } else {
-                            this.lowerLayer[offX][offY] = { color: noise.getColor(val), val };
+                            this.lowerLayer[offX][offY] = { color };
                         }
                     } else {
-                        this.lowerLayer[offX][offY] = noise.getColor(0.4);
+                        const color = noise.getColor(0.4);
+                        this.lowerLayer[offX][offY] = { color };
                     }
                 } else {
                     const map = function (n, start1, stop1, start2, stop2) {
@@ -140,34 +142,35 @@ export class MapChunk {
                     };
 
                     if (val < 0.4) {
-                        const color = noise.getColor(
-                            map(distance, distanceLimit * globalConfig.mapChunkSize, 0, val, 0.2)
-                        );
+                        val = map(distance, distanceLimit * globalConfig.mapChunkSize, 0, val, 0.2);
+                        const color = noise.getColor(val);
 
                         if (val < waterLevel) {
-                            ++patchesDrawn;
-                            avgPos.x += offX;
-                            avgPos.y += offY;
+                            // ++patchesDrawn;
+                            // avgPos.x += offX;
+                            // avgPos.y += offY;
                             this.lowerLayer[offX][offY] = { item, color };
                         } else {
-                            this.lowerLayer[offX][offY] = color;
+                            this.lowerLayer[offX][offY] = { color };
                         }
                     } else {
-                        this.lowerLayer[offX][offY] = noise.getColor(
+                        const color = noise.getColor(
                             map(distance, distanceLimit * globalConfig.mapChunkSize, 0, 0.4, 0.2)
                         );
+
+                        this.lowerLayer[offX][offY] = { color };
                     }
                 }
             }
         }
 
-        this.patches = [
-            {
-                pos: avgPos.divideScalar(patchesDrawn),
-                item,
-                size: 5,
-            },
-        ];
+        // this.patches = [
+        //     {
+        //         pos: avgPos.divideScalar(patchesDrawn),
+        //         item,
+        //         size: 5,
+        //     },
+        // ];
     }
     /**
      *

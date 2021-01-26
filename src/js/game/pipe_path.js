@@ -126,7 +126,7 @@ export class PipePath extends BasicSerializableObject {
         if (this.spacingToFirstFluid >= globalConfig.fluidSpacingOnPipes) {
             // So, since we already need one tick to accept this fluid we will add this directly.
             const pipeProgressPerTick =
-                this.root.hubGoals.getPipeBaseSpeed() *
+                this.root.hubGoals.getBeltBaseSpeed() *
                 this.root.dynamicTickrate.deltaSeconds *
                 globalConfig.fluidSpacingOnPipes;
 
@@ -499,8 +499,6 @@ export class PipePath extends BasicSerializableObject {
         if (G_IS_DEV && globalConfig.debug.checkPipePaths) {
             this.debug_checkIntegrity("extend-on-end");
         }
-
-        console.log(pipeComp.assignedPath);
     }
 
     /**
@@ -1060,7 +1058,7 @@ export class PipePath extends BasicSerializableObject {
 
         // Divide by fluid spacing on pipes since we use throughput and not speed
         let pipeSpeed =
-            this.root.hubGoals.getPipeBaseSpeed() *
+            this.root.hubGoals.getBeltBaseSpeed() *
             this.root.dynamicTickrate.deltaSeconds *
             globalConfig.fluidSpacingOnPipes;
 
@@ -1200,7 +1198,7 @@ export class PipePath extends BasicSerializableObject {
             // Trigger animation on the acceptor comp
             const targetAcceptorComp = this.acceptorTarget.entity.components.FluidAcceptor;
             if (targetAcceptorComp) {
-                if (!this.root.app.settings.getAllSettings().simplifiedPipes) {
+                if (!this.root.app.settings.getAllSettings().simplifiedBelts) {
                     targetAcceptorComp.onFluidAccepted(
                         this.acceptorTarget.slot,
                         this.acceptorTarget.direction,
@@ -1322,7 +1320,7 @@ export class PipePath extends BasicSerializableObject {
      */
     checkIsPotatoMode() {
         // POTATO Mode: Only show fluids when pipe is hovered
-        if (!this.root.app.settings.getAllSettings().simplifiedPipes) {
+        if (!this.root.app.settings.getAllSettings().simplifiedBelts) {
             return false;
         }
 

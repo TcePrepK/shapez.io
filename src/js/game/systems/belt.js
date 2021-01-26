@@ -542,7 +542,7 @@ export class BeltSystem extends GameSystemWithFilter {
                     const staticComp = entity.components.StaticMapEntity;
 
                     // DEBUG Rendering
-                    if (G_IS_DEV && globalConfig.debug.renderPipeRotations) {
+                    if (G_IS_DEV && globalConfig.debug.renderBeltRotations) {
                         parameters.context.globalAlpha = 1;
                         parameters.context.fillStyle = "red";
                         parameters.context.font = "5px Tahoma";
