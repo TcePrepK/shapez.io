@@ -13,6 +13,7 @@ import { Rectangle } from "../core/rectangle";
 import { FLUID_ITEM_SINGLETONS } from "./items/fluid_item";
 import { enumFluids } from "./items/fluid_item";
 import { CoherentNoise } from "../core/coherentNoise";
+import { FastNoise } from "../core/FastNoise";
 
 const logger = createLogger("map_chunk");
 
@@ -96,10 +97,11 @@ export class MapChunk {
      * @param {BaseItem} item
      */
     internalGenerateOcean(distanceLimit, threashold, scale, item) {
-        const noise = new CoherentNoise(this.root.map.seed);
+        // const noise = new CoherentNoise(this.root.map.seed);
+        const noise = new FastNoise(this.root.map.seed);
 
-        const avgPos = new Vector(0, 0);
-        let patchesDrawn = 0;
+        // const avgPos = new Vector(0, 0);
+        // let patchesDrawn = 0;
 
         for (let offX = 0; offX < globalConfig.mapChunkSize; ++offX) {
             for (let offY = 0; offY < globalConfig.mapChunkSize; ++offY) {
@@ -108,16 +110,18 @@ export class MapChunk {
 
                 const distance = new Vector(x, y).length();
 
-                const valOnPoint = (x, y) => {
+                const valOnPoint = (x, y, z) => {
                     return (
-                        noise.computePerlin2(x * 0.01, y * 0.01) * 0.4 +
-                        noise.computePerlin2(x * 0.02, y * 0.02) * 0.3 +
-                        noise.computePerlin2(x * 0.04, y * 0.04) * 0.2 +
-                        noise.computePerlin2(x * 0.08, y * 0.08) * 0.1
+                        noise.GetNoise(x * 1, y * 1, z * 1) * 1 // noise.GetNoise(x * 2, y * 2) * 0.3
+                        // noise.GetNoise(x * 4, y * 4, z * 4) * 0.2 +
+                        // noise.GetNoise(x * 8, y * 8, z * 8) * 0.1
                     );
                 };
 
-                let val = valOnPoint(x, y);
+                // let val = valOnPoint(x, y);
+                // // console.log(val);
+
+                let val = valOnPoint(x, y, 0);
 
                 const waterLevel = -0.18;
 
