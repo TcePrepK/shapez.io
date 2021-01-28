@@ -7,6 +7,7 @@ import { enumDirection, enumDirectionToVector, enumInvertedDirections, Vector } 
 import { BasicSerializableObject, types } from "../savegame/serialization";
 import { BaseItem } from "./base_item";
 import { Entity } from "./entity";
+import { enumFluidsToHex } from "./items/fluid_item";
 import { typeItemSingleton } from "./item_resolver";
 import { GameRoot } from "./root";
 
@@ -1416,7 +1417,7 @@ export class PipePath extends BasicSerializableObject {
                     worldPos.x,
                     worldPos.y,
                     parameters,
-                    globalConfig.defaultFluidDiameter
+                    globalConfig.defaultItemDiameter
                 );
 
                 // Check for the next fluid

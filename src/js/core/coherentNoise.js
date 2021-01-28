@@ -229,25 +229,6 @@ export class CoherentNoise {
 
         return torgb(gradient(terrainGrad, val / 2 + 0.5));
     }
-
-    getColorArray(val) {
-        const terrainGrad = [
-            [0, [0, 0, 128]],
-            [0.3, [0, 0, 255]],
-            [0.4, [0, 255, 255]],
-            [0.41, [255, 192, 0]],
-            [0.45, [192, 160, 0]],
-            [0.46, [0, 192, 0]],
-            [0.65, [140, 112, 0]],
-            [0.7, [112, 96, 0]],
-            [0.75, [128, 128, 128]],
-            [0.9, [160, 160, 160]],
-            [0.91, [212, 212, 212]],
-            [1, [255, 255, 255]],
-        ];
-
-        return gradient(terrainGrad, val / 2 + 0.5);
-    }
 }
 
 const perlinNoiseData = [

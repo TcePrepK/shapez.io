@@ -97,11 +97,11 @@ export class MapChunk {
      * @param {BaseItem} item
      */
     internalGenerateOcean(distanceLimit, threashold, scale, item) {
-        // const noise = new CoherentNoise(this.root.map.seed);
-        const noise = new FastNoise(this.root.map.seed);
+        const noise = new CoherentNoise(this.root.map.seed);
+        // const noise = new FastNoise(this.root.map.seed);
 
-        // const avgPos = new Vector(0, 0);
-        // let patchesDrawn = 0;
+        const avgPos = new Vector(0, 0);
+        let patchesDrawn = 0;
 
         for (let offX = 0; offX < globalConfig.mapChunkSize; ++offX) {
             for (let offY = 0; offY < globalConfig.mapChunkSize; ++offY) {
@@ -112,9 +112,10 @@ export class MapChunk {
 
                 const valOnPoint = (x, y, z) => {
                     return (
-                        noise.GetNoise(x * 1, y * 1, z * 1) * 1 // noise.GetNoise(x * 2, y * 2) * 0.3
-                        // noise.GetNoise(x * 4, y * 4, z * 4) * 0.2 +
-                        // noise.GetNoise(x * 8, y * 8, z * 8) * 0.1
+                        noise.computeSimplex2(x * 0.01, y * 0.01) * 0.4 +
+                        noise.computeSimplex2(x * 0.02, y * 0.02) * 0.3 +
+                        noise.computeSimplex2(x * 0.04, y * 0.04) * 0.2 +
+                        noise.computeSimplex2(x * 0.08, y * 0.08) * 0.1
                     );
                 };
 

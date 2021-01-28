@@ -13,6 +13,8 @@ export class PumpSystem extends GameSystemWithFilter {
     constructor(root) {
         super(root, [PumpComponent]);
 
+        this.pressurePower = 20;
+
         this.needsRecompute = true;
     }
 
@@ -133,11 +135,21 @@ export class PumpSystem extends GameSystemWithFilter {
         }
 
         // Seems we are a regular pump or at the end of a row, try actually ejecting
-        if (ejectComp.tryEject(0, fluid)) {
-            return true;
+        let ejected = false;
+        if (ejectComp.tryEject(0, fluid, this.pressurePower)) {
+            ejected = true;
+        }
+        if (ejectComp.tryEject(1, fluid, this.pressurePower)) {
+            ejected = true;
+        }
+        if (ejectComp.tryEject(2, fluid, this.pressurePower)) {
+            ejected = true;
+        }
+        if (ejectComp.tryEject(3, fluid, this.pressurePower)) {
+            ejected = true;
         }
 
-        return false;
+        return ejected;
     }
 
     /**
