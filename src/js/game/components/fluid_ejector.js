@@ -1,7 +1,6 @@
 import { enumDirection, enumDirectionToVector, Vector } from "../../core/vector";
 import { types } from "../../savegame/serialization";
 import { BaseItem } from "../base_item";
-import { PipePath } from "../pipe_path";
 import { Component } from "../component";
 import { Entity } from "../entity";
 import { typeItemSingleton } from "../item_resolver";
@@ -13,7 +12,6 @@ import { typeItemSingleton } from "../item_resolver";
  *    fluid: BaseItem,
  *    progress: number?,
  *    cachedDestSlot?: import("./fluid_acceptor").FluidAcceptorLocatedSlot,
- *    cachedPipePath?: PipePath,
  *    cachedTargetEntity?: Entity
  * }} FluidEjectorSlot
  */

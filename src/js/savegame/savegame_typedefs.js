@@ -13,7 +13,6 @@
  *   waypoints: any,
  *   entities: Array<Entity>,
  *   beltPaths: Array<any>
- *   pipePaths: Array<any>
  * }} SerializedGame
  *
  * @typedef {{

@@ -136,16 +136,16 @@ export class PumpSystem extends GameSystemWithFilter {
 
         // Seems we are a regular pump or at the end of a row, try actually ejecting
         let ejected = false;
-        if (ejectComp.tryEject(0, fluid, this.pressurePower)) {
+        if (ejectComp.tryEject(0, fluid)) {
             ejected = true;
         }
-        if (ejectComp.tryEject(1, fluid, this.pressurePower)) {
+        if (ejectComp.tryEject(1, fluid)) {
             ejected = true;
         }
-        if (ejectComp.tryEject(2, fluid, this.pressurePower)) {
+        if (ejectComp.tryEject(2, fluid)) {
             ejected = true;
         }
-        if (ejectComp.tryEject(3, fluid, this.pressurePower)) {
+        if (ejectComp.tryEject(3, fluid)) {
             ejected = true;
         }
 

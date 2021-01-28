@@ -79,7 +79,6 @@ export class FluidEjectorSystem extends GameSystemWithFilter {
             // Clear the old cache.
             ejectorSlot.cachedDestSlot = null;
             ejectorSlot.cachedTargetEntity = null;
-            ejectorSlot.cachedPipePath = null;
 
             // Figure out where and into which direction we eject fluids
             const ejectSlotWsTile = staticComp.localTileToWorld(ejectorSlot.pos);
@@ -105,7 +104,6 @@ export class FluidEjectorSystem extends GameSystemWithFilter {
                     const pipeAcceptingDirection = targetStaticComp.localDirectionToWorld(enumDirection.top);
                     if (ejectSlotWsDirection === pipeAcceptingDirection) {
                         ejectorSlot.cachedTargetEntity = targetEntity;
-                        ejectorSlot.cachedPipePath = targetPipeComp.assignedPath;
                         break;
                     }
                 }
@@ -174,19 +172,6 @@ export class FluidEjectorSystem extends GameSystemWithFilter {
 
                 // Check if we are still in the process of ejecting, can't proceed then
                 if (sourceSlot.progress < 1.0) {
-                    continue;
-                }
-
-                // Check if we are ejecting to a pipe path
-                const destPath = sourceSlot.cachedPipePath;
-                if (destPath) {
-                    // Try passing the fluid over
-                    if (destPath.tryAcceptFluid(fluid)) {
-                        sourceSlot.fluid = null;
-                    }
-
-                    // Always stop here, since there can *either* be a pipe path *or*
-                    // a slot
                     continue;
                 }
 
@@ -330,56 +315,6 @@ export class FluidEjectorSystem extends GameSystemWithFilter {
 
                 // Limit the progress to the maximum available space on the next pipe (also see #1000)
                 let progress = slot.progress;
-                const nextPipePath = slot.cachedPipePath;
-                if (nextPipePath) {
-                    /*
-                    If you imagine the track between the center of the building and the center of the first pipe as
-                    a range from 0 to 1:1
-
-                           Building              Pipe
-                    |         X         |         X         |
-                    |         0...................1         |
-
-                    And for example the first fluid on pipe has a distance of 0.4 to the beginning of the pipe:
-
-                           Building              Pipe
-                    |         X         |         X         |
-                    |         0...................1         |
-                                               ^ fluid
-
-                    Then the space towards this first fluid is always 0.5 (the distance from the center of the building to the beginning of the pipe)
-                    PLUS the spacing to the fluid, so in this case 0.5 + 0.4 = 0.9:
-
-                    Building              Pipe
-                    |         X         |         X         |
-                    |         0...................1         |
-                                               ^ fluid @ 0.9
-
-                    Since fluids must not get clashed, we need to substract some spacing (lets assume it is 0.6, exact value see globalConfig.fluidSpacingOnPipes),
-                    So we do 0.9 - globalConfig.fluidSpacingOnPipes = 0.3
-
-                    Building              Pipe
-                    |         X         |         X         |
-                    |         0...................1         |
-                                    ^           ^ fluid @ 0.9
-                                    ^ max progress = 0.3
-
-                    Because now our range actually only goes to the end of the building, and not towards the center of the building, we need to multiply
-                    all values by 2:
-
-                    Building              Pipe
-                    |         X         |         X         |
-                    |         0.........1.........2         |
-                                    ^           ^ fluid @ 1.8
-                                    ^ max progress = 0.6
-
-                    And that's it! If you summarize the calculations from above into a formula, you get the one below.
-                    */
-
-                    const maxProgress =
-                        (0.5 + nextPipePath.spacingToFirstFluid - globalConfig.fluidSpacingOnPipes) * 2;
-                    progress = Math.min(maxProgress, progress);
-                }
 
                 // Skip if the fluid would barely be visible
                 if (progress < 0.05) {

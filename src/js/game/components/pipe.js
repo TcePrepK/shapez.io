@@ -1,7 +1,6 @@
 import { enumDirection, Vector } from "../../core/vector";
 import { Component } from "../component";
 import { defaultBuildingVariant } from "../meta_building";
-import { PipePath } from "../pipe_path";
 
 export const curvedPipeLength = /* Math.PI / 4 */ 0.78;
 
@@ -52,12 +51,6 @@ export class PipeComponent extends Component {
          * @type {enumPipeVariant}
          */
         this.variant = variant;
-
-        /**
-         * The path this pipe is contained in, not serialized
-         * @type {PipePath}
-         */
-        this.assignedPath = null;
 
         this.currentValue = null;
         this.currentAmount = 0;
