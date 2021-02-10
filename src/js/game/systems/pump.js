@@ -1,7 +1,9 @@
 import { globalConfig } from "../../core/config";
 import { DrawParameters } from "../../core/draw_parameters";
+import { gMetaBuildingRegistry } from "../../core/global_registries";
 import { enumDirectionToVector } from "../../core/vector";
 import { BaseItem } from "../base_item";
+import { MetaPipeBuilding } from "../buildings/pipe";
 import { MetaPumpBuilding } from "../buildings/pump";
 import { PumpComponent } from "../components/pump";
 import { Entity } from "../entity";
@@ -16,58 +18,92 @@ export class PumpSystem extends GameSystemWithFilter {
         this.pressurePower = 20;
 
         this.needsRecompute = true;
+
+        this.root.signals.entityAdded.add(this.foundFluid, this);
     }
 
     update() {
         for (let i = 0; i < this.allEntities.length; ++i) {
             const entity = this.allEntities[i];
+
+            const staticComp = entity.components.StaticMapEntity;
             const pumpComp = entity.components.Pump;
 
-            // // Reset everything on recompute
-            // if (this.needsRecompute) {
-            //     pumpComp.cachedChainedPump = null;
-            // }
+            const origin = staticComp.origin;
 
-            // Check if pump is above an actual tile
-            if (!pumpComp.cachedPumpedFluid) {
-                const staticComp = entity.components.StaticMapEntity;
-                let tileBelow = this.root.map.getLowerLayerContentXY(
-                    staticComp.origin.x,
-                    staticComp.origin.y
-                );
+            const metaPipe = gMetaBuildingRegistry.findByClass(MetaPipeBuilding);
+            // Compute affected area
+            const originalRect = staticComp.getTileSpaceBounds();
+            const affectedArea = originalRect.expandedInAllDirections(1);
 
-                if (!tileBelow) {
-                    continue;
-                }
-
-                if (!(tileBelow instanceof BaseItem)) {
-                    const fakeTile = tileBelow.item;
-                    if (fakeTile instanceof BaseItem) {
-                        tileBelow = fakeTile;
-                    } else {
+            for (let x = affectedArea.x; x < affectedArea.right(); ++x) {
+                for (let y = affectedArea.y; y < affectedArea.bottom(); ++y) {
+                    if (originalRect.containsPoint(x, y)) {
+                        // Make sure we don't update the original entity
                         continue;
                     }
+
+                    if (origin.x - x != 0 && origin.y - y != 0) {
+                        // Corners
+                        continue;
+                    }
+
+                    const targetEntities = this.root.map.getLayersContentsMultipleXY(x, y);
+                    for (let i = 0; i < targetEntities.length; ++i) {
+                        const targetEntity = targetEntities[i];
+
+                        const pipeComp = targetEntity.components.Pipe;
+                        if (!pipeComp) {
+                            continue;
+                        }
+
+                        if (!pipeComp.currentValue && pumpComp.cachedPumpedFluid) {
+                            // @ts-ignore
+                            pipeComp.currentValue = FLUID_ITEM_SINGLETONS[pumpComp.cachedPumpedFluid.fluid];
+                        }
+
+                        if (!pipeComp.currentValue) {
+                            continue;
+                        }
+
+                        if (pipeComp.currentAmount < pipeComp.getMaxValue()) {
+                            pipeComp.currentAmount += 1;
+                        }
+
+                        pipeComp.currentPressure = 20;
+                    }
                 }
-
-                pumpComp.cachedPumpedFluid = tileBelow;
-            }
-
-            // First, try to get rid of chained fluids
-            if (pumpComp.fluidChainBuffer.length > 0) {
-                if (this.tryPerformPumpEject(entity, pumpComp.fluidChainBuffer[0])) {
-                    pumpComp.fluidChainBuffer.shift();
-                    continue;
-                }
-            }
-
-            if (this.tryPerformPumpEject(entity, pumpComp.cachedPumpedFluid)) {
-                // Analytics hook
-                this.root.signals.itemProduced.dispatch(pumpComp.cachedPumpedFluid);
             }
         }
 
         // After this frame we are done
         this.needsRecompute = false;
+    }
+
+    foundFluid(entity) {
+        const pumpComp = entity.components.Pump;
+
+        if (!pumpComp) {
+            return;
+        }
+
+        // Check if miner is above an actual tile
+        if (!pumpComp.cachedPumpedFluid) {
+            const staticComp = entity.components.StaticMapEntity;
+            let tileBelow = this.root.map.getLowerLayerContentXY(staticComp.origin.x, staticComp.origin.y);
+            if (!tileBelow) {
+                return;
+            }
+
+            if (!(tileBelow instanceof BaseItem)) {
+                const fakeTile = tileBelow.item;
+                if (fakeTile instanceof BaseItem) {
+                    tileBelow = fakeTile;
+                }
+            }
+
+            pumpComp.cachedPumpedFluid = tileBelow;
+        }
     }
 
     /**
@@ -103,53 +139,6 @@ export class PumpSystem extends GameSystemWithFilter {
         }
 
         return false;
-    }
-
-    /**
-     *
-     * @param {Entity} entity
-     * @param {BaseItem} fluid
-     */
-    tryPerformPumpEject(entity, fluid) {
-        const pumpComp = entity.components.Pump;
-        const ejectComp = entity.components.FluidEjector;
-
-        // Check if we are a chained pump
-        if (pumpComp.chainable) {
-            const targetEntity = pumpComp.cachedChainedPump;
-
-            // Check if the cache has to get recomputed
-            if (targetEntity === null) {
-                pumpComp.cachedChainedPump = this.findChainedPump(entity);
-            }
-
-            // Check if we now have a target
-            if (targetEntity) {
-                const targetPumpComp = targetEntity.components.Pump;
-                if (targetPumpComp.tryAcceptChainedFluid(fluid)) {
-                    return true;
-                } else {
-                    return false;
-                }
-            }
-        }
-
-        // Seems we are a regular pump or at the end of a row, try actually ejecting
-        let ejected = false;
-        if (ejectComp.tryEject(0, fluid)) {
-            ejected = true;
-        }
-        if (ejectComp.tryEject(1, fluid)) {
-            ejected = true;
-        }
-        if (ejectComp.tryEject(2, fluid)) {
-            ejected = true;
-        }
-        if (ejectComp.tryEject(3, fluid)) {
-            ejected = true;
-        }
-
-        return ejected;
     }
 
     /**

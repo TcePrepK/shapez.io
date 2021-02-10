@@ -124,7 +124,7 @@ export class MapChunk {
 
                 let val = valOnPoint(x, y, 0);
 
-                const waterLevel = -0.18;
+                const waterLevel = -0.187;
 
                 if (distance > distanceLimit * globalConfig.mapChunkSize) {
                     if (val < 0.4) {
@@ -133,13 +133,13 @@ export class MapChunk {
                             // ++patchesDrawn;
                             // avgPos.x += offX;
                             // avgPos.y += offY;
-                            this.lowerLayer[offX][offY] = { item, color };
+                            this.lowerLayer[offX][offY] = { item, color, val };
                         } else {
-                            this.lowerLayer[offX][offY] = { color };
+                            this.lowerLayer[offX][offY] = { color, val };
                         }
                     } else {
                         const color = noise.getColor(0.4);
-                        this.lowerLayer[offX][offY] = { color };
+                        this.lowerLayer[offX][offY] = { color, val };
                     }
                 } else {
                     const map = function (n, start1, stop1, start2, stop2) {
@@ -154,16 +154,16 @@ export class MapChunk {
                             // ++patchesDrawn;
                             // avgPos.x += offX;
                             // avgPos.y += offY;
-                            this.lowerLayer[offX][offY] = { item, color };
+                            this.lowerLayer[offX][offY] = { item, color, val };
                         } else {
-                            this.lowerLayer[offX][offY] = { color };
+                            this.lowerLayer[offX][offY] = { color, val };
                         }
                     } else {
                         const color = noise.getColor(
                             map(distance, distanceLimit * globalConfig.mapChunkSize, 0, 0.4, 0.2)
                         );
 
-                        this.lowerLayer[offX][offY] = { color };
+                        this.lowerLayer[offX][offY] = { color, val };
                     }
                 }
             }
@@ -410,7 +410,7 @@ export class MapChunk {
         //     this.internalGenerateShapePatch(rng, shapePatchSize, distanceToOriginInChunks);
         // }
 
-        this.internalGenerateLiquidOcean(rng, distanceToOriginInChunks);
+        // this.internalGenerateLiquidOcean(rng, distanceToOriginInChunks);
     }
 
     /**

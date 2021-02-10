@@ -108,7 +108,7 @@ export default {
     // renderWireRotations: true,
     // -----------------------------------------------------------------------------------
     // Renders the rotation of all pipes
-    // renderPipeRotations: true,
+    renderPipeRotations: true,
     // -----------------------------------------------------------------------------------
     // Renders the rotation of all pipes
     // renderBeltRotations: true,

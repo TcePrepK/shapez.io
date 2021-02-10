@@ -1,3 +1,4 @@
+import { gItemRegistry } from "../../core/global_registries";
 import { types } from "../../savegame/serialization";
 import { BaseItem } from "../base_item";
 import { Component } from "../component";
@@ -15,6 +16,7 @@ export class PumpComponent extends Component {
         // cachedMinedItem is not serialized.
         return {
             fluidChainBuffer: types.array(typeItemSingleton),
+            cachedPumpedFluid: types.nullable(typeItemSingleton),
         };
     }
 

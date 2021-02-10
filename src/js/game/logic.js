@@ -537,6 +537,69 @@ export class GameLogic {
     }
 
     /**
+     * Finds the follow up entity for a given pipe. Used for building the dependencies
+     * @param {Entity} entity
+     * @returns {Entity|null}
+     */
+    findFollowUpPipeEntity(entity) {
+        const staticComp = entity.components.StaticMapEntity;
+        const pipeComp = entity.components.Pipe;
+
+        const followUpDirection = staticComp.localDirectionToWorld(pipeComp.direction);
+        const followUpVector = enumDirectionToVector[followUpDirection];
+
+        const followUpTile = staticComp.origin.add(followUpVector);
+        const followUpEntity = this.root.map.getLayerContentXY(followUpTile.x, followUpTile.y, entity.layer);
+
+        // Check if there's a pipe at the tile we point to
+        if (followUpEntity) {
+            const followUpPipeComp = followUpEntity.components.Pipe;
+            if (followUpPipeComp) {
+                const followUpStatic = followUpEntity.components.StaticMapEntity;
+
+                const acceptedDirection = followUpStatic.localDirectionToWorld(enumDirection.top);
+                if (acceptedDirection === followUpDirection) {
+                    return followUpEntity;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Finds the supplying pipe for a given pipe. Used for building the dependencies
+     * @param {Entity} entity
+     * @returns {Entity|null}
+     */
+    findSupplyingPipeEntity(entity) {
+        const staticComp = entity.components.StaticMapEntity;
+
+        const supplyDirection = staticComp.localDirectionToWorld(enumDirection.bottom);
+        const supplyVector = enumDirectionToVector[supplyDirection];
+
+        const supplyTile = staticComp.origin.add(supplyVector);
+        const supplyEntity = this.root.map.getLayerContentXY(supplyTile.x, supplyTile.y, entity.layer);
+
+        // Check if there's a pipe at the tile we point to
+        if (supplyEntity) {
+            const supplyPipeComp = supplyEntity.components.Pipe;
+            if (supplyPipeComp) {
+                const supplyStatic = supplyEntity.components.StaticMapEntity;
+                const otherDirection = supplyStatic.localDirectionToWorld(
+                    enumInvertedDirections[supplyPipeComp.direction]
+                );
+
+                if (otherDirection === supplyDirection) {
+                    return supplyEntity;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * Finds surrounding entities which are not yet assigned to a network
      * @param {Vector} initialTile
      * @param {Array<enumDirection>} directions

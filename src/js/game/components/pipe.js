@@ -1,5 +1,8 @@
 import { enumDirection, Vector } from "../../core/vector";
+import { types } from "../../savegame/serialization";
+import { BaseItem } from "../base_item";
 import { Component } from "../component";
+import { Entity } from "../entity";
 import { defaultBuildingVariant } from "../meta_building";
 
 export const curvedPipeLength = /* Math.PI / 4 */ 0.78;
@@ -8,6 +11,11 @@ export const curvedPipeLength = /* Math.PI / 4 */ 0.78;
 export const enumPipeVariant = {
     pipe: "pipe",
     industrial: "industrial",
+};
+
+export const enumMaxValueByVariant = {
+    [defaultBuildingVariant]: 80,
+    [enumPipeVariant.industrial]: 320,
 };
 
 export const FAKE_PIPE_ACCEPTOR_SLOT = {
@@ -37,6 +45,12 @@ export class PipeComponent extends Component {
         return "Pipe";
     }
 
+    static getSchema() {
+        return {
+            currentAmount: types.ufloat,
+        };
+    }
+
     /**
      * @param {object} param0
      * @param {enumPipeVariant=} param0.variant
@@ -54,6 +68,13 @@ export class PipeComponent extends Component {
 
         this.currentValue = null;
         this.currentAmount = 0;
+        this.currentPressure = 0;
+
+        /**
+         * The variant of the wire, different variants do not connect
+         * @type {Array<Entity>}
+         */
+        this.connections = [];
     }
 
     /**
@@ -76,6 +97,10 @@ export class PipeComponent extends Component {
      */
     getFakeEjectorSlot() {
         return FAKE_PIPE_EJECTOR_SLOT_BY_DIRECTION[this.direction];
+    }
+
+    getMaxValue() {
+        return enumMaxValueByVariant[this.variant];
     }
 
     /**

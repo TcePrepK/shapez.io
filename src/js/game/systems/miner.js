@@ -52,6 +52,7 @@ export class MinerSystem extends GameSystemWithFilter {
                     staticComp.origin.x,
                     staticComp.origin.y
                 );
+
                 if (!tileBelow) {
                     continue;
                 }
@@ -60,6 +61,8 @@ export class MinerSystem extends GameSystemWithFilter {
                     const fakeTile = tileBelow.item;
                     if (fakeTile instanceof BaseItem) {
                         tileBelow = fakeTile;
+                    } else {
+                        continue;
                     }
                 }
 

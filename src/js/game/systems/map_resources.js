@@ -67,13 +67,15 @@ export class MapResourcesSystem extends GameSystem {
 
                     if (lowerItem) {
                         if (!(lowerItem instanceof BaseItem)) {
-                            lowerItem = lowerItem.item;
-                            if (!(lowerItem instanceof BaseItem)) {
+                            if (!(lowerItem.item instanceof BaseItem)) {
                                 continue;
                             }
                         }
 
-                        if (lowerItem.getItemType() === "fluid") {
+                        if (
+                            (lowerItem.item && lowerItem.item.getItemType() === "fluid") ||
+                            (lowerItem && lowerItem.getItemType() === "fluid")
+                        ) {
                             let drawnPatches = [];
                             for (let i = 0; i < chunk.patches.length; ++i) {
                                 const patch = chunk.patches[i];
@@ -139,6 +141,23 @@ export class MapResourcesSystem extends GameSystem {
                                 globalConfig.defaultItemDiameter
                             );
                         }
+                    }
+
+                    const worldY = (chunk.tileY + y) * globalConfig.tileSize;
+
+                    const destX = worldX + globalConfig.halfTileSize;
+                    const destY = worldY + globalConfig.halfTileSize;
+
+                    if (typeof lowerItem === "object") {
+                        parameters.context.fillStyle = "white";
+                        parameters.context.font = "10px Arial";
+                        parameters.context.textBaseline = "middle";
+                        parameters.context.fillText(
+                            String(Math.floor(lowerItem.val * 1000) / 1000),
+                            destX - globalConfig.tileSize / 2,
+                            destY,
+                            globalConfig.tileSize
+                        );
                     }
                 }
             }

@@ -46,28 +46,9 @@ export class FluidItem extends BaseItem {
         return this.fluid;
     }
 
-    /**
-     * @param {BaseItem} other
-     */
-    equalsImpl(other) {
-        return this.fluid === /** @type {FluidItem} */ (other).fluid;
-    }
-
     getBackgroundColorAsResource() {
         return enumFluidsToHex[this.fluid];
     }
-
-    // /**
-    //  * Draws the item to a canvas
-    //  * @param {CanvasRenderingContext2D} context
-    //  * @param {number} size
-    //  */
-    // drawFullSizeOnCanvas(context, size) {
-    //     if (!this.cachedSprite) {
-    //         this.cachedSprite = Loader.getSprite("sprites/fluids/" + this.fluid + ".png");
-    //     }
-    //     this.cachedSprite.drawCentered(context, size / 2, size / 2, size);
-    // }
 
     /**
      * @param {number} x
