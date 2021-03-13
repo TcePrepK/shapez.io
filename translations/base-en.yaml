@@ -701,6 +701,14 @@ buildings:
             name: Item Producer
             description: Available in sandbox mode only, outputs the given signal from the wires layer on the regular layer.
 
+    corner_editor:
+        default:
+            name: Corner Adder
+            description: Adds new corner to shape
+        remover:
+            name: Corner Remover
+            description: Removed corner from shape
+
 storyRewards:
     # Those are the rewards gained from completing the store
     reward_cutter_and_trash:
@@ -1128,6 +1136,7 @@ keybindings:
         analyzer: *analyzer
         comparator: *comparator
         item_producer: Item Producer (Sandbox)
+        corner_editor: Corner Editor
         # ---
 
         pipette: Pipette

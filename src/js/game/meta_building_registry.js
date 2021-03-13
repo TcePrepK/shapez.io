@@ -6,6 +6,7 @@ import { enumBalancerVariants, MetaBalancerBuilding } from "./buildings/balancer
 import { MetaBeltBuilding } from "./buildings/belt";
 import { MetaComparatorBuilding } from "./buildings/comparator";
 import { MetaConstantSignalBuilding } from "./buildings/constant_signal";
+import { MetaCornerEditorBuilding, enumCornerEditerVariants } from "./buildings/corner_editer";
 import { enumCutterVariants, MetaCutterBuilding } from "./buildings/cutter";
 import { MetaDisplayBuilding } from "./buildings/display";
 import { MetaFilterBuilding } from "./buildings/filter";
@@ -59,6 +60,7 @@ export function initMetaBuildingRegistry() {
     gMetaBuildingRegistry.register(MetaAnalyzerBuilding);
     gMetaBuildingRegistry.register(MetaComparatorBuilding);
     gMetaBuildingRegistry.register(MetaItemProducerBuilding);
+    gMetaBuildingRegistry.register(MetaCornerEditorBuilding);
 
     // Belt
     registerBuildingVariant(1, MetaBeltBuilding, defaultBuildingVariant, 0);
@@ -164,6 +166,10 @@ export function initMetaBuildingRegistry() {
 
     // Item producer
     registerBuildingVariant(61, MetaItemProducerBuilding);
+
+    // Corner Changer
+    registerBuildingVariant(100, MetaCornerEditorBuilding);
+    registerBuildingVariant(101, MetaCornerEditorBuilding, enumCornerEditerVariants.remover);
 
     // Propagate instances
     for (const key in gBuildingVariants) {

@@ -40,6 +40,9 @@ export const globalConfig = {
     assetsSharpness: 1.5,
     shapesSharpness: 1.4,
 
+    // Shape corner amount
+    shapeCornerAmount: 8,
+
     // Achievements
     achievementSliceDuration: 10, // Seconds
 

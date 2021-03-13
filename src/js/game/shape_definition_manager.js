@@ -241,6 +241,40 @@ export class ShapeDefinitionManager extends BasicSerializableObject {
     }
 
     /**
+     * Generates a definition for painting it with the 4 colors
+     * @param {ShapeDefinition} definition
+     * @param {[enumColors, enumColors, enumColors, enumColors]} colors
+     * @returns {ShapeDefinition}
+     */
+    shapeActionAddCorner(definition, colors) {
+        const key = "corneradd/" + definition.getHash();
+        if (this.operationCache[key]) {
+            return /** @type {ShapeDefinition} */ (this.operationCache[key]);
+        }
+        const newShape = definition.cloneAndAddCorner();
+        return /** @type {ShapeDefinition} */ (this.operationCache[key] = this.registerOrReturnHandle(
+            newShape
+        ));
+    }
+
+    /**
+     * Generates a definition for painting it with the 4 colors
+     * @param {ShapeDefinition} definition
+     * @param {[enumColors, enumColors, enumColors, enumColors]} colors
+     * @returns {ShapeDefinition}
+     */
+    shapeActionRemoveCorner(definition, colors) {
+        const key = "cornerremove/" + definition.getHash();
+        if (this.operationCache[key]) {
+            return /** @type {ShapeDefinition} */ (this.operationCache[key]);
+        }
+        const newShape = definition.cloneAndRemoveCorner();
+        return /** @type {ShapeDefinition} */ (this.operationCache[key] = this.registerOrReturnHandle(
+            newShape
+        ));
+    }
+
+    /**
      * Checks if we already have cached this definition, and if so throws it away and returns the already
      * cached variant
      * @param {ShapeDefinition} definition

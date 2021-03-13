@@ -16,6 +16,7 @@ import { HUDBaseToolbar } from "./base_toolbar";
 import { MetaStorageBuilding } from "../../buildings/storage";
 import { MetaItemProducerBuilding } from "../../buildings/item_producer";
 import { queryParamOptions } from "../../../core/query_parameters";
+import { MetaCornerEditorBuilding } from "../../buildings/corner_editer";
 
 export class HUDBuildingsToolbar extends HUDBaseToolbar {
     constructor(root) {
@@ -31,6 +32,7 @@ export class HUDBuildingsToolbar extends HUDBaseToolbar {
                 MetaMixerBuilding,
                 MetaPainterBuilding,
                 MetaTrashBuilding,
+                MetaCornerEditorBuilding,
                 ...(queryParamOptions.sandboxMode || G_IS_DEV ? [MetaItemProducerBuilding] : []),
             ],
             secondaryBuildings: [

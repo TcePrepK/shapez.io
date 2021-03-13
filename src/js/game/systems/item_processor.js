@@ -59,6 +59,8 @@ export class ItemProcessorSystem extends GameSystemWithFilter {
             [enumItemProcessorTypes.painterQuad]: this.process_PAINTER_QUAD,
             [enumItemProcessorTypes.hub]: this.process_HUB,
             [enumItemProcessorTypes.reader]: this.process_READER,
+            [enumItemProcessorTypes.cornerAdder]: this.process_CORNER_ADDER,
+            [enumItemProcessorTypes.cornerRemover]: this.process_CORNER_REMOVER,
         };
 
         // Bind all handlers
@@ -548,6 +550,34 @@ export class ItemProcessorSystem extends GameSystemWithFilter {
         const readerComp = payload.entity.components.BeltReader;
         readerComp.lastItemTimes.push(this.root.time.now());
         readerComp.lastItem = item;
+    }
+
+    /**
+     * @param {ProcessorImplementationPayload} payload
+     */
+    process_CORNER_ADDER(payload) {
+        const shapeItem = /** @type {ShapeItem} */ (payload.itemsBySlot[0]);
+        assert(shapeItem instanceof ShapeItem, "Input for corner adder is not a shape");
+
+        const newShape = this.root.shapeDefinitionMgr.shapeActionAddCorner(shapeItem.definition);
+
+        payload.outItems.push({
+            item: this.root.shapeDefinitionMgr.getShapeItemFromDefinition(newShape),
+        });
+    }
+
+    /**
+     * @param {ProcessorImplementationPayload} payload
+     */
+    process_CORNER_REMOVER(payload) {
+        const shapeItem = /** @type {ShapeItem} */ (payload.itemsBySlot[0]);
+        assert(shapeItem instanceof ShapeItem, "Input for corner adder is not a shape");
+
+        const newShape = this.root.shapeDefinitionMgr.shapeActionRemoveCorner(shapeItem.definition);
+
+        payload.outItems.push({
+            item: this.root.shapeDefinitionMgr.getShapeItemFromDefinition(newShape),
+        });
     }
 
     /**
