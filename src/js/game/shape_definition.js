@@ -2,6 +2,7 @@ import { makeOffscreenBuffer } from "../core/buffer_utils";
 import { globalConfig } from "../core/config";
 import { smoothenDpi } from "../core/dpi_manager";
 import { DrawParameters } from "../core/draw_parameters";
+import { RandomNumberGenerator } from "../core/rng";
 import { Vector } from "../core/vector";
 import { BasicSerializableObject, types } from "../savegame/serialization";
 import { enumColors, enumColorsToHexCode, enumColorToShortcode, enumShortcodeToColor } from "./colors";
@@ -276,24 +277,34 @@ export class ShapeDefinition extends BasicSerializableObject {
      * @param {number} x
      * @param {number} y
      * @param {DrawParameters} parameters
+     * @param {number} rotationAngle
      * @param {number=} diameter
      */
-    drawCentered(x, y, parameters, diameter = 20) {
+    drawCentered(x, y, parameters, rotationAngle, diameter = 20) {
         const dpi = smoothenDpi(globalConfig.shapesSharpness * parameters.zoomLevel);
 
-        if (!this.bufferGenerator) {
-            this.bufferGenerator = this.internalGenerateShapeBuffer.bind(this);
-        }
+        // if (!this.bufferGenerator) {
+        //     this.rotations = rotations;
+        //     this.bufferGenerator = this.internalGenerateShapeBuffer.bind(this);
+        // }
 
-        const key = diameter + "/" + dpi + "/" + this.cachedHash;
-        const canvas = parameters.root.buffers.getForKey({
-            key: "shapedef",
-            subKey: key,
-            w: diameter,
-            h: diameter,
-            dpi,
-            redrawMethod: this.bufferGenerator,
+        const [canvas, context] = makeOffscreenBuffer(120, 120, {
+            smooth: true,
+            label: "definition-canvas-cache-" + this.getHash(),
+            reusable: false,
         });
+
+        this.internalGenerateShapeBuffer(canvas, context, 120, 120, 1, rotationAngle);
+
+        // const key = diameter + "/" + dpi + "/" + this.cachedHash;
+        // const canvas = parameters.root.buffers.getForKey({
+        //     key: "shapedef",
+        //     subKey: key,
+        //     w: diameter,
+        //     h: diameter,
+        //     dpi,
+        //     redrawMethod: this.bufferGenerator,
+        // });
         parameters.context.drawImage(canvas, x - diameter / 2, y - diameter / 2, diameter, diameter);
     }
 
@@ -301,9 +312,10 @@ export class ShapeDefinition extends BasicSerializableObject {
      * Draws the item to a canvas
      * @param {CanvasRenderingContext2D} context
      * @param {number} size
+     * @param {number} rotation
      */
-    drawFullSizeOnCanvas(context, size) {
-        this.internalGenerateShapeBuffer(null, context, size, size, 1);
+    drawFullSizeOnCanvas(context, size, rotation) {
+        this.internalGenerateShapeBuffer(null, context, size, size, 1, rotation);
     }
 
     /**
@@ -328,8 +340,9 @@ export class ShapeDefinition extends BasicSerializableObject {
      * @param {number} w
      * @param {number} h
      * @param {number} dpi
+     * @param {number=} rotationAngle
      */
-    internalGenerateShapeBuffer(canvas, context, w, h, dpi) {
+    internalGenerateShapeBuffer(canvas, context, w, h, dpi, rotationAngle = 0) {
         context.translate((w * dpi) / 2, (h * dpi) / 2);
         context.scale((dpi * w) / 23, (dpi * h) / 23);
 
@@ -359,6 +372,7 @@ export class ShapeDefinition extends BasicSerializableObject {
 
                 const rotation = Math.radians(quadrantIndex * 90);
 
+                context.rotate(rotationAngle);
                 context.translate(centerQuadrantX, centerQuadrantY);
                 context.rotate(rotation);
 
@@ -399,6 +413,7 @@ export class ShapeDefinition extends BasicSerializableObject {
 
                     case enumSubShape.windmill: {
                         context.beginPath();
+                        // context.rotate(rotationAngle);
                         const dims = quadrantSize * layerScale;
 
                         let originX = insetPadding - quadrantHalfSize;
@@ -408,6 +423,7 @@ export class ShapeDefinition extends BasicSerializableObject {
                         context.lineTo(originX + dims, originY);
                         context.lineTo(originX + dims, originY + dims);
                         context.lineTo(originX, originY + dims);
+                        // context.rotate(-rotationAngle);
                         context.closePath();
                         break;
                     }
@@ -436,6 +452,7 @@ export class ShapeDefinition extends BasicSerializableObject {
 
                 context.rotate(-rotation);
                 context.translate(-centerQuadrantX, -centerQuadrantY);
+                context.rotate(-rotationAngle);
             }
         }
     }

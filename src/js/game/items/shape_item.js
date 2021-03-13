@@ -51,6 +51,9 @@ export class ShapeItem extends BaseItem {
          * This property must not be modified on runtime, you have to clone the class in order to change the definition
          */
         this.definition = definition;
+
+        // Rotating angle
+        this.rotateAngle = 0;
     }
 
     getBackgroundColorAsResource() {
@@ -63,7 +66,7 @@ export class ShapeItem extends BaseItem {
      * @param {number} size
      */
     drawFullSizeOnCanvas(context, size) {
-        this.definition.drawFullSizeOnCanvas(context, size);
+        this.definition.drawFullSizeOnCanvas(context, size, this.rotateAngle);
     }
 
     /**
@@ -73,6 +76,7 @@ export class ShapeItem extends BaseItem {
      * @param {number=} diameter
      */
     drawItemCenteredImpl(x, y, parameters, diameter = globalConfig.defaultItemDiameter) {
-        this.definition.drawCentered(x, y, parameters, diameter);
+        this.definition.drawCentered(x, y, parameters, this.rotateAngle, diameter);
+        this.rotateAngle += Math.PI / 360;
     }
 }
