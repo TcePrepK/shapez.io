@@ -571,7 +571,7 @@ export class ItemProcessorSystem extends GameSystemWithFilter {
      */
     process_CORNER_REMOVER(payload) {
         const shapeItem = /** @type {ShapeItem} */ (payload.itemsBySlot[0]);
-        assert(shapeItem instanceof ShapeItem, "Input for corner adder is not a shape");
+        assert(shapeItem instanceof ShapeItem, "Input for corner remover is not a shape");
 
         const newShape = this.root.shapeDefinitionMgr.shapeActionRemoveCorner(shapeItem.definition);
 

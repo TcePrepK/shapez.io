@@ -94,8 +94,25 @@ export class ShapeDefinitionManager extends BasicSerializableObject {
         if (this.operationCache[key]) {
             return /** @type {[ShapeDefinition, ShapeDefinition]} */ (this.operationCache[key]);
         }
-        const rightSide = definition.cloneFilteredByQuadrants([2, 3]);
-        const leftSide = definition.cloneFilteredByQuadrants([0, 1]);
+
+        const cornerAmount = definition.getHash().length / 2;
+
+        let rightNumbers = [];
+        let leftNumbers = [];
+
+        for (let i = 0; i < cornerAmount; i++) {
+            if (i <= cornerAmount / 2) {
+                rightNumbers.push(i);
+            } else {
+                leftNumbers.push(i);
+            }
+        }
+
+        const rightSide = definition.cloneFilteredByQuadrants(rightNumbers);
+        const leftSide = definition.cloneFilteredByQuadrants(leftNumbers);
+
+        console.log(rightSide);
+        console.log(leftSide);
 
         this.root.signals.achievementCheck.dispatch(ACHIEVEMENTS.cutShape);
 
@@ -243,10 +260,9 @@ export class ShapeDefinitionManager extends BasicSerializableObject {
     /**
      * Generates a definition for painting it with the 4 colors
      * @param {ShapeDefinition} definition
-     * @param {[enumColors, enumColors, enumColors, enumColors]} colors
      * @returns {ShapeDefinition}
      */
-    shapeActionAddCorner(definition, colors) {
+    shapeActionAddCorner(definition) {
         const key = "corneradd/" + definition.getHash();
         if (this.operationCache[key]) {
             return /** @type {ShapeDefinition} */ (this.operationCache[key]);
@@ -260,10 +276,9 @@ export class ShapeDefinitionManager extends BasicSerializableObject {
     /**
      * Generates a definition for painting it with the 4 colors
      * @param {ShapeDefinition} definition
-     * @param {[enumColors, enumColors, enumColors, enumColors]} colors
      * @returns {ShapeDefinition}
      */
-    shapeActionRemoveCorner(definition, colors) {
+    shapeActionRemoveCorner(definition) {
         const key = "cornerremove/" + definition.getHash();
         if (this.operationCache[key]) {
             return /** @type {ShapeDefinition} */ (this.operationCache[key]);
