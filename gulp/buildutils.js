@@ -6,10 +6,11 @@ const path = require("path");
 
 module.exports = {
     getRevision: function (useLast = false) {
-        const commitHash = execSync("git rev-parse --short " + (useLast ? "HEAD^1" : "HEAD")).toString(
-            "ascii"
-        );
-        return commitHash.replace(/^\s+|\s+$/g, "");
+        let commitHash = execSync("git rev-parse --short " + (useLast ? "HEAD^1" : "HEAD")).toString("ascii");
+
+        commitHash = commitHash.replace(/^\s+|\s+$/g, "");
+        console.log(commitHash);
+        return commitHash;
     },
 
     getAllResourceImages() {
@@ -29,7 +30,7 @@ module.exports = {
         try {
             return execSync("git describe --tag --exact-match").toString("ascii");
         } catch (e) {
-            throw new Error('Current git HEAD is not a version tag');
+            throw new Error("Current git HEAD is not a version tag");
         }
     },
 
@@ -42,6 +43,6 @@ module.exports = {
      * @param {string} commitHash
      */
     cachebust(url, commitHash) {
-        return "/v/" + commitHash + "/" + url;
+        return "/shapez/EditableCorners/v/" + commitHash + "/" + url;
     },
 };
