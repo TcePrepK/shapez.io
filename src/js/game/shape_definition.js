@@ -355,7 +355,8 @@ export class ShapeDefinition extends BasicSerializableObject {
                 }
                 const { subShape, color } = quadrants[quadrantIndex];
 
-                const rotation = Math.radians(quadrantIndex * (360 / cornerAmount));
+                const angle = quadrantIndex * (360 / cornerAmount);
+                const rotation = Math.radians(angle);
 
                 const quadrantPosX = Math.sqrt(2) * Math.cos(rotation - Math.PI / 4);
                 const quadrantPosY = Math.sqrt(2) * Math.sin(rotation - Math.PI / 4);
@@ -371,63 +372,85 @@ export class ShapeDefinition extends BasicSerializableObject {
 
                 const insetPadding = 0.0;
 
+                const dims = quadrantSize * layerScale - 1;
+                const moveInwards = dims * 0.4;
+                const originX = insetPadding - quadrantHalfSize;
+                const originY = -insetPadding + quadrantHalfSize;
+
+                context.translate(originX, originY);
+                context.beginPath();
                 switch (subShape) {
                     case enumSubShape.rect: {
-                        context.beginPath();
-                        const dims = quadrantSize * layerScale;
-                        context.rect(
-                            insetPadding + -quadrantHalfSize,
-                            -insetPadding + quadrantHalfSize - dims,
-                            dims,
-                            dims
-                        );
+                        if (cornerAmount > 1) {
+                            const alpha = Math.radians((90 - 360 / cornerAmount) / 2);
 
+                            context.moveTo(0, 0);
+                            context.rotate(-alpha);
+                            context.lineTo(dims, 0);
+                            context.rotate(alpha);
+                            context.lineTo(dims, -dims);
+                            context.rotate(alpha);
+                            context.lineTo(0, -dims);
+                            context.rotate(-alpha);
+                        } else {
+                            context.rect(-dims, -dims, dims * 2, dims * 2);
+                        }
                         break;
                     }
                     case enumSubShape.star: {
-                        context.beginPath();
-                        const dims = quadrantSize * layerScale;
+                        if (cornerAmount > 1) {
+                            const alpha = Math.radians((90 - 360 / cornerAmount) / 2);
 
-                        let originX = insetPadding - quadrantHalfSize;
-                        let originY = -insetPadding + quadrantHalfSize - dims;
-
-                        const moveInwards = dims * 0.4;
-                        context.moveTo(originX, originY + moveInwards);
-                        context.lineTo(originX + dims, originY);
-                        context.lineTo(originX + dims - moveInwards, originY + dims);
-                        context.lineTo(originX, originY + dims);
-                        context.closePath();
+                            context.moveTo(0, 0);
+                            context.rotate(-alpha);
+                            context.lineTo(moveInwards, 0);
+                            context.rotate(alpha);
+                            context.lineTo(dims, -dims);
+                            context.rotate(alpha);
+                            context.lineTo(0, -moveInwards);
+                            context.rotate(-alpha);
+                        } else {
+                            context.moveTo(0, -dims);
+                            context.rotate(Math.radians(120));
+                            context.lineTo(0, -dims);
+                            context.rotate(Math.radians(120));
+                            context.lineTo(0, -dims);
+                            context.rotate(Math.radians(120));
+                        }
                         break;
                     }
 
                     case enumSubShape.windmill: {
-                        context.beginPath();
-                        // context.rotate(rotationAngle);
-                        const dims = quadrantSize * layerScale;
+                        if (cornerAmount > 1) {
+                            const alpha = Math.radians(((cornerAmount - 4) * 90) / cornerAmount);
 
-                        let originX = insetPadding - quadrantHalfSize;
-                        let originY = -insetPadding + quadrantHalfSize - dims;
-                        const moveInwards = dims * 0.4;
-                        context.moveTo(originX, originY + moveInwards);
-                        context.lineTo(originX + dims, originY);
-                        context.lineTo(originX + dims, originY + dims);
-                        context.lineTo(originX, originY + dims);
-                        // context.rotate(-rotationAngle);
-                        context.closePath();
+                            context.translate(0, -dims);
+                            context.moveTo(0, moveInwards);
+                            context.lineTo(dims, 0);
+                            context.lineTo(dims, dims);
+                            context.lineTo(0, dims);
+                            context.translate(0, dims);
+                        } else {
+                            context.moveTo(0, moveInwards);
+                            context.lineTo(dims, 0);
+                            context.lineTo(dims, dims);
+                            context.lineTo(0, dims);
+                        }
                         break;
                     }
 
                     case enumSubShape.circle: {
-                        context.beginPath();
-                        context.moveTo(insetPadding + -quadrantHalfSize, -insetPadding + quadrantHalfSize);
-                        context.arc(
-                            insetPadding + -quadrantHalfSize,
-                            -insetPadding + quadrantHalfSize,
-                            quadrantSize * layerScale,
-                            -Math.PI * 0.5,
-                            0
-                        );
-                        context.closePath();
+                        context.rotate(-Math.PI / 2);
+
+                        const alpha = Math.radians(360 / cornerAmount);
+
+                        if (cornerAmount > 1) {
+                            context.moveTo(0, 0);
+                            context.arc(0, 0, dims, 0, alpha);
+                        } else {
+                            context.arc(0, 0, dims, -Math.PI, Math.PI);
+                        }
+                        context.rotate(Math.PI / 2);
                         break;
                     }
 
@@ -435,6 +458,9 @@ export class ShapeDefinition extends BasicSerializableObject {
                         assertAlways(false, "Unkown sub shape: " + subShape);
                     }
                 }
+
+                context.closePath();
+                context.translate(-originX, -originY);
 
                 context.fill();
                 context.stroke();
