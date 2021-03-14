@@ -6,11 +6,10 @@ const path = require("path");
 
 module.exports = {
     getRevision: function (useLast = false) {
-        let commitHash = execSync("git rev-parse --short " + (useLast ? "HEAD^1" : "HEAD")).toString("ascii");
-
-        commitHash = commitHash.replace(/^\s+|\s+$/g, "");
-        console.log(commitHash);
-        return commitHash;
+        const commitHash = execSync("git rev-parse --short " + (useLast ? "HEAD^1" : "HEAD")).toString(
+            "ascii"
+        );
+        return commitHash.replace(/^\s+|\s+$/g, "");
     },
 
     getAllResourceImages() {
