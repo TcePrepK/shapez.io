@@ -42,6 +42,6 @@ module.exports = {
      * @param {string} commitHash
      */
     cachebust(url, commitHash) {
-        return "/shapez/FactorioLikeControlsOnShapezIO/" + url;
+        return "/shapez/Factory.io/" + url;
     },
 };

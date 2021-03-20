@@ -4,7 +4,7 @@
  */
 export function cachebust(path) {
     if (G_IS_BROWSER && !G_IS_STANDALONE && !G_IS_DEV) {
-        return "/shapez/FactorioLikeControlsOnShapezIO/" + path;
+        return "/shapez/Factory.io/" + path;
     }
     return path;
 }
