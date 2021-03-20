@@ -80,6 +80,9 @@ export class Camera extends BasicSerializableObject {
         /** @type {number} */
         this.desiredZoom = null;
 
+        /** @type {boolean} */
+        this.zoomedOutMap = false;
+
         /** @type {Vector} */
         this.touchPostMoveVelocity = new Vector(0, 0);
 
@@ -291,7 +294,7 @@ export class Camera extends BasicSerializableObject {
     }
 
     getIsMapOverlayActive() {
-        return this.zoomLevel < globalConfig.mapChunkOverviewMinZoom;
+        return this.zoomedOutMap;
     }
 
     /**
@@ -356,10 +359,27 @@ export class Camera extends BasicSerializableObject {
             .add(() => (this.desiredZoom = this.zoomLevel / 1.2));
 
         mapper.getBinding(KEYMAPPINGS.navigation.centerMap).add(() => this.centerOnMap());
+
+        mapper.getBinding(KEYMAPPINGS.navigation.openMap).add(() => this.openBigMap());
     }
 
     centerOnMap() {
-        this.desiredCenter = new Vector(0, 0);
+        if (this.zoomedOutMap) {
+            this.desiredCenter = new Vector(0, 0);
+        }
+    }
+
+    openBigMap() {
+        this.zoomedOutMap = !this.zoomedOutMap;
+        if (this.zoomedOutMap) {
+            this.oldZoomLevel = this.zoomLevel;
+            this.oldCenter = this.center;
+        } else {
+            this.center = this.oldCenter;
+            this.zoomLevel = this.oldZoomLevel;
+        }
+        this.desiredCenter = null;
+        this.desiredZoom = null;
     }
 
     /**
@@ -397,7 +417,7 @@ export class Camera extends BasicSerializableObject {
      * @returns {boolean}
      */
     canZoomIn() {
-        const maxLevel = this.root.app.platformWrapper.getMaximumZoom();
+        const maxLevel = this.root.app.platformWrapper.getMaximumZoom(this.zoomedOutMap);
         return this.zoomLevel <= maxLevel - 0.01;
     }
 
@@ -406,7 +426,7 @@ export class Camera extends BasicSerializableObject {
      * @returns {boolean}
      */
     canZoomOut() {
-        const minLevel = this.root.app.platformWrapper.getMinimumZoom();
+        const minLevel = this.root.app.platformWrapper.getMinimumZoom(this.zoomedOutMap);
         return this.zoomLevel >= minLevel + 0.01;
     }
 
@@ -462,7 +482,7 @@ export class Camera extends BasicSerializableObject {
             return;
         }
 
-        if (event.button === 0) {
+        if (this.zoomedOutMap && event.button === 0) {
             this.combinedSingleTouchMoveHandler(event.clientX, event.clientY);
         }
 
@@ -511,18 +531,12 @@ export class Camera extends BasicSerializableObject {
         this.clampZoomLevel();
         this.desiredZoom = null;
 
-        let mousePosition = this.root.app.mousePosition;
-        if (!this.root.app.settings.getAllSettings().zoomToCursor) {
-            mousePosition = new Vector(this.root.gameWidth / 2, this.root.gameHeight / 2);
-        }
-
-        if (mousePosition) {
-            const worldPos = this.root.camera.screenToWorld(mousePosition);
-            const worldDelta = worldPos.sub(this.center);
-            const actualDelta = this.zoomLevel / prevZoom - 1;
-            this.center = this.center.add(worldDelta.multiplyScalar(actualDelta));
-            this.desiredCenter = null;
-        }
+        let mousePosition = new Vector(this.root.gameWidth / 2, this.root.gameHeight / 2);
+        const worldPos = this.root.camera.screenToWorld(mousePosition);
+        const worldDelta = worldPos.sub(this.center);
+        const actualDelta = this.zoomLevel / prevZoom - 1;
+        this.center = this.center.add(worldDelta.multiplyScalar(actualDelta));
+        this.desiredCenter = null;
 
         return false;
     }
@@ -574,8 +588,8 @@ export class Camera extends BasicSerializableObject {
         clickDetectorGlobals.lastTouchTime = performance.now();
 
         if (event.touches.length === 1) {
-            const touch = event.touches[0];
-            this.combinedSingleTouchMoveHandler(touch.clientX, touch.clientY);
+            // const touch = event.touches[0];
+            // this.combinedSingleTouchMoveHandler(touch.clientX, touch.clientY);
         } else if (event.touches.length === 2) {
             if (this.currentlyPinching) {
                 const touch1 = event.touches[0];
@@ -745,12 +759,15 @@ export class Camera extends BasicSerializableObject {
         }
         const wrapper = this.root.app.platformWrapper;
 
+        const minZoom = wrapper.getMinimumZoom(this.zoomedOutMap);
+        const maxZoom = wrapper.getMaximumZoom(this.zoomedOutMap);
+
         assert(Number.isFinite(this.zoomLevel), "Invalid zoom level *before* clamp: " + this.zoomLevel);
-        this.zoomLevel = clamp(this.zoomLevel, wrapper.getMinimumZoom(), wrapper.getMaximumZoom());
+        this.zoomLevel = clamp(this.zoomLevel, minZoom, maxZoom);
         assert(Number.isFinite(this.zoomLevel), "Invalid zoom level *after* clamp: " + this.zoomLevel);
 
         if (this.desiredZoom) {
-            this.desiredZoom = clamp(this.desiredZoom, wrapper.getMinimumZoom(), wrapper.getMaximumZoom());
+            this.desiredZoom = clamp(this.desiredZoom, minZoom, maxZoom);
         }
     }
 
@@ -1003,6 +1020,10 @@ export class Camera extends BasicSerializableObject {
             let movementSpeed =
                 this.root.app.settings.getMovementSpeed() *
                 (actionMapper.getBinding(KEYMAPPINGS.navigation.mapMoveFaster).pressed ? 4 : 1);
+
+            if (!this.zoomedOutMap) {
+                movementSpeed *= this.zoomLevel / 2;
+            }
 
             this.center.x += moveAmount * forceX * movementSpeed;
             this.center.y += moveAmount * forceY * movementSpeed;

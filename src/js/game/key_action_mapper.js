@@ -40,7 +40,8 @@ export const KEYMAPPINGS = {
         mapZoomIn: { keyCode: 187, repeated: true }, // "+"
         mapZoomOut: { keyCode: 189, repeated: true }, // "-"
 
-        createMarker: { keyCode: key("M") },
+        createMarker: { keyCode: key("P") },
+        openMap: { keyCode: key("M") },
     },
 
     buildings: {

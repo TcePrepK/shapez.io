@@ -258,7 +258,6 @@ export const allApplicationSettings = [
 
     new BoolSetting("enableMousePan", enumCategories.advanced, (app, value) => {}),
     new BoolSetting("alwaysMultiplace", enumCategories.advanced, (app, value) => {}),
-    new BoolSetting("zoomToCursor", enumCategories.advanced, (app, value) => {}),
     new BoolSetting("clearCursorOnDeleteWhilePlacing", enumCategories.advanced, (app, value) => {}),
     new BoolSetting("enableTunnelSmartplace", enumCategories.advanced, (app, value) => {}),
     new BoolSetting("vignette", enumCategories.userInterface, (app, value) => {}),
@@ -324,7 +323,6 @@ class SettingsStorage {
         this.disableTileGrid = false;
         this.lowQualityTextures = false;
         this.simplifiedBelts = false;
-        this.zoomToCursor = true;
         this.mapResourcesScale = 0.5;
 
         /**
@@ -670,17 +668,12 @@ export class ApplicationSettings extends ReadWriteProxy {
         }
 
         if (data.version < 29) {
-            data.settings.zoomToCursor = true;
-            data.version = 29;
-        }
-
-        if (data.version < 30) {
             data.settings.mapResourcesScale = 0.5;
 
             // Re-enable hints as well
             data.settings.offerHints = true;
 
-            data.version = 30;
+            data.version = 29;
         }
 
         return ExplainedResult.good();

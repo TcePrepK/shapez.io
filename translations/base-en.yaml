@@ -1093,6 +1093,7 @@ keybindings:
         mapZoomIn: Zoom in
         mapZoomOut: Zoom out
         createMarker: Create Marker
+        openMap: Open Big Map
 
         menuOpenShop: Upgrades
         menuOpenStats: Statistics

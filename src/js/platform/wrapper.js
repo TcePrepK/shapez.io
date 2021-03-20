@@ -52,18 +52,28 @@ export class PlatformWrapperInterface {
 
     /**
      * Should return the minimum supported zoom level
+     * @param {boolean} zoomedOutMap
      * @returns {number}
      */
-    getMinimumZoom() {
-        return 0.1 * this.getScreenScale();
+    getMinimumZoom(zoomedOutMap) {
+        let maxZoom = 0.1 * this.getScreenScale();
+        if (!zoomedOutMap) {
+            maxZoom = this.getScreenScale();
+        }
+        return maxZoom;
     }
 
     /**
      * Should return the maximum supported zoom level
+     * @param {boolean} zoomedOutMap
      * @returns {number}
      */
-    getMaximumZoom() {
-        return 3.5 * this.getScreenScale();
+    getMaximumZoom(zoomedOutMap) {
+        let maxZoom = 3.5 * this.getScreenScale();
+        if (zoomedOutMap) {
+            maxZoom = this.getScreenScale();
+        }
+        return maxZoom;
     }
 
     getScreenScale() {

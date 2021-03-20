@@ -38,6 +38,7 @@ import { ShapeDefinitionManager } from "./shape_definition_manager";
 import { AchievementProxy } from "./achievement_proxy";
 import { SoundProxy } from "./sound_proxy";
 import { GameTime } from "./time/game_time";
+import { Player } from "./player";
 
 const logger = createLogger("ingame/core");
 
@@ -108,6 +109,7 @@ export class GameCore {
 
         // Init classes
         root.camera = new Camera(root);
+        root.player = new Player(root.camera);
         root.map = new MapView(root);
         root.logic = new GameLogic(root);
         root.hud = new GameHUD(root);
@@ -453,6 +455,9 @@ export class GameCore {
                 // Static map entities
                 root.map.drawWiresForegroundLayer(params);
             }
+
+            // Player
+            root.player.drawPlayer(params);
         }
 
         if (this.overlayAlpha > 0.01) {

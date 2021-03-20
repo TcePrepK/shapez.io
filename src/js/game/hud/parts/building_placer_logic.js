@@ -652,8 +652,19 @@ export class HUDBuildingPlacerLogic extends BaseHUDPart {
 
         const metaBuilding = this.currentMetaBuilding.get();
 
+        const player = this.root.player;
+        const width = this.root.app.screenWidth;
+        const height = this.root.app.screenHeight;
+        const playerPos = this.root.camera.screenToWorld(new Vector(width / 2, height / 2)).toTileSpace();
+        const dist = playerPos.sub(this.root.camera.screenToWorld(pos).toTileSpace()).length();
+
         // Placement
         if (button === enumMouseButton.left && metaBuilding) {
+            if (dist > player.reachLen) {
+                player.outOfReach = 3;
+                return;
+            }
+
             this.currentlyDragging = true;
             this.currentlyDeleting = false;
             this.lastDragTile = this.root.camera.screenToWorld(pos).toTileSpace();
@@ -672,6 +683,11 @@ export class HUDBuildingPlacerLogic extends BaseHUDPart {
             button === enumMouseButton.right &&
             (!metaBuilding || !this.root.app.settings.getAllSettings().clearCursorOnDeleteWhilePlacing)
         ) {
+            if (dist > player.reachLen) {
+                player.outOfReach = 3;
+                return;
+            }
+
             this.currentlyDragging = true;
             this.currentlyDeleting = true;
             this.lastDragTile = this.root.camera.screenToWorld(pos).toTileSpace();

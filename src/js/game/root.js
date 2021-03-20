@@ -11,7 +11,7 @@ import { GameSystemManager } from "./game_system_manager";
 import { AchievementProxy } from "./achievement_proxy";
 import { GameHUD } from "./hud/hud";
 import { MapView } from "./map_view";
-import { Camera } from "./camera";
+import { Player } from "./player";
 import { InGameState } from "../states/ingame";
 import { AutomaticSave } from "./automatic_save";
 import { Application } from "../application";
@@ -29,6 +29,7 @@ import { DynamicTickrate } from "./dynamic_tickrate";
 import { KeyActionMapper } from "./key_action_mapper";
 import { Vector } from "../core/vector";
 import { GameMode } from "./game_mode";
+import { Camera } from "./camera";
 /* typehints:end */
 
 const logger = createLogger("game/root");
@@ -81,8 +82,14 @@ export class GameRoot {
 
         //////// Other properties ///////
 
+        /** @type {boolean} */
+        this.zoomedOutMap = false;
+
         /** @type {Camera} */
         this.camera = null;
+
+        /** @type {Player} */
+        this.player = null;
 
         /** @type {HTMLCanvasElement} */
         this.canvas = null;
@@ -219,8 +226,8 @@ export class GameRoot {
         if (this.hud) {
             this.hud.cleanup();
         }
-        if (this.camera) {
-            this.camera.cleanup();
+        if (this.player.camera) {
+            this.player.camera.cleanup();
         }
 
         // Finally free all properties
