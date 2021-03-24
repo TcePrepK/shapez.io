@@ -1,5 +1,4 @@
 import { globalConfig } from "../../core/config";
-import { DrawParameters } from "../../core/draw_parameters";
 import { fastArrayDelete } from "../../core/utils";
 import { enumDirectionToVector } from "../../core/vector";
 import { ItemAcceptorComponent } from "../components/item_acceptor";
@@ -7,8 +6,8 @@ import { GameSystemWithFilter } from "../game_system_with_filter";
 import { MapChunkView } from "../map_chunk_view";
 
 export class ItemAcceptorSystem extends GameSystemWithFilter {
-    constructor(root) {
-        super(root, [ItemAcceptorComponent]);
+    constructor() {
+        super([ItemAcceptorComponent]);
 
         // Well ... it's better to be verbose I guess?
         this.accumulatedTicksWhileInMapOverview = 0;
@@ -57,10 +56,9 @@ export class ItemAcceptorSystem extends GameSystemWithFilter {
     }
 
     /**
-     * @param {DrawParameters} parameters
      * @param {MapChunkView} chunk
      */
-    drawChunk(parameters, chunk) {
+    drawChunk(chunk) {
         if (this.root.app.settings.getAllSettings().simplifiedBelts) {
             // Disabled in potato mode
             return;
@@ -97,7 +95,6 @@ export class ItemAcceptorSystem extends GameSystemWithFilter {
                 item.drawItemCenteredClipped(
                     (finalTile.x + 0.5) * globalConfig.tileSize,
                     (finalTile.y + 0.5) * globalConfig.tileSize,
-                    parameters,
                     globalConfig.defaultItemDiameter
                 );
             }

@@ -1,7 +1,5 @@
-/* typehints:start */
 import { Application } from "../application";
-/* typehints:end */
-
+import { globalConfig } from "../core/config";
 import { createLogger } from "../core/logging";
 import { T } from "../translations";
 
@@ -23,8 +21,8 @@ export class BaseSetting {
      *
      * @param {string} id
      * @param {string} categoryId
-     * @param {function(Application, any):void} changeCb
-     * @param {function(Application) : boolean=} enabledCb
+     * @param {function(any):void} changeCb
+     * @param {function() : boolean=} enabledCb
      */
     constructor(id, categoryId, changeCb, enabledCb = null) {
         this.id = id;
@@ -32,26 +30,23 @@ export class BaseSetting {
         this.changeCb = changeCb;
         this.enabledCb = enabledCb;
 
-        /** @type {Application} */
-        this.app = null;
+        this.app = globalConfig.app;
 
         this.element = null;
         this.dialogs = null;
     }
 
     /**
-     * @param {Application} app
      * @param {any} value
      */
-    apply(app, value) {
+    apply(value) {
         if (this.changeCb) {
-            this.changeCb(app, value);
+            this.changeCb(value);
         }
     }
 
     /**
      * Binds all parameters
-     * @param {Application} app
      * @param {HTMLElement} element
      * @param {any} dialogs
      */
@@ -63,19 +58,17 @@ export class BaseSetting {
 
     /**
      * Returns the HTML for this setting
-     * @param {Application} app
      */
-    getHtml(app) {
+    getHtml() {
         abstract;
         return "";
     }
 
     /**
      * Returns whether this setting is enabled and available
-     * @param {Application} app
      */
-    getIsAvailable(app) {
-        return this.enabledCb ? this.enabledCb(app) : true;
+    getIsAvailable() {
+        return this.enabledCb ? this.enabledCb() : true;
     }
 
     syncValueToElement() {
@@ -141,11 +134,8 @@ export class EnumSetting extends BaseSetting {
         this.magicValue = magicValue;
     }
 
-    /**
-     * @param {Application} app
-     */
-    getHtml(app) {
-        const available = this.getIsAvailable(app);
+    getHtml() {
+        const available = this.getIsAvailable();
         return `
             <div class="setting cardbox ${available ? "enabled" : "disabled"}">
                 ${available ? "" : `<span class="standaloneOnlyHint">${T.demo.settingNotAvailable}</span>`}
@@ -208,7 +198,7 @@ export class EnumSetting extends BaseSetting {
             }
 
             if (this.changeCb) {
-                this.changeCb(this.app, value);
+                this.changeCb(value);
             }
         }, this);
     }
@@ -219,11 +209,8 @@ export class BoolSetting extends BaseSetting {
         super(id, category, changeCb, enabledCb);
     }
 
-    /**
-     * @param {Application} app
-     */
-    getHtml(app) {
-        const available = this.getIsAvailable(app);
+    getHtml() {
+        const available = this.getIsAvailable();
         return `
         <div class="setting cardbox ${available ? "enabled" : "disabled"}">
             ${available ? "" : `<span class="standaloneOnlyHint">${T.demo.settingNotAvailable}</span>`}
@@ -251,7 +238,7 @@ export class BoolSetting extends BaseSetting {
         this.syncValueToElement();
 
         if (this.changeCb) {
-            this.changeCb(this.app, newValue);
+            this.changeCb(newValue);
         }
     }
 
@@ -279,11 +266,8 @@ export class RangeSetting extends BaseSetting {
         this.stepSize = stepSize;
     }
 
-    /**
-     * @param {Application} app
-     */
-    getHtml(app) {
-        const available = this.getIsAvailable(app);
+    getHtml() {
+        const available = this.getIsAvailable();
         return `
         <div class="setting cardbox ${available ? "enabled" : "disabled"}">
             ${available ? "" : `<span class="standaloneOnlyHint">${T.demo.settingNotAvailable}</span>`}
@@ -355,7 +339,7 @@ export class RangeSetting extends BaseSetting {
         this.syncValueToElement();
         console.log("SET", newValue);
         if (this.changeCb) {
-            this.changeCb(this.app, newValue);
+            this.changeCb(newValue);
         }
     }
 

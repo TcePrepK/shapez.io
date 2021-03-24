@@ -3,7 +3,6 @@ import { createLogger } from "../../core/logging";
 import { queryParamOptions } from "../../core/query_parameters";
 import { BeltComponent } from "../../game/components/belt";
 import { StaticMapEntityComponent } from "../../game/components/static_map_entity";
-import { GameRoot } from "../../game/root";
 import { InGameState } from "../../states/ingame";
 import { GameAnalyticsInterface } from "../game_analytics";
 import { FILE_NOT_FOUND } from "../storage";
@@ -174,7 +173,7 @@ export class ShapezGameAnalytics extends GameAnalyticsInterface {
             value,
             version: G_BUILD_VERSION,
             level: root.hubGoals.level,
-            gameDump: this.generateGameDump(root),
+            gameDump: this.generateGameDump(),
         });
     }
 
@@ -188,10 +187,10 @@ export class ShapezGameAnalytics extends GameAnalyticsInterface {
 
     /**
      * Returns true if the shape is interesting
-     * @param {GameRoot} root
      * @param {string} key
      */
-    isInterestingShape(root, key) {
+    isInterestingShape(key) {
+        const root = globalConfig.root;
         if (key === root.gameMode.getBlueprintShapeKey()) {
             return true;
         }
@@ -224,12 +223,10 @@ export class ShapezGameAnalytics extends GameAnalyticsInterface {
 
     /**
      * Generates a game dump
-     * @param {GameRoot} root
      */
-    generateGameDump(root) {
-        const shapeIds = Object.keys(root.hubGoals.storedShapes).filter(key =>
-            this.isInterestingShape(root, key)
-        );
+    generateGameDump() {
+        const root = globalConfig.root;
+        const shapeIds = Object.keys(root.hubGoals.storedShapes).filter(key => this.isInterestingShape(key));
         let shapes = {};
         for (let i = 0; i < shapeIds.length; ++i) {
             shapes[shapeIds[i]] = root.hubGoals.storedShapes[shapeIds[i]];

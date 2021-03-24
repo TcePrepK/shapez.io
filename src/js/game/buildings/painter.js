@@ -10,7 +10,6 @@ import {
 } from "../components/item_processor";
 import { Entity } from "../entity";
 import { defaultBuildingVariant, MetaBuilding } from "../meta_building";
-import { GameRoot } from "../root";
 import { enumHubGoalRewards } from "../tutorial_goals";
 import { WiredPinsComponent, enumPinSlotType } from "../components/wired_pins";
 
@@ -41,47 +40,40 @@ export class MetaPainterBuilding extends MetaBuilding {
     }
 
     /**
-     * @param {GameRoot} root
      * @param {string} variant
      * @returns {Array<[string, string]>}
      */
-    getAdditionalStatistics(root, variant) {
+    getAdditionalStatistics(variant) {
         switch (variant) {
             case defaultBuildingVariant:
             case enumPainterVariants.mirrored: {
-                const speed = root.hubGoals.getProcessorBaseSpeed(enumItemProcessorTypes.painter);
+                const speed = this.root.hubGoals.getProcessorBaseSpeed(enumItemProcessorTypes.painter);
                 return [[T.ingame.buildingPlacement.infoTexts.speed, formatItemsPerSecond(speed)]];
             }
             case enumPainterVariants.double: {
-                const speed = root.hubGoals.getProcessorBaseSpeed(enumItemProcessorTypes.painterDouble);
+                const speed = this.root.hubGoals.getProcessorBaseSpeed(enumItemProcessorTypes.painterDouble);
                 return [[T.ingame.buildingPlacement.infoTexts.speed, formatItemsPerSecond(speed, true)]];
             }
             case enumPainterVariants.quad: {
-                const speed = root.hubGoals.getProcessorBaseSpeed(enumItemProcessorTypes.painterQuad);
+                const speed = this.root.hubGoals.getProcessorBaseSpeed(enumItemProcessorTypes.painterQuad);
                 return [[T.ingame.buildingPlacement.infoTexts.speed, formatItemsPerSecond(speed)]];
             }
         }
     }
 
-    /**
-     * @param {GameRoot} root
-     */
-    getAvailableVariants(root) {
+    getAvailableVariants() {
         let variants = [defaultBuildingVariant, enumPainterVariants.mirrored];
-        if (root.hubGoals.isRewardUnlocked(enumHubGoalRewards.reward_painter_double)) {
+        if (this.root.hubGoals.isRewardUnlocked(enumHubGoalRewards.reward_painter_double)) {
             variants.push(enumPainterVariants.double);
         }
-        if (root.hubGoals.isRewardUnlocked(enumHubGoalRewards.reward_wires_painter_and_levers)) {
+        if (this.root.hubGoals.isRewardUnlocked(enumHubGoalRewards.reward_wires_painter_and_levers)) {
             variants.push(enumPainterVariants.quad);
         }
         return variants;
     }
 
-    /**
-     * @param {GameRoot} root
-     */
-    getIsUnlocked(root) {
-        return root.hubGoals.isRewardUnlocked(enumHubGoalRewards.reward_painter);
+    getIsUnlocked() {
+        return this.root.hubGoals.isRewardUnlocked(enumHubGoalRewards.reward_painter);
     }
 
     /**

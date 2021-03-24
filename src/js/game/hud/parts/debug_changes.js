@@ -1,5 +1,4 @@
 import { globalConfig } from "../../../core/config";
-import { DrawParameters } from "../../../core/draw_parameters";
 import { Rectangle } from "../../../core/rectangle";
 import { BaseHUDPart } from "../base_hud_part";
 
@@ -49,11 +48,8 @@ export class HUDChangesDebugger extends BaseHUDPart {
         }
     }
 
-    /**
-     *
-     * @param {DrawParameters} parameters
-     */
-    draw(parameters) {
+    draw() {
+        const parameters = globalConfig.parameters;
         for (let i = 0; i < this.changes.length; ++i) {
             const change = this.changes[i];
             parameters.context.fillStyle = change.fillColor;

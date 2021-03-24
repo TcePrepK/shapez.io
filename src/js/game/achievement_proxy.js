@@ -1,6 +1,5 @@
 /* typehints:start */
 import { Entity } from "./entity";
-import { GameRoot } from "./root";
 /* typehints:end */
 
 import { globalConfig } from "../core/config";
@@ -14,9 +13,8 @@ const ROTATER = "rotater";
 const DEFAULT = "default";
 
 export class AchievementProxy {
-    /** @param {GameRoot} root */
-    constructor(root) {
-        this.root = root;
+    constructor() {
+        this.root = globalConfig.root;
         this.provider = this.root.app.achievementProvider;
         this.disabled = true;
 

@@ -2,7 +2,6 @@ import { createLogger } from "../core/logging";
 import { BasicSerializableObject } from "../savegame/serialization";
 import { enumColors } from "./colors";
 import { ShapeItem } from "./items/shape_item";
-import { GameRoot } from "./root";
 import { enumSubShape, ShapeDefinition } from "./shape_definition";
 import { ACHIEVEMENTS } from "../platform/achievement_provider";
 
@@ -13,13 +12,8 @@ export class ShapeDefinitionManager extends BasicSerializableObject {
         return "ShapeDefinitionManager";
     }
 
-    /**
-     *
-     * @param {GameRoot} root
-     */
-    constructor(root) {
+    constructor() {
         super();
-        this.root = root;
 
         /**
          * Store a cache from key -> definition
@@ -97,7 +91,7 @@ export class ShapeDefinitionManager extends BasicSerializableObject {
         const rightSide = definition.cloneFilteredByQuadrants([2, 3]);
         const leftSide = definition.cloneFilteredByQuadrants([0, 1]);
 
-        this.root.signals.achievementCheck.dispatch(ACHIEVEMENTS.cutShape, null);
+        this.root.signals.achievementCheck.dispatch(ACHIEVEMENTS.cutShape);
 
         return /** @type {[ShapeDefinition, ShapeDefinition]} */ (this.operationCache[key] = [
             this.registerOrReturnHandle(rightSide),
@@ -139,7 +133,6 @@ export class ShapeDefinitionManager extends BasicSerializableObject {
         }
 
         const rotated = definition.cloneRotateCW();
-
         this.root.signals.achievementCheck.dispatch(ACHIEVEMENTS.rotateShape, null);
 
         return /** @type {ShapeDefinition} */ (this.operationCache[key] = this.registerOrReturnHandle(

@@ -1,7 +1,3 @@
-/* typehints:start */
-import { GameRoot } from "../root";
-/* typehints:end */
-
 import { types, BasicSerializableObject } from "../../savegame/serialization";
 import { RegularGameSpeed } from "./regular_game_speed";
 import { BaseGameSpeed } from "./base_game_speed";
@@ -13,12 +9,9 @@ import { createLogger } from "../../core/logging";
 const logger = createLogger("game_time");
 
 export class GameTime extends BasicSerializableObject {
-    /**
-     * @param {GameRoot} root
-     */
-    constructor(root) {
+    constructor() {
         super();
-        this.root = root;
+        this.root = globalConfig.root;
 
         // Current ingame time seconds, not incremented while paused
         this.timeSeconds = 0;
@@ -30,7 +23,7 @@ export class GameTime extends BasicSerializableObject {
         this.realtimeAdjust = 0;
 
         /** @type {BaseGameSpeed} */
-        this.speed = new RegularGameSpeed(this.root);
+        this.speed = new RegularGameSpeed();
 
         // Store how much time we have in bucket
         this.logicTimeBudget = 0;

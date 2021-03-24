@@ -51,6 +51,8 @@ export class Signal {
                 break;
             }
         }
+        console.log(receiver);
+        console.log(this.receivers[0].receiver);
         assert(index !== null, "Receiver not found in list");
         this.receivers.splice(index, 1);
         ++this.modifyCount;

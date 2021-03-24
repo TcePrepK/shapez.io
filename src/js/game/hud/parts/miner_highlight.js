@@ -9,11 +9,8 @@ import { BaseHUDPart } from "../base_hud_part";
 export class HUDMinerHighlight extends BaseHUDPart {
     initialize() {}
 
-    /**
-     *
-     * @param {import("../../../core/draw_utils").DrawParameters} parameters
-     */
-    draw(parameters) {
+    draw() {
+        const parameters = globalConfig.parameters;
         const mousePos = this.root.app.mousePosition;
         if (!mousePos) {
             // Mouse pos not ready

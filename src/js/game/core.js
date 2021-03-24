@@ -1,6 +1,3 @@
-/* typehints:start */
-import { Application } from "../application";
-/* typehints:end */
 import { BufferMaintainer } from "../core/buffer_maintainer";
 import {
     disableImageSmoothing,
@@ -52,9 +49,8 @@ let lastContext = null;
  * the root class is just a data holder.
  */
 export class GameCore {
-    /** @param {Application} app */
-    constructor(app) {
-        this.app = app;
+    constructor() {
+        this.app = globalConfig.app;
 
         /** @type {GameRoot} */
         this.root = null;
@@ -84,45 +80,48 @@ export class GameCore {
      */
     initializeRoot(parentState, savegame) {
         // Construct the root element, this is the data representation of the game
-        this.root = new GameRoot(this.app);
+        this.root = globalConfig.root;
+        this.root.setVariables();
+        this.root.app = this.app;
         this.root.gameState = parentState;
         this.root.keyMapper = parentState.keyActionMapper;
         this.root.savegame = savegame;
         this.root.gameWidth = this.app.screenWidth;
         this.root.gameHeight = this.app.screenHeight;
 
+        globalConfig.root = this.root;
+
         // Initialize canvas element & context
         this.internalInitCanvas();
 
         // Members
         const root = this.root;
-
         // This isn't nice, but we need it right here
-        root.keyMapper = new KeyActionMapper(root, this.root.gameState.inputReciever);
+        root.keyMapper = new KeyActionMapper(this.root.gameState.inputReciever);
 
         // Needs to come first
-        root.dynamicTickrate = new DynamicTickrate(root);
+        root.dynamicTickrate = new DynamicTickrate();
 
         // Init game mode
-        root.gameMode = new RegularGameMode(root);
+        root.gameMode = new RegularGameMode();
 
-        // Init classes
-        root.camera = new Camera(root);
-        root.map = new MapView(root);
-        root.logic = new GameLogic(root);
-        root.hud = new GameHUD(root);
-        root.time = new GameTime(root);
-        root.achievementProxy = new AchievementProxy(root);
-        root.automaticSave = new AutomaticSave(root);
-        root.soundProxy = new SoundProxy(root);
+        // Init classesw2
+        root.camera = new Camera();
+        root.map = new MapView();
+        root.logic = new GameLogic();
+        root.hud = new GameHUD();
+        root.time = new GameTime();
+        root.achievementProxy = new AchievementProxy();
+        root.automaticSave = new AutomaticSave();
+        root.soundProxy = new SoundProxy();
 
         // Init managers
-        root.entityMgr = new EntityManager(root);
-        root.systemMgr = new GameSystemManager(root);
-        root.shapeDefinitionMgr = new ShapeDefinitionManager(root);
-        root.hubGoals = new HubGoals(root);
-        root.productionAnalytics = new ProductionAnalytics(root);
-        root.buffers = new BufferMaintainer(root);
+        root.entityMgr = new EntityManager();
+        root.systemMgr = new GameSystemManager();
+        root.shapeDefinitionMgr = new ShapeDefinitionManager();
+        root.hubGoals = new HubGoals();
+        root.productionAnalytics = new ProductionAnalytics();
+        root.buffers = new BufferMaintainer();
 
         // Initialize the hud once everything is loaded
         this.root.hud.initialize();
@@ -170,7 +169,6 @@ export class GameCore {
 
         // Place the hub
         const hub = gMetaBuildingRegistry.findByClass(MetaHubBuilding).createEntity({
-            root: this.root,
             origin: new Vector(-2, -2),
             rotation: 0,
             originalRotation: 0,
@@ -190,7 +188,7 @@ export class GameCore {
         const serializer = new SavegameSerializer();
 
         try {
-            const status = serializer.deserialize(this.root.savegame.getCurrentDump(), this.root);
+            const status = serializer.deserialize(this.root.savegame.getCurrentDump());
             if (!status.isGood()) {
                 logger.error("savegame-deserialize-failed:" + status.reason);
                 return false;
@@ -396,12 +394,13 @@ export class GameCore {
 
         // Construct parameters required for drawing
         const params = new DrawParameters({
-            context: context,
+            context,
             visibleRect: root.camera.getVisibleRect(),
             desiredAtlasScale,
             zoomLevel,
-            root: root,
         });
+
+        globalConfig.parameters = params;
 
         if (G_IS_DEV && globalConfig.debug.testCulling) {
             context.clearRect(0, 0, root.gameWidth, root.gameHeight);
@@ -435,46 +434,46 @@ export class GameCore {
 
         if (this.overlayAlpha < 0.99) {
             // Background (grid, resources, etc)
-            root.map.drawBackground(params);
+            root.map.drawBackground();
 
             // Belt items
-            systems.belt.drawBeltItems(params);
+            systems.belt.drawBeltItems();
 
             // Miner & Static map entities etc.
-            root.map.drawForeground(params);
+            root.map.drawForeground();
 
             // HUB Overlay
-            systems.hub.draw(params);
+            systems.hub.draw();
 
             // Green wires overlay
-            root.hud.parts.wiresOverlay.draw(params);
+            root.hud.parts.wiresOverlay.draw();
 
             if (this.root.currentLayer === "wires") {
                 // Static map entities
-                root.map.drawWiresForegroundLayer(params);
+                root.map.drawWiresForegroundLayer();
             }
         }
 
         if (this.overlayAlpha > 0.01) {
             // Map overview
             context.globalAlpha = this.overlayAlpha;
-            root.map.drawOverlay(params);
+            root.map.drawOverlay();
             context.globalAlpha = 1;
         }
 
         if (G_IS_DEV) {
-            root.map.drawStaticEntityDebugOverlays(params);
+            root.map.drawStaticEntityDebugOverlays();
         }
 
         if (G_IS_DEV && globalConfig.debug.renderBeltPaths) {
-            systems.belt.drawBeltPathDebug(params);
+            systems.belt.drawBeltPathDebug();
         }
 
         // END OF GAME CONTENT
         // -----
 
         // Finally, draw the hud. Nothing should come after that
-        root.hud.draw(params);
+        root.hud.draw();
 
         assert(context.globalAlpha === 1.0, "Global alpha not 1 on frame end before restore");
 
@@ -490,7 +489,7 @@ export class GameCore {
         }
 
         // Draw overlays, those are screen space
-        root.hud.drawOverlays(params);
+        root.hud.drawOverlays();
 
         assert(context.globalAlpha === 1.0, "context.globalAlpha not 1 on frame end");
 

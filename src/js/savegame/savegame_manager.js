@@ -19,8 +19,8 @@ export const enumLocalSavegameStatus = {
 };
 
 export class SavegameManager extends ReadWriteProxy {
-    constructor(app) {
-        super(app, "savegames.bin");
+    constructor() {
+        super("savegames.bin");
 
         this.currentData = this.getDefaultData();
     }
@@ -86,7 +86,7 @@ export class SavegameManager extends ReadWriteProxy {
         if (!metadata) {
             return null;
         }
-        return new Savegame(this.app, { internalId, metaDataRef: metadata });
+        return new Savegame({ internalId, metaDataRef: metadata });
     }
 
     /**
@@ -102,7 +102,7 @@ export class SavegameManager extends ReadWriteProxy {
      * @param {SavegameMetadata} game
      */
     deleteSavegame(game) {
-        const handle = new Savegame(this.app, {
+        const handle = new Savegame({
             internalId: game.internalId,
             metaDataRef: game,
         });
@@ -154,7 +154,7 @@ export class SavegameManager extends ReadWriteProxy {
         // Notice: This is async and happening in the background
         this.updateAfterSavegamesChanged();
 
-        return new Savegame(this.app, {
+        return new Savegame({
             internalId: id,
             metaDataRef: metaData,
         });
@@ -207,7 +207,7 @@ export class SavegameManager extends ReadWriteProxy {
             const toRemove = this.currentData.savegames.pop();
 
             // Try to remove the savegame since its no longer available
-            const game = new Savegame(this.app, {
+            const game = new Savegame({
                 internalId: toRemove.internalId,
                 metaDataRef: toRemove,
             });

@@ -1,17 +1,11 @@
-/* typehints:start */
-import { Application } from "../application";
-/* typehints:end */
 import { IS_MAC } from "./config";
 import { ExplainedResult } from "./explained_result";
 import { queryParamOptions } from "./query_parameters";
 import { ReadWriteProxy } from "./read_write_proxy";
 
 export class RestrictionManager extends ReadWriteProxy {
-    /**
-     * @param {Application} app
-     */
-    constructor(app) {
-        super(app, "restriction-flags.bin");
+    constructor() {
+        super("restriction-flags.bin");
 
         this.currentData = this.getDefaultData();
     }

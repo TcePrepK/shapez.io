@@ -1,8 +1,5 @@
-/* typehints:start */
+import { globalConfig } from "../core/config";
 import { enumHubGoalRewards } from "./tutorial_goals";
-/* typehints:end */
-
-import { GameRoot } from "./root";
 
 /** @typedef {{
  *   shape: string,
@@ -25,12 +22,8 @@ import { GameRoot } from "./root";
  * }} LevelDefinition */
 
 export class GameMode {
-    /**
-     *
-     * @param {GameRoot} root
-     */
-    constructor(root) {
-        this.root = root;
+    constructor() {
+        this.root = globalConfig.root;
     }
 
     /**

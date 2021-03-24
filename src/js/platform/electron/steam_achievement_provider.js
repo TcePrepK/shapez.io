@@ -1,11 +1,7 @@
-/* typehints:start */
-import { Application } from "../../application";
-import { GameRoot } from "../../game/root";
-/* typehints:end */
-
 import { createLogger } from "../../core/logging";
 import { getIPCRenderer } from "../../core/utils";
 import { ACHIEVEMENTS, AchievementCollection, AchievementProviderInterface } from "../achievement_provider";
+import { globalConfig } from "../../core/config";
 
 const logger = createLogger("achievements/steam");
 
@@ -58,9 +54,8 @@ const ACHIEVEMENT_IDS = {
 };
 
 export class SteamAchievementProvider extends AchievementProviderInterface {
-    /** @param {Application} app */
-    constructor(app) {
-        super(app);
+    constructor() {
+        super();
 
         this.initialized = false;
         this.collection = new AchievementCollection(this.activate.bind(this));
@@ -80,15 +75,14 @@ export class SteamAchievementProvider extends AchievementProviderInterface {
     }
 
     /**
-     * @param {GameRoot} root
      * @returns {Promise<void>}
      */
-    onLoad(root) {
-        this.root = root;
+    onLoad() {
+        this.root = globalConfig.root;
 
         try {
             this.collection = new AchievementCollection(this.activate.bind(this));
-            this.collection.initialize(root);
+            this.collection.initialize();
 
             logger.log("Initialized", this.collection.map.size, "relevant achievements");
             return Promise.resolve();

@@ -7,7 +7,6 @@ import { clamp } from "../core/utils";
 import { mixVector, Vector } from "../core/vector";
 import { BasicSerializableObject, types } from "../savegame/serialization";
 import { KEYMAPPINGS } from "./key_action_mapper";
-import { GameRoot } from "./root";
 
 const logger = createLogger("camera");
 
@@ -31,11 +30,10 @@ export const enumMouseButton = {
 };
 
 export class Camera extends BasicSerializableObject {
-    constructor(root) {
+    constructor() {
         super();
-
-        /** @type {GameRoot} */
-        this.root = root;
+        this.root = globalConfig.root;
+        this.app = globalConfig.app;
 
         // Zoom level, 2 means double size
 
@@ -397,7 +395,7 @@ export class Camera extends BasicSerializableObject {
      * @returns {boolean}
      */
     canZoomIn() {
-        const maxLevel = this.root.app.platformWrapper.getMaximumZoom();
+        const maxLevel = this.app.platformWrapper.getMaximumZoom();
         return this.zoomLevel <= maxLevel - 0.01;
     }
 
@@ -406,7 +404,7 @@ export class Camera extends BasicSerializableObject {
      * @returns {boolean}
      */
     canZoomOut() {
-        const minLevel = this.root.app.platformWrapper.getMinimumZoom();
+        const minLevel = this.app.platformWrapper.getMinimumZoom();
         return this.zoomLevel >= minLevel + 0.01;
     }
 
@@ -743,7 +741,7 @@ export class Camera extends BasicSerializableObject {
         if (G_IS_DEV && globalConfig.debug.disableZoomLimits) {
             return;
         }
-        const wrapper = this.root.app.platformWrapper;
+        const wrapper = this.app.platformWrapper;
 
         assert(Number.isFinite(this.zoomLevel), "Invalid zoom level *before* clamp: " + this.zoomLevel);
         this.zoomLevel = clamp(this.zoomLevel, wrapper.getMinimumZoom(), wrapper.getMaximumZoom());

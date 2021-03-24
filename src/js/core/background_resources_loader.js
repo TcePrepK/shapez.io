@@ -1,7 +1,3 @@
-/* typehints:start */
-import { Application } from "../application";
-/* typehints:end */
-
 import { Loader } from "./loader";
 import { createLogger } from "./logging";
 import { Signal } from "./signal";
@@ -9,6 +5,7 @@ import { SOUNDS, MUSIC } from "../platform/sound";
 import { AtlasDefinition, atlasFiles } from "./atlas_definitions";
 import { initBuildingCodesAfterResourcesLoaded } from "../game/meta_building_registry";
 import { cachebust } from "./cachebust";
+import { globalConfig } from "./config";
 
 const logger = createLogger("background_loader");
 
@@ -34,12 +31,8 @@ const additionalGameSprites = [];
 const additionalGameSounds = [...Object.values(SOUNDS), ...Object.values(MUSIC)];
 
 export class BackgroundResourcesLoader {
-    /**
-     *
-     * @param {Application} app
-     */
-    constructor(app) {
-        this.app = app;
+    constructor() {
+        this.app = globalConfig.app;
 
         this.registerReady = false;
         this.mainMenuReady = false;

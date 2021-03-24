@@ -1,18 +1,12 @@
-/* typehints:start */
-import { GameRoot } from "./root";
-import { DrawParameters } from "../core/draw_parameters";
-/* typehints:end */
+import { globalConfig } from "../core/config";
 
 /**
  * A game system processes all entities which match a given schema, usually a list of
  * required components. This is the core of the game logic.
  */
 export class GameSystem {
-    /**
-     * @param {GameRoot} root
-     */
-    constructor(root) {
-        this.root = root;
+    constructor() {
+        this.root = globalConfig.root;
     }
 
     ///// PUBLIC API /////
@@ -24,9 +18,8 @@ export class GameSystem {
 
     /**
      * Override, do not call this directly, use startDraw()
-     * @param {DrawParameters} parameters
      */
-    draw(parameters) {}
+    draw() {}
 
     /**
      * Should refresh all caches
@@ -35,9 +28,8 @@ export class GameSystem {
 
     /**
      * @see GameSystem.draw Wrapper arround the draw method
-     * @param {DrawParameters} parameters
      */
-    startDraw(parameters) {
-        this.draw(parameters);
+    startDraw() {
+        this.draw();
     }
 }

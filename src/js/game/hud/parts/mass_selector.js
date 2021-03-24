@@ -1,7 +1,6 @@
 import { BaseHUDPart } from "../base_hud_part";
 import { Vector } from "../../../core/vector";
 import { STOP_PROPAGATION } from "../../../core/signal";
-import { DrawParameters } from "../../../core/draw_parameters";
 import { Entity } from "../../entity";
 import { Loader } from "../../../core/loader";
 import { globalConfig } from "../../../core/config";
@@ -184,8 +183,8 @@ export class HUDMassSelector extends BaseHUDPart {
                 }
             };
 
-            const blueprint = Blueprint.fromUids(this.root, entityUids);
-            if (blueprint.canAfford(this.root)) {
+            const blueprint = Blueprint.fromUids(entityUids);
+            if (blueprint.canAfford()) {
                 cutAction();
             } else {
                 const { cancel, ok } = this.root.hud.parts.dialogs.showWarning(
@@ -261,11 +260,8 @@ export class HUDMassSelector extends BaseHUDPart {
         }
     }
 
-    /**
-     *
-     * @param {DrawParameters} parameters
-     */
-    draw(parameters) {
+    draw() {
+        const parameters = globalConfig.parameters;
         const boundsBorder = 2;
 
         if (this.currentSelectionStartWorld) {

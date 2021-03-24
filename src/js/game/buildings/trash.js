@@ -5,7 +5,6 @@ import { ItemAcceptorComponent } from "../components/item_acceptor";
 import { enumItemProcessorTypes, ItemProcessorComponent } from "../components/item_processor";
 import { Entity } from "../entity";
 import { MetaBuilding } from "../meta_building";
-import { GameRoot } from "../root";
 import { enumHubGoalRewards } from "../tutorial_goals";
 
 const overlayMatrix = generateMatrixRotations([1, 1, 0, 1, 1, 1, 0, 1, 1]);
@@ -31,11 +30,27 @@ export class MetaTrashBuilding extends MetaBuilding {
         return overlayMatrix[rotation];
     }
 
-    /**
-     * @param {GameRoot} root
-     */
-    getIsUnlocked(root) {
-        return root.hubGoals.isRewardUnlocked(enumHubGoalRewards.reward_cutter_and_trash);
+    getIsUnlocked() {
+        return this.root.hubGoals.isRewardUnlocked(enumHubGoalRewards.reward_cutter_and_trash);
+    }
+
+    addAchievementReceiver(entity) {
+        if (!entity.root) {
+            return;
+        }
+
+        const itemProcessor = entity.components.ItemProcessor;
+        const tryTakeItem = itemProcessor.tryTakeItem.bind(itemProcessor);
+
+        itemProcessor.tryTakeItem = () => {
+            const taken = tryTakeItem(...arguments);
+
+            if (taken) {
+                entity.root.signals.achievementCheck.dispatch(ACHIEVEMENTS.trash1000, 1);
+            }
+
+            return taken;
+        };
     }
 
     addAchievementReceiver(entity) {

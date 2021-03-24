@@ -18,8 +18,8 @@ import { MetaItemProducerBuilding } from "../../buildings/item_producer";
 import { queryParamOptions } from "../../../core/query_parameters";
 
 export class HUDBuildingsToolbar extends HUDBaseToolbar {
-    constructor(root) {
-        super(root, {
+    constructor() {
+        super({
             primaryBuildings: [
                 MetaBeltBuilding,
                 MetaBalancerBuilding,

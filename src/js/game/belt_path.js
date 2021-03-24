@@ -1,5 +1,4 @@
 import { globalConfig } from "../core/config";
-import { DrawParameters } from "../core/draw_parameters";
 import { createLogger } from "../core/logging";
 import { Rectangle } from "../core/rectangle";
 import { clamp, epsilonCompare, round4Digits } from "../core/utils";
@@ -8,7 +7,6 @@ import { BasicSerializableObject, types } from "../savegame/serialization";
 import { BaseItem } from "./base_item";
 import { Entity } from "./entity";
 import { typeItemSingleton } from "./item_resolver";
-import { GameRoot } from "./root";
 
 const logger = createLogger("belt_path");
 
@@ -36,14 +34,13 @@ export class BeltPath extends BasicSerializableObject {
 
     /**
      * Creates a path from a serialized object
-     * @param {GameRoot} root
      * @param {Object} data
      * @returns {BeltPath|string}
      */
-    static fromSerialized(root, data) {
+    static fromSerialized(data) {
         // Create fake object which looks like a belt path but skips the constructor
         const fakeObject = /** @type {BeltPath} */ (Object.create(BeltPath.prototype));
-        fakeObject.root = root;
+        fakeObject.root = globalConfig.root;
 
         // Deserialize the data
         const errorCodeDeserialize = fakeObject.deserialize(data);
@@ -58,12 +55,11 @@ export class BeltPath extends BasicSerializableObject {
     }
 
     /**
-     * @param {GameRoot} root
      * @param {Array<Entity>} entityPath
      */
-    constructor(root, entityPath) {
+    constructor(entityPath) {
         super();
-        this.root = root;
+        this.root = globalConfig.root;
 
         assert(entityPath.length > 0, "invalid entity path");
         this.entityPath = entityPath;
@@ -622,7 +618,7 @@ export class BeltPath extends BasicSerializableObject {
             );
 
         // Create second path
-        const secondPath = new BeltPath(this.root, secondEntities);
+        const secondPath = new BeltPath(secondEntities);
 
         // Remove all items which are no longer relevant and transfer them to the second path
         let itemPos = this.spacingToFirstItem;
@@ -1233,11 +1229,8 @@ export class BeltPath extends BasicSerializableObject {
         assert(false, "invalid progress: " + progress + " (max: " + this.totalLength + ")");
     }
 
-    /**
-     *
-     * @param {DrawParameters} parameters
-     */
-    drawDebug(parameters) {
+    drawDebug() {
+        const parameters = globalConfig.parameters;
         if (!parameters.visibleRect.containsRect(this.worldBounds)) {
             return;
         }
@@ -1341,9 +1334,9 @@ export class BeltPath extends BasicSerializableObject {
 
     /**
      * Draws the path
-     * @param {DrawParameters} parameters
      */
-    draw(parameters) {
+    draw() {
+        const parameters = globalConfig.parameters;
         if (!parameters.visibleRect.containsRect(this.worldBounds)) {
             return;
         }
@@ -1370,7 +1363,7 @@ export class BeltPath extends BasicSerializableObject {
                 const centerPos = staticComp.localTileToWorld(centerPosLocal).toWorldSpaceCenterOfTile();
 
                 parameters.context.globalAlpha = 0.5;
-                firstItem[_item].drawItemCenteredClipped(centerPos.x, centerPos.y, parameters);
+                firstItem[_item].drawItemCenteredClipped(centerPos.x, centerPos.y);
                 parameters.context.globalAlpha = 1;
             }
 
@@ -1405,7 +1398,6 @@ export class BeltPath extends BasicSerializableObject {
                 distanceAndItem[_item].drawItemCenteredClipped(
                     worldPos.x,
                     worldPos.y,
-                    parameters,
                     globalConfig.defaultItemDiameter
                 );
 

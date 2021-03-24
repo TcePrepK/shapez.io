@@ -2,9 +2,9 @@ import { makeOffscreenBuffer } from "./buffer_utils";
 import { AtlasSprite, BaseSprite, RegularSprite, SpriteAtlasLink } from "./sprites";
 import { cachebust } from "./cachebust";
 import { createLogger } from "./logging";
+import { globalConfig } from "./config";
 
 /**
- * @typedef {import("../application").Application} Application
  * @typedef {import("./atlas_definitions").AtlasDefinition} AtlasDefinition;
  */
 
@@ -14,7 +14,7 @@ const missingSpriteIds = {};
 
 class LoaderImpl {
     constructor() {
-        this.app = null;
+        this.app = globalConfig.app;
 
         /** @type {Map<string, BaseSprite>} */
         this.sprites = new Map();
@@ -22,11 +22,7 @@ class LoaderImpl {
         this.rawImages = [];
     }
 
-    /**
-     * @param {Application} app
-     */
-    linkAppAfterBoot(app) {
-        this.app = app;
+    linkAppAfterBoot() {
         this.makeSpriteNotFoundCanvas();
     }
 

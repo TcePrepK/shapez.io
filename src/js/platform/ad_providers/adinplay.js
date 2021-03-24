@@ -1,7 +1,3 @@
-/* typehints:start */
-import { Application } from "../../application";
-/* typehints:end */
-
 import { AdProviderInterface } from "../ad_provider";
 import { createLogger } from "../../core/logging";
 import { ClickDetector } from "../../core/click_detector";
@@ -13,12 +9,8 @@ const logger = createLogger("adprovider/adinplay");
 const minimumTimeBetweenVideoAdsMs = G_IS_DEV ? 1 : 15 * 60 * 1000;
 
 export class AdinplayAdProvider extends AdProviderInterface {
-    /**
-     *
-     * @param {Application} app
-     */
-    constructor(app) {
-        super(app);
+    constructor() {
+        super();
 
         /** @type {ClickDetector} */
         this.getOnSteamClickDetector = null;

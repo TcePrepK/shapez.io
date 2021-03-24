@@ -53,7 +53,7 @@ export class HUDStandaloneAdvantages extends BaseHUDPart {
     }
 
     initialize() {
-        this.domAttach = new DynamicDomAttach(this.root, this.background, {
+        this.domAttach = new DynamicDomAttach(this.background, {
             attachClass: "visible",
         });
 

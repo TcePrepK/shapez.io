@@ -97,7 +97,7 @@ export class TextualGameState extends GameState {
         if (this.getStateHeaderTitle()) {
             headerHtml = `
             <div class="headerBar">
-            
+
                 <h1><button class="backButton"></button> ${this.getStateHeaderTitle()}</h1>
             </div>`;
         }
@@ -144,7 +144,7 @@ export class TextualGameState extends GameState {
             this.trackClicks(this.headerElement, this.onBackButton);
         }
 
-        this.dialogs = new HUDModalDialogs(null, this.app);
+        this.dialogs = new HUDModalDialogs();
         const dialogsElement = document.body.querySelector(".modalDialogParent");
         this.dialogs.initializeToElement(dialogsElement);
 

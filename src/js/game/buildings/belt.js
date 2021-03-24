@@ -6,7 +6,6 @@ import { T } from "../../translations";
 import { BeltComponent } from "../components/belt";
 import { Entity } from "../entity";
 import { MetaBuilding } from "../meta_building";
-import { GameRoot } from "../root";
 import { THEME } from "../theme";
 
 export const arrayBeltVariantToRotation = [enumDirection.top, enumDirection.left, enumDirection.right];
@@ -50,12 +49,11 @@ export class MetaBeltBuilding extends MetaBuilding {
     }
 
     /**
-     * @param {GameRoot} root
      * @param {string} variant
      * @returns {Array<[string, string]>}
      */
-    getAdditionalStatistics(root, variant) {
-        const beltSpeed = root.hubGoals.getBeltBaseSpeed();
+    getAdditionalStatistics(variant) {
+        const beltSpeed = this.root.hubGoals.getBeltBaseSpeed();
         return [[T.ingame.buildingPlacement.infoTexts.speed, formatItemsPerSecond(beltSpeed)]];
     }
 
@@ -128,20 +126,19 @@ export class MetaBeltBuilding extends MetaBuilding {
     /**
      * Should compute the optimal rotation variant on the given tile
      * @param {object} param0
-     * @param {GameRoot} param0.root
      * @param {Vector} param0.tile
      * @param {number} param0.rotation
      * @param {string} param0.variant
      * @param {Layer} param0.layer
      * @return {{ rotation: number, rotationVariant: number, connectedEntities?: Array<Entity> }}
      */
-    computeOptimalDirectionAndRotationVariantAtTile({ root, tile, rotation, variant, layer }) {
+    computeOptimalDirectionAndRotationVariantAtTile({ tile, rotation, variant, layer }) {
         const topDirection = enumAngleToDirection[rotation];
         const rightDirection = enumAngleToDirection[(rotation + 90) % 360];
         const bottomDirection = enumAngleToDirection[(rotation + 180) % 360];
         const leftDirection = enumAngleToDirection[(rotation + 270) % 360];
 
-        const { ejectors, acceptors } = root.logic.getEjectorsAndAcceptorsAtTile(tile);
+        const { ejectors, acceptors } = this.root.logic.getEjectorsAndAcceptorsAtTile(tile);
 
         let hasBottomEjector = false;
         let hasRightEjector = false;

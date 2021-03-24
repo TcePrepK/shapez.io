@@ -190,7 +190,7 @@ export class MainMenuState extends GameState {
     }
 
     onEnter(payload) {
-        this.dialogs = new HUDModalDialogs(null, this.app);
+        this.dialogs = new HUDModalDialogs();
         const dialogsElement = document.body.querySelector(".modalDialogParent");
         this.dialogs.initializeToElement(dialogsElement);
 
@@ -357,7 +357,7 @@ export class MainMenuState extends GameState {
                 }
 
                 if (setting.changeCb) {
-                    setting.changeCb(this.app, value);
+                    setting.changeCb(value);
                 }
             });
 
@@ -443,7 +443,6 @@ export class MainMenuState extends GameState {
             validator: val => val.match(regex) && trim(val).length > 0,
         });
         const dialog = new DialogWithForm({
-            app: this.app,
             title: T.dialogs.renameSavegame.title,
             desc: T.dialogs.renameSavegame.desc,
             formElements: [nameInput],

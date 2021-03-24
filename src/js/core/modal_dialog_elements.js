@@ -1,7 +1,3 @@
-/* typehints:start */
-import { Application } from "../application";
-/* typehints:end */
-
 import { Signal, STOP_PROPAGATION } from "./signal";
 import { arrayDeleteValue, waitNextFrame } from "./utils";
 import { ClickDetector } from "./click_detector";
@@ -37,7 +33,6 @@ export class Dialog {
      *
      * Constructs a new dialog with the given options
      * @param {object} param0
-     * @param {Application} param0.app
      * @param {string} param0.title Title of the dialog
      * @param {string} param0.contentHTML Inner dialog html
      * @param {Array<string>} param0.buttons
@@ -51,8 +46,8 @@ export class Dialog {
      * @param {string=} param0.type The dialog type, either "info" or "warn"
      * @param {boolean=} param0.closeButton Whether this dialog has a close button
      */
-    constructor({ app, title, contentHTML, buttons, type = "info", closeButton = false }) {
-        this.app = app;
+    constructor({ title, contentHTML, buttons, type = "info", closeButton = false }) {
+        this.app = globalConfig.app;
         this.title = title;
         this.contentHTML = contentHTML;
         this.type = type;
@@ -267,9 +262,8 @@ export class Dialog {
  * Dialog which simply shows a loading spinner
  */
 export class DialogLoading extends Dialog {
-    constructor(app) {
+    constructor() {
         super({
-            app,
             title: "",
             contentHTML: "",
             buttons: [],
@@ -299,7 +293,7 @@ export class DialogLoading extends Dialog {
 }
 
 export class DialogOptionChooser extends Dialog {
-    constructor({ app, title, options }) {
+    constructor({ title, options }) {
         let html = "<div class='optionParent'>";
 
         options.options.forEach(({ value, text, desc = null, iconPrefix = null }) => {
@@ -309,7 +303,7 @@ export class DialogOptionChooser extends Dialog {
                 <div class='option ${value === options.active ? "active" : ""} ${
                 iconPrefix ? "hasIcon" : ""
             }' data-optionvalue='${value}'>
-                    ${iconHtml}    
+                    ${iconHtml}
                     <span class='title'>${text}</span>
                     ${descHtml}
                 </div>
@@ -318,7 +312,6 @@ export class DialogOptionChooser extends Dialog {
 
         html += "</div>";
         super({
-            app,
             title,
             contentHTML: html,
             buttons: [],
@@ -374,7 +367,6 @@ export class DialogWithForm extends Dialog {
     /**
      *
      * @param {object} param0
-     * @param {Application} param0.app
      * @param {string} param0.title
      * @param {string} param0.desc
      * @param {array=} param0.buttons
@@ -384,7 +376,6 @@ export class DialogWithForm extends Dialog {
      * @param {Array<FormElement>} param0.formElements
      */
     constructor({
-        app,
         title,
         desc,
         formElements,
@@ -399,7 +390,6 @@ export class DialogWithForm extends Dialog {
         }
 
         super({
-            app,
             title: title,
             contentHTML: html,
             buttons: buttons,

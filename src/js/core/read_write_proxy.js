@@ -1,7 +1,3 @@
-/* typehints:start */
-import { Application } from "../application";
-/* typehints:end */
-
 import { sha1, CRC_PREFIX, computeCrc } from "./sensitive_utils.encrypt";
 import { createLogger } from "./logging";
 import { FILE_NOT_FOUND } from "../platform/storage";
@@ -20,9 +16,8 @@ const salt = accessNestedPropertyReverse(globalConfig, ["file", "info"]);
 
 // Helper which only writes / reads if verify() works. Also performs migration
 export class ReadWriteProxy {
-    constructor(app, filename) {
-        /** @type {Application} */
-        this.app = app;
+    constructor(filename) {
+        this.app = globalConfig.app;
 
         this.filename = filename;
 

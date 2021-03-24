@@ -9,8 +9,8 @@ import { ColorItem, COLOR_ITEM_SINGLETONS } from "../items/color_item";
 import { MapChunkView } from "../map_chunk_view";
 
 export class DisplaySystem extends GameSystemWithFilter {
-    constructor(root) {
-        super(root, [DisplayComponent]);
+    constructor() {
+        super([DisplayComponent]);
 
         /** @type {Object<string, import("../../core/draw_utils").AtlasSprite>} */
         this.displaySprites = {};
@@ -54,10 +54,9 @@ export class DisplaySystem extends GameSystemWithFilter {
 
     /**
      * Draws a given chunk
-     * @param {import("../../core/draw_utils").DrawParameters} parameters
      * @param {MapChunkView} chunk
      */
-    drawChunk(parameters, chunk) {
+    drawChunk(chunk) {
         const contents = chunk.containedEntitiesByLayer.regular;
         for (let i = 0; i < contents.length; ++i) {
             const entity = contents[i];
@@ -78,7 +77,6 @@ export class DisplaySystem extends GameSystemWithFilter {
                 const origin = entity.components.StaticMapEntity.origin;
                 if (value.getItemType() === "color") {
                     this.displaySprites[/** @type {ColorItem} */ (value).color].drawCachedCentered(
-                        parameters,
                         (origin.x + 0.5) * globalConfig.tileSize,
                         (origin.y + 0.5) * globalConfig.tileSize,
                         globalConfig.tileSize
@@ -87,7 +85,6 @@ export class DisplaySystem extends GameSystemWithFilter {
                     value.drawItemCenteredClipped(
                         (origin.x + 0.5) * globalConfig.tileSize,
                         (origin.y + 0.5) * globalConfig.tileSize,
-                        parameters,
                         30
                     );
                 }

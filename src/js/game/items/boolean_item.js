@@ -1,4 +1,3 @@
-import { DrawParameters } from "../../core/draw_parameters";
 import { Loader } from "../../core/loader";
 import { types } from "../../savegame/serialization";
 import { BaseItem } from "../base_item";
@@ -52,16 +51,15 @@ export class BooleanItem extends BaseItem {
      * @param {number} x
      * @param {number} y
      * @param {number} diameter
-     * @param {DrawParameters} parameters
      */
-    drawItemCenteredImpl(x, y, parameters, diameter = globalConfig.defaultItemDiameter) {
+    drawItemCenteredImpl(x, y, diameter = globalConfig.defaultItemDiameter) {
         let sprite;
         if (this.value) {
             sprite = Loader.getSprite("sprites/wires/boolean_true.png");
         } else {
             sprite = Loader.getSprite("sprites/wires/boolean_false.png");
         }
-        sprite.drawCachedCentered(parameters, x, y, diameter);
+        sprite.drawCachedCentered(x, y, diameter);
     }
 
     /**

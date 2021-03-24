@@ -7,7 +7,6 @@ import { StorageComponent } from "../components/storage";
 import { enumPinSlotType, WiredPinsComponent } from "../components/wired_pins";
 import { Entity } from "../entity";
 import { MetaBuilding } from "../meta_building";
-import { GameRoot } from "../root";
 import { enumHubGoalRewards } from "../tutorial_goals";
 
 const storageSize = 5000;
@@ -24,7 +23,7 @@ export class MetaStorageBuilding extends MetaBuilding {
     /**
      * @returns {Array<[string, string]>}
      */
-    getAdditionalStatistics(root, variant) {
+    getAdditionalStatistics() {
         return [[T.ingame.buildingPlacement.infoTexts.storage, formatBigNumber(storageSize)]];
     }
 
@@ -32,11 +31,8 @@ export class MetaStorageBuilding extends MetaBuilding {
         return new Vector(2, 2);
     }
 
-    /**
-     * @param {GameRoot} root
-     */
-    getIsUnlocked(root) {
-        return root.hubGoals.isRewardUnlocked(enumHubGoalRewards.reward_storage);
+    getIsUnlocked() {
+        return this.root.hubGoals.isRewardUnlocked(enumHubGoalRewards.reward_storage);
     }
 
     /**

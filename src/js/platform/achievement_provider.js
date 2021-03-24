@@ -1,7 +1,5 @@
 /* typehints:start */
-import { Application } from "../application";
 import { Entity } from "../game/entity";
-import { GameRoot } from "../game/root";
 import { THEMES } from "../game/theme";
 /* typehints:end */
 
@@ -84,9 +82,8 @@ export class AchievementProviderInterface {
     collection = /** @type {AchievementCollection|undefined} */ (null);
     /* typehints:end */
 
-    /** @param {Application} app */
-    constructor(app) {
-        this.app = app;
+    constructor() {
+        this.app = globalConfig.app;
     }
 
     /**
@@ -100,10 +97,9 @@ export class AchievementProviderInterface {
 
     /**
      * Opportunity to do additional initialization work with the GameRoot.
-     * @param {GameRoot} root
      * @returns {Promise<void>}
      */
-    onLoad(root) {
+    onLoad() {
         abstract;
         return Promise.reject();
     }
@@ -260,9 +256,8 @@ export class AchievementCollection {
         this.add(ACHIEVEMENTS.upgradesTier8, this.createUpgradeOptions(8));
     }
 
-    /** @param {GameRoot} root */
-    initialize(root) {
-        this.root = root;
+    initialize() {
+        this.root = globalConfig.root;
         this.root.signals.achievementCheck.add(this.unlock, this);
         this.root.signals.bulkAchievementCheck.add(this.bulkUnlock, this);
 

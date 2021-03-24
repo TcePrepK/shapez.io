@@ -1,7 +1,3 @@
-/* typehints:start */
-import { Application } from "../application";
-/* typehints:end */
-
 import { ReadWriteProxy } from "../core/read_write_proxy";
 import { BoolSetting, EnumSetting, RangeSetting, BaseSetting } from "./setting_types";
 import { createLogger } from "../core/logging";
@@ -9,6 +5,8 @@ import { ExplainedResult } from "../core/explained_result";
 import { THEMES, applyGameTheme } from "../game/theme";
 import { T } from "../translations";
 import { LANGUAGES } from "../languages";
+import { Application } from "../application";
+import { globalConfig } from "../core/config";
 
 const logger = createLogger("application_settings");
 
@@ -141,7 +139,7 @@ export const allApplicationSettings = [
         textGetter: key => LANGUAGES[key].name,
         category: enumCategories.general,
         restartRequired: true,
-        changeCb: (app, id) => null,
+        changeCb: id => null,
         magicValue: "auto-detect",
     }),
 
@@ -151,56 +149,30 @@ export const allApplicationSettings = [
         textGetter: scale => T.settings.labels.uiScale.scales[scale.id],
         category: enumCategories.userInterface,
         restartRequired: false,
-        changeCb:
-            /**
-             * @param {Application} app
-             */
-            (app, id) => app.updateAfterUiScaleChanged(),
+        changeCb: id => globalConfig.app.updateAfterUiScaleChanged(),
     }),
 
-    new RangeSetting(
-        "soundVolume",
-        enumCategories.general,
-        /**
-         * @param {Application} app
-         */
-        (app, value) => app.sound.setSoundVolume(value)
+    new RangeSetting("soundVolume", enumCategories.general, value =>
+        globalConfig.app.sound.setSoundVolume(value)
     ),
-    new RangeSetting(
-        "musicVolume",
-        enumCategories.general,
-        /**
-         * @param {Application} app
-         */
-        (app, value) => app.sound.setMusicVolume(value)
+    new RangeSetting("musicVolume", enumCategories.general, value =>
+        globalConfig.app.sound.setMusicVolume(value)
     ),
 
     new BoolSetting(
         "fullscreen",
         enumCategories.general,
-        /**
-         * @param {Application} app
-         */
-        (app, value) => {
-            if (app.platformWrapper.getSupportsFullscreen()) {
-                app.platformWrapper.setFullscreen(value);
+        value => {
+            if (globalConfig.app.platformWrapper.getSupportsFullscreen()) {
+                globalConfig.app.platformWrapper.setFullscreen(value);
             }
         },
-        /**
-         * @param {Application} app
-         */ app => app.restrictionMgr.getHasExtendedSettings()
+        () => globalConfig.app.restrictionMgr.getHasExtendedSettings()
     ),
 
-    new BoolSetting(
-        "enableColorBlindHelper",
-        enumCategories.general,
-        /**
-         * @param {Application} app
-         */
-        (app, value) => null
-    ),
+    new BoolSetting("enableColorBlindHelper", enumCategories.general, value => null),
 
-    new BoolSetting("offerHints", enumCategories.userInterface, (app, value) => {}),
+    new BoolSetting("offerHints", enumCategories.userInterface, value => {}),
 
     new EnumSetting("theme", {
         options: Object.keys(THEMES),
@@ -208,17 +180,11 @@ export const allApplicationSettings = [
         textGetter: theme => T.settings.labels.theme.themes[theme],
         category: enumCategories.userInterface,
         restartRequired: false,
-        changeCb:
-            /**
-             * @param {Application} app
-             */
-            (app, id) => {
-                applyGameTheme(id);
-                document.documentElement.setAttribute("data-theme", id);
-            },
-        enabledCb: /**
-         * @param {Application} app
-         */ app => app.restrictionMgr.getHasExtendedSettings(),
+        changeCb: id => {
+            applyGameTheme(id);
+            document.documentElement.setAttribute("data-theme", id);
+        },
+        enabledCb: () => globalConfig.app.restrictionMgr.getHasExtendedSettings(),
     }),
 
     new EnumSetting("autosaveInterval", {
@@ -227,11 +193,7 @@ export const allApplicationSettings = [
         textGetter: interval => T.settings.labels.autosaveInterval.intervals[interval.id],
         category: enumCategories.advanced,
         restartRequired: false,
-        changeCb:
-            /**
-             * @param {Application} app
-             */
-            (app, id) => null,
+        changeCb: id => null,
     }),
 
     new EnumSetting("scrollWheelSensitivity", {
@@ -240,11 +202,7 @@ export const allApplicationSettings = [
         textGetter: scale => T.settings.labels.scrollWheelSensitivity.sensitivity[scale.id],
         category: enumCategories.advanced,
         restartRequired: false,
-        changeCb:
-            /**
-             * @param {Application} app
-             */
-            (app, id) => app.updateAfterUiScaleChanged(),
+        changeCb: id => globalConfig.app.updateAfterUiScaleChanged(),
     }),
 
     new EnumSetting("movementSpeed", {
@@ -253,20 +211,20 @@ export const allApplicationSettings = [
         textGetter: multiplier => T.settings.labels.movementSpeed.speeds[multiplier.id],
         category: enumCategories.advanced,
         restartRequired: false,
-        changeCb: (app, id) => {},
+        changeCb: id => {},
     }),
 
-    new BoolSetting("enableMousePan", enumCategories.advanced, (app, value) => {}),
-    new BoolSetting("alwaysMultiplace", enumCategories.advanced, (app, value) => {}),
-    new BoolSetting("zoomToCursor", enumCategories.advanced, (app, value) => {}),
-    new BoolSetting("clearCursorOnDeleteWhilePlacing", enumCategories.advanced, (app, value) => {}),
-    new BoolSetting("enableTunnelSmartplace", enumCategories.advanced, (app, value) => {}),
-    new BoolSetting("vignette", enumCategories.userInterface, (app, value) => {}),
-    new BoolSetting("compactBuildingInfo", enumCategories.userInterface, (app, value) => {}),
-    new BoolSetting("disableCutDeleteWarnings", enumCategories.advanced, (app, value) => {}),
-    new BoolSetting("rotationByBuilding", enumCategories.advanced, (app, value) => {}),
-    new BoolSetting("displayChunkBorders", enumCategories.advanced, (app, value) => {}),
-    new BoolSetting("pickMinerOnPatch", enumCategories.advanced, (app, value) => {}),
+    new BoolSetting("enableMousePan", enumCategories.advanced, value => {}),
+    new BoolSetting("alwaysMultiplace", enumCategories.advanced, value => {}),
+    new BoolSetting("zoomToCursor", enumCategories.advanced, value => {}),
+    new BoolSetting("clearCursorOnDeleteWhilePlacing", enumCategories.advanced, value => {}),
+    new BoolSetting("enableTunnelSmartplace", enumCategories.advanced, value => {}),
+    new BoolSetting("vignette", enumCategories.userInterface, value => {}),
+    new BoolSetting("compactBuildingInfo", enumCategories.userInterface, value => {}),
+    new BoolSetting("disableCutDeleteWarnings", enumCategories.advanced, value => {}),
+    new BoolSetting("rotationByBuilding", enumCategories.advanced, value => {}),
+    new BoolSetting("displayChunkBorders", enumCategories.advanced, value => {}),
+    new BoolSetting("pickMinerOnPatch", enumCategories.advanced, value => {}),
     new RangeSetting("mapResourcesScale", enumCategories.advanced, () => null),
 
     new EnumSetting("refreshRate", {
@@ -275,16 +233,14 @@ export const allApplicationSettings = [
         textGetter: rate => rate + " Hz",
         category: enumCategories.performance,
         restartRequired: false,
-        changeCb: (app, id) => {},
-        enabledCb: /**
-         * @param {Application} app
-         */ app => app.restrictionMgr.getHasExtendedSettings(),
+        changeCb: id => {},
+        enabledCb: () => globalConfig.app.restrictionMgr.getHasExtendedSettings(),
     }),
 
-    new BoolSetting("lowQualityMapResources", enumCategories.performance, (app, value) => {}),
-    new BoolSetting("disableTileGrid", enumCategories.performance, (app, value) => {}),
-    new BoolSetting("lowQualityTextures", enumCategories.performance, (app, value) => {}),
-    new BoolSetting("simplifiedBelts", enumCategories.performance, (app, value) => {}),
+    new BoolSetting("lowQualityMapResources", enumCategories.performance, value => {}),
+    new BoolSetting("disableTileGrid", enumCategories.performance, value => {}),
+    new BoolSetting("lowQualityTextures", enumCategories.performance, value => {}),
+    new BoolSetting("simplifiedBelts", enumCategories.performance, value => {}),
 ];
 
 export function getApplicationSettingById(id) {
@@ -335,8 +291,8 @@ class SettingsStorage {
 }
 
 export class ApplicationSettings extends ReadWriteProxy {
-    constructor(app) {
-        super(app, "app_settings.bin");
+    constructor() {
+        super("app_settings.bin");
     }
 
     initialize() {
@@ -347,7 +303,7 @@ export class ApplicationSettings extends ReadWriteProxy {
                 const settings = this.getAllSettings();
                 for (let i = 0; i < allApplicationSettings.length; ++i) {
                     const handle = allApplicationSettings[i];
-                    handle.apply(this.app, settings[handle.id]);
+                    handle.apply(settings[handle.id]);
                 }
             })
 
@@ -463,7 +419,7 @@ export class ApplicationSettings extends ReadWriteProxy {
                 }
                 this.getAllSettings()[key] = value;
                 if (setting.changeCb) {
-                    setting.changeCb(this.app, value);
+                    setting.changeCb(value);
                 }
                 return this.writeAsync();
             }

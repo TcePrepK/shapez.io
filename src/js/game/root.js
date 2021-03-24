@@ -14,7 +14,6 @@ import { MapView } from "./map_view";
 import { Camera } from "./camera";
 import { InGameState } from "../states/ingame";
 import { AutomaticSave } from "./automatic_save";
-import { Application } from "../application";
 import { SoundProxy } from "./sound_proxy";
 import { Savegame } from "../savegame/savegame";
 import { GameLogic } from "./logic";
@@ -29,9 +28,8 @@ import { DynamicTickrate } from "./dynamic_tickrate";
 import { KeyActionMapper } from "./key_action_mapper";
 import { Vector } from "../core/vector";
 import { GameMode } from "./game_mode";
+import { globalConfig } from "../core/config";
 /* typehints:end */
-
-const logger = createLogger("game/root");
 
 /** @type {Array<Layer>} */
 export const layers = ["regular", "wires"];
@@ -44,11 +42,14 @@ export const layers = ["regular", "wires"];
 export class GameRoot {
     /**
      * Constructs a new game root
-     * @param {Application} app
      */
     constructor(app) {
         this.app = app;
 
+        this.setVariables();
+    }
+
+    setVariables() {
         /** @type {Savegame} */
         this.savegame = null;
 
@@ -199,7 +200,7 @@ export class GameRoot {
      * Destructs the game root
      */
     destruct() {
-        logger.log("destructing root");
+        createLogger("game/root").log("destructing root");
         this.signals.aboutToDestruct.dispatch();
 
         this.reset();

@@ -6,7 +6,6 @@ import { ItemEjectorComponent } from "../components/item_ejector";
 import { enumItemProcessorTypes, ItemProcessorComponent } from "../components/item_processor";
 import { Entity } from "../entity";
 import { MetaBuilding } from "../meta_building";
-import { GameRoot } from "../root";
 import { enumHubGoalRewards } from "../tutorial_goals";
 
 export class MetaMixerBuilding extends MetaBuilding {
@@ -22,20 +21,15 @@ export class MetaMixerBuilding extends MetaBuilding {
         return "#cdbb7d";
     }
 
-    /**
-     * @param {GameRoot} root
-     */
-    getIsUnlocked(root) {
-        return root.hubGoals.isRewardUnlocked(enumHubGoalRewards.reward_mixer);
+    getIsUnlocked() {
+        return this.root.hubGoals.isRewardUnlocked(enumHubGoalRewards.reward_mixer);
     }
 
     /**
-     * @param {GameRoot} root
-     * @param {string} variant
      * @returns {Array<[string, string]>}
      */
-    getAdditionalStatistics(root, variant) {
-        const speed = root.hubGoals.getProcessorBaseSpeed(enumItemProcessorTypes.mixer);
+    getAdditionalStatistics() {
+        const speed = this.root.hubGoals.getProcessorBaseSpeed(enumItemProcessorTypes.mixer);
         return [[T.ingame.buildingPlacement.infoTexts.speed, formatItemsPerSecond(speed)]];
     }
 

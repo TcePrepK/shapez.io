@@ -3,7 +3,6 @@ import { globalConfig } from "../../../core/config";
 import { clamp, formatBigNumber, round2Digits } from "../../../core/utils";
 import { T } from "../../../translations";
 import { enumAnalyticsDataSource } from "../../production_analytics";
-import { GameRoot } from "../../root";
 import { ShapeDefinition } from "../../shape_definition";
 
 /** @enum {string} */
@@ -27,13 +26,12 @@ export const statisticsUnitsSeconds = {
  */
 export class HUDShapeStatisticsHandle {
     /**
-     * @param {GameRoot} root
      * @param {ShapeDefinition} definition
      * @param {IntersectionObserver} intersectionObserver
      */
-    constructor(root, definition, intersectionObserver) {
+    constructor(definition, intersectionObserver) {
         this.definition = definition;
-        this.root = root;
+        this.root = globalConfig.root;
         this.intersectionObserver = intersectionObserver;
 
         this.visible = false;

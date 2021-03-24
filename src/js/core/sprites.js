@@ -1,4 +1,4 @@
-import { DrawParameters } from "./draw_parameters";
+import { globalConfig } from "./config";
 import { Rectangle } from "./rectangle";
 import { round3Digits } from "./utils";
 
@@ -119,15 +119,13 @@ export class AtlasSprite extends BaseSprite {
     }
 
     /**
-     *
-     * @param {DrawParameters} parameters
      * @param {number} x
      * @param {number} y
      * @param {number} size
      * @param {boolean=} clipping
      */
-    drawCachedCentered(parameters, x, y, size, clipping = true) {
-        this.drawCached(parameters, x - size / 2, y - size / 2, size, size, clipping);
+    drawCachedCentered(x, y, size, clipping = true) {
+        this.drawCached(x - size / 2, y - size / 2, size, size, clipping);
     }
 
     /**
@@ -143,16 +141,15 @@ export class AtlasSprite extends BaseSprite {
 
     /**
      * Draws the sprite
-     * @param {DrawParameters} parameters
      * @param {number} x
      * @param {number} y
      * @param {number} w
      * @param {number} h
      * @param {boolean=} clipping Whether to perform culling
      */
-    drawCached(parameters, x, y, w = null, h = null, clipping = true) {
+    drawCached(x, y, w = null, h = null, clipping = true) {
+        const parameters = globalConfig.parameters;
         if (G_IS_DEV) {
-            assert(parameters instanceof DrawParameters, "Not a valid context");
             assert(!!w && w > 0, "Not a valid width:" + w);
             assert(!!h && h > 0, "Not a valid height:" + h);
         }
@@ -222,16 +219,15 @@ export class AtlasSprite extends BaseSprite {
 
     /**
      * Draws a subset of the sprite. Does NO culling
-     * @param {DrawParameters} parameters
      * @param {number} x
      * @param {number} y
      * @param {number} w
      * @param {number} h
      * @param {Rectangle=} clipRect The rectangle in local space (0 ... 1) to draw of the image
      */
-    drawCachedWithClipRect(parameters, x, y, w = null, h = null, clipRect = FULL_CLIP_RECT) {
+    drawCachedWithClipRect(x, y, w = null, h = null, clipRect = FULL_CLIP_RECT) {
+        const parameters = globalConfig.parameters;
         if (G_IS_DEV) {
-            assert(parameters instanceof DrawParameters, "Not a valid context");
             assert(!!w && w > 0, "Not a valid width:" + w);
             assert(!!h && h > 0, "Not a valid height:" + h);
             assert(clipRect, "No clip rect given!");

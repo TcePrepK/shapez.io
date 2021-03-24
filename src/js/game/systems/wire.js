@@ -91,8 +91,8 @@ export class WireNetwork {
 }
 
 export class WireSystem extends GameSystemWithFilter {
-    constructor(root) {
-        super(root, [WireComponent]);
+    constructor() {
+        super([WireComponent]);
 
         /**
          * @type {Object<enumWireVariant, Object<enumWireType, AtlasSprite>>}
@@ -122,7 +122,6 @@ export class WireSystem extends GameSystemWithFilter {
         this.isFirstRecompute = true;
 
         this.staleArea = new StaleAreaDetector({
-            root: this.root,
             name: "wires",
             recomputeMethod: this.updateSurroundingWirePlacement.bind(this),
         });
@@ -597,10 +596,10 @@ export class WireSystem extends GameSystemWithFilter {
 
     /**
      * Draws a given chunk
-     * @param {import("../../core/draw_utils").DrawParameters} parameters
      * @param {MapChunkView} chunk
      */
-    drawChunk(parameters, chunk) {
+    drawChunk(chunk) {
+        const parameters = globalConfig.parameters;
         const contents = chunk.wireContents;
         for (let y = 0; y < globalConfig.mapChunkSize; ++y) {
             for (let x = 0; x < globalConfig.mapChunkSize; ++x) {
@@ -616,7 +615,7 @@ export class WireSystem extends GameSystemWithFilter {
                     assert(sprite, "Unknown wire type: " + wireType);
                     const staticComp = entity.components.StaticMapEntity;
                     parameters.context.globalAlpha = opacity;
-                    staticComp.drawSpriteOnBoundsClipped(parameters, sprite, 0);
+                    staticComp.drawSpriteOnBoundsClipped(sprite, 0);
 
                     // DEBUG Rendering
                     if (G_IS_DEV && globalConfig.debug.renderWireRotations) {
@@ -733,7 +732,6 @@ export class WireSystem extends GameSystemWithFilter {
                         rotation,
                         rotationVariant,
                     } = metaWire.computeOptimalDirectionAndRotationVariantAtTile({
-                        root: this.root,
                         tile: new Vector(x, y),
                         rotation: targetStaticComp.originalRotation,
                         variant,

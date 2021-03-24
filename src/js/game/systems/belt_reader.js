@@ -4,8 +4,8 @@ import { globalConfig } from "../../core/config";
 import { BOOL_TRUE_SINGLETON, BOOL_FALSE_SINGLETON } from "../items/boolean_item";
 
 export class BeltReaderSystem extends GameSystemWithFilter {
-    constructor(root) {
-        super(root, [BeltReaderComponent]);
+    constructor() {
+        super([BeltReaderComponent]);
     }
 
     update() {

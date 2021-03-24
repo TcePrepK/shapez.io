@@ -1,11 +1,8 @@
-/* typehints:start */
-import { Application } from "../application";
-/* typehints:end */
+import { globalConfig } from "../core/config";
 
 export class AdProviderInterface {
-    /** @param {Application} app */
-    constructor(app) {
-        this.app = app;
+    constructor() {
+        this.app = globalConfig.app;
     }
 
     /**

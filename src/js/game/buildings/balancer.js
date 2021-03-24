@@ -4,7 +4,6 @@ import { ItemEjectorComponent } from "../components/item_ejector";
 import { enumItemProcessorTypes, ItemProcessorComponent } from "../components/item_processor";
 import { Entity } from "../entity";
 import { MetaBuilding, defaultBuildingVariant } from "../meta_building";
-import { GameRoot } from "../root";
 import { enumHubGoalRewards } from "../tutorial_goals";
 import { T } from "../../translations";
 import { formatItemsPerSecond, generateMatrixRotations } from "../../core/utils";
@@ -61,11 +60,10 @@ export class MetaBalancerBuilding extends MetaBuilding {
     }
 
     /**
-     * @param {GameRoot} root
      * @param {string} variant
      * @returns {Array<[string, string]>}
      */
-    getAdditionalStatistics(root, variant) {
+    getAdditionalStatistics(variant) {
         let speedMultiplier = 2;
         switch (variant) {
             case enumBalancerVariants.merger:
@@ -76,7 +74,7 @@ export class MetaBalancerBuilding extends MetaBuilding {
         }
 
         const speed =
-            (root.hubGoals.getProcessorBaseSpeed(enumItemProcessorTypes.balancer) / 2) * speedMultiplier;
+            (this.root.hubGoals.getProcessorBaseSpeed(enumItemProcessorTypes.balancer) / 2) * speedMultiplier;
         return [[T.ingame.buildingPlacement.infoTexts.speed, formatItemsPerSecond(speed)]];
     }
 
@@ -84,28 +82,22 @@ export class MetaBalancerBuilding extends MetaBuilding {
         return "#555759";
     }
 
-    /**
-     * @param {GameRoot} root
-     */
-    getAvailableVariants(root) {
+    getAvailableVariants() {
         let available = [defaultBuildingVariant];
 
-        if (root.hubGoals.isRewardUnlocked(enumHubGoalRewards.reward_merger)) {
+        if (this.root.hubGoals.isRewardUnlocked(enumHubGoalRewards.reward_merger)) {
             available.push(enumBalancerVariants.merger, enumBalancerVariants.mergerInverse);
         }
 
-        if (root.hubGoals.isRewardUnlocked(enumHubGoalRewards.reward_splitter)) {
+        if (this.root.hubGoals.isRewardUnlocked(enumHubGoalRewards.reward_splitter)) {
             available.push(enumBalancerVariants.splitter, enumBalancerVariants.splitterInverse);
         }
 
         return available;
     }
 
-    /**
-     * @param {GameRoot} root
-     */
-    getIsUnlocked(root) {
-        return root.hubGoals.isRewardUnlocked(enumHubGoalRewards.reward_balancer);
+    getIsUnlocked() {
+        return this.root.hubGoals.isRewardUnlocked(enumHubGoalRewards.reward_balancer);
     }
 
     /**

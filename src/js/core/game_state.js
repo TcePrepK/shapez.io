@@ -1,5 +1,4 @@
 /* typehints:start */
-import { Application } from "../application";
 import { StateManager } from "./state_manager";
 /* typehints:end */
 
@@ -24,12 +23,10 @@ export class GameState {
      */
     constructor(key) {
         this.key = key;
+        this.app = globalConfig.app;
 
         /** @type {StateManager} */
         this.stateManager = null;
-
-        /** @type {Application} */
-        this.app = null;
 
         // Store if we are currently fading out
         this.fadingOut = false;
@@ -261,11 +258,9 @@ export class GameState {
      * Internal callback from the manager. Do not override!
      * @param {StateManager} stateManager
      */
-    internalRegisterCallback(stateManager, app) {
+    internalRegisterCallback(stateManager) {
         assert(stateManager, "No state manager");
-        assert(app, "No app");
         this.stateManager = stateManager;
-        this.app = app;
     }
 
     /**

@@ -1,6 +1,6 @@
 import { AnimationFrame } from "./core/animation_frame";
 import { BackgroundResourcesLoader } from "./core/background_resources_loader";
-import { IS_MOBILE } from "./core/config";
+import { globalConfig, IS_MOBILE } from "./core/config";
 import { GameState } from "./core/game_state";
 import { GLOBAL_APP, setGlobalApp } from "./core/globals";
 import { InputDistributor } from "./core/input_distributor";
@@ -63,18 +63,20 @@ export class Application {
         logger.log("Creating application, platform =", getPlatformName());
         setGlobalApp(this);
 
+        globalConfig.app = this;
+
         this.unloaded = false;
 
         // Global stuff
-        this.settings = new ApplicationSettings(this);
+        this.settings = new ApplicationSettings();
         this.ticker = new AnimationFrame();
-        this.stateMgr = new StateManager(this);
-        this.savegameMgr = new SavegameManager(this);
-        this.inputMgr = new InputDistributor(this);
-        this.backgroundResourceLoader = new BackgroundResourcesLoader(this);
+        this.stateMgr = new StateManager();
+        this.savegameMgr = new SavegameManager();
+        this.inputMgr = new InputDistributor();
+        this.backgroundResourceLoader = new BackgroundResourcesLoader();
 
         // Restrictions (Like demo etc)
-        this.restrictionMgr = new RestrictionManager(this);
+        this.restrictionMgr = new RestrictionManager();
 
         // Platform dependent stuff
 
@@ -132,17 +134,17 @@ export class Application {
         logger.log("Creating platform dependent instances (standalone=", G_IS_STANDALONE, ")");
 
         if (G_IS_STANDALONE) {
-            this.platformWrapper = new PlatformWrapperImplElectron(this);
+            this.platformWrapper = new PlatformWrapperImplElectron();
         } else {
-            this.platformWrapper = new PlatformWrapperImplBrowser(this);
+            this.platformWrapper = new PlatformWrapperImplBrowser();
         }
 
         // Start with empty ad provider
-        this.adProvider = new NoAdProvider(this);
-        this.sound = new SoundImplBrowser(this);
-        this.analytics = new GoogleAnalyticsImpl(this);
-        this.gameAnalytics = new ShapezGameAnalytics(this);
-        this.achievementProvider = new NoAchievementProvider(this);
+        this.adProvider = new NoAdProvider();
+        this.sound = new SoundImplBrowser();
+        this.analytics = new GoogleAnalyticsImpl();
+        this.gameAnalytics = new ShapezGameAnalytics();
+        this.achievementProvider = new NoAchievementProvider();
     }
 
     /**
@@ -322,7 +324,7 @@ export class Application {
         this.registerStates();
         this.registerEventListeners();
 
-        Loader.linkAppAfterBoot(this);
+        Loader.linkAppAfterBoot();
 
         // Check for mobile
         if (IS_MOBILE) {

@@ -1,5 +1,4 @@
 import { globalConfig } from "../../core/config";
-import { DrawParameters } from "../../core/draw_parameters";
 import { GameSystem } from "../game_system";
 import { MapChunkView } from "../map_chunk_view";
 import { THEME } from "../theme";
@@ -8,10 +7,10 @@ import { drawSpriteClipped } from "../../core/draw_utils";
 export class MapResourcesSystem extends GameSystem {
     /**
      * Draws the map resources
-     * @param {DrawParameters} parameters
      * @param {MapChunkView} chunk
      */
-    drawChunk(parameters, chunk) {
+    drawChunk(chunk) {
+        const parameters = globalConfig.parameters;
         const basicChunkBackground = this.root.buffers.getForKey({
             key: "mapresourcebg",
             subKey: chunk.renderKey,
@@ -23,7 +22,6 @@ export class MapResourcesSystem extends GameSystem {
 
         parameters.context.imageSmoothingEnabled = false;
         drawSpriteClipped({
-            parameters,
             sprite: basicChunkBackground,
             x: chunk.tileX * globalConfig.tileSize,
             y: chunk.tileY * globalConfig.tileSize,
@@ -44,7 +42,7 @@ export class MapResourcesSystem extends GameSystem {
                 const destY = chunk.y * globalConfig.mapChunkWorldSize + patch.pos.y * globalConfig.tileSize;
                 const diameter = Math.min(80, 40 / parameters.zoomLevel);
 
-                patch.item.drawItemCenteredClipped(destX, destY, parameters, diameter);
+                patch.item.drawItemCenteredClipped(destX, destY, diameter);
             }
         } else {
             // HIGH QUALITY: Draw all items
@@ -69,12 +67,7 @@ export class MapResourcesSystem extends GameSystem {
                         const destX = worldX + globalConfig.halfTileSize;
                         const destY = worldY + globalConfig.halfTileSize;
 
-                        lowerItem.drawItemCenteredClipped(
-                            destX,
-                            destY,
-                            parameters,
-                            globalConfig.defaultItemDiameter
-                        );
+                        lowerItem.drawItemCenteredClipped(destX, destY, globalConfig.defaultItemDiameter);
                     }
                 }
             }

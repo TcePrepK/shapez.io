@@ -218,7 +218,7 @@ export class InGameState extends GameState {
     stage3CreateCore() {
         if (this.switchStage(stages.s3_createCore)) {
             logger.log("Creating new game core");
-            this.core = new GameCore(this.app);
+            this.core = new GameCore();
 
             this.core.initializeRoot(this, this.savegame);
 
@@ -355,7 +355,7 @@ export class InGameState extends GameState {
         this.creationPayload = payload;
         this.savegame = payload.savegame;
 
-        this.loadingOverlay = new GameLoadingOverlay(this.app, this.getDivElement());
+        this.loadingOverlay = new GameLoadingOverlay(this.getDivElement());
         this.loadingOverlay.showBasic();
 
         // Remove unneded default element
@@ -434,7 +434,7 @@ export class InGameState extends GameState {
             return this.currentSavePromise;
         }
         logger.log("Starting to save game ...");
-        this.savegame.updateData(this.core.root);
+        this.savegame.updateData();
 
         this.currentSavePromise = this.savegame
             .writeSavegameAndMetadata()

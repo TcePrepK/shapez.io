@@ -1,11 +1,5 @@
-/* typehints:start */
-import { GameRoot } from "./root";
-import { InputReceiver } from "../core/input_receiver";
-import { Application } from "../application";
-/* typehints:end */
-
 import { Signal, STOP_PROPAGATION } from "../core/signal";
-import { IS_MOBILE } from "../core/config";
+import { globalConfig, IS_MOBILE } from "../core/config";
 import { T } from "../translations";
 function key(str) {
     return str.toUpperCase().charCodeAt(0);
@@ -279,18 +273,16 @@ export function getStringForKeyCode(code) {
 
 export class Keybinding {
     /**
-     *
      * @param {KeyActionMapper} keyMapper
-     * @param {Application} app
      * @param {object} param0
      * @param {number} param0.keyCode
      * @param {boolean=} param0.builtin
      * @param {boolean=} param0.repeated
      */
-    constructor(keyMapper, app, { keyCode, builtin = false, repeated = false }) {
+    constructor(keyMapper, { keyCode, builtin = false, repeated = false }) {
         assert(keyCode && Number.isInteger(keyCode), "Invalid key code: " + keyCode);
         this.keyMapper = keyMapper;
-        this.app = app;
+        this.app = globalConfig.app;
         this.keyCode = keyCode;
         this.builtin = builtin;
         this.repeated = repeated;
@@ -354,12 +346,10 @@ export class Keybinding {
 
 export class KeyActionMapper {
     /**
-     *
-     * @param {GameRoot} root
      * @param {InputReceiver} inputReciever
      */
-    constructor(root, inputReciever) {
-        this.root = root;
+    constructor(inputReciever) {
+        this.root = globalConfig.root;
         this.inputReceiver = inputReciever;
 
         inputReciever.keydown.add(this.handleKeydown, this);
@@ -368,7 +358,7 @@ export class KeyActionMapper {
         /** @type {Object.<string, Keybinding>} */
         this.keybindings = {};
 
-        const overrides = root.app.settings.getKeybindingOverrides();
+        const overrides = this.root.app.settings.getKeybindingOverrides();
 
         for (const category in KEYMAPPINGS) {
             for (const key in KEYMAPPINGS[category]) {
@@ -377,7 +367,7 @@ export class KeyActionMapper {
                     payload.keyCode = overrides[key];
                 }
 
-                this.keybindings[key] = new Keybinding(this, this.root.app, payload);
+                this.keybindings[key] = new Keybinding(this, payload);
 
                 if (G_IS_DEV) {
                     // Sanity

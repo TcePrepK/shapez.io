@@ -78,7 +78,7 @@ export class SettingsState extends TextualGameState {
                 continue;
             }
 
-            categoriesHTML[setting.categoryId] += setting.getHtml(this.app);
+            categoriesHTML[setting.categoryId] += setting.getHtml();
         }
 
         return Object.keys(categoriesHTML)

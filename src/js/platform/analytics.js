@@ -1,11 +1,8 @@
-/* typehints:start */
-import { Application } from "../application";
-/* typehints:end */
+import { globalConfig } from "../core/config";
 
 export class AnalyticsInterface {
-    constructor(app) {
-        /** @type {Application} */
-        this.app = app;
+    constructor() {
+        this.app = globalConfig.app;
     }
 
     /**

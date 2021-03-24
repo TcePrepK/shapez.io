@@ -1,6 +1,5 @@
 import { makeOffscreenBuffer } from "../../../core/buffer_utils";
 import { globalConfig, THIRDPARTY_URLS } from "../../../core/config";
-import { DrawParameters } from "../../../core/draw_parameters";
 import { gMetaBuildingRegistry } from "../../../core/global_registries";
 import { Loader } from "../../../core/loader";
 import { DialogWithForm } from "../../../core/modal_dialog_elements";
@@ -119,7 +118,7 @@ export class HUDWaypoints extends BaseHUDPart {
 
         // Dynamically attach/detach the lower right hint in the map overview
         if (this.hintElement) {
-            this.domAttach = new DynamicDomAttach(this.root, this.hintElement);
+            this.domAttach = new DynamicDomAttach(this.hintElement);
         }
 
         // Catch mouse and key events
@@ -563,9 +562,9 @@ export class HUDWaypoints extends BaseHUDPart {
 
     /**
      * Draws the waypoints on the map
-     * @param {DrawParameters} parameters
      */
-    drawOverlays(parameters) {
+    drawOverlays() {
+        const parameters = globalConfig.parameters;
         const mousePos = this.root.app.mousePosition;
         const desiredOpacity = this.root.camera.getIsMapOverlayActive() ? 1 : 0;
         this.currentMarkerOpacity = lerp(this.currentMarkerOpacity, desiredOpacity, 0.08);

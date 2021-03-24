@@ -1,11 +1,8 @@
-/**
- * @typedef {import("../application").Application} Application
- */
+import { globalConfig } from "../core/config";
 
 export class GameAnalyticsInterface {
-    constructor(app) {
-        /** @type {Application} */
-        this.app = app;
+    constructor() {
+        this.app = globalConfig.app;
     }
 
     /**

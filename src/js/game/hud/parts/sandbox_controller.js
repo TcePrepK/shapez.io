@@ -19,25 +19,25 @@ export class HUDSandboxController extends BaseHUDPart {
                     <button class="styledButton minus">-</button>
                     <button class="styledButton plus">+</button>
                 </div>
-                
+
                 <div class="upgradesBelt plusMinus">
                     <label>Upgrades &rarr; Belt</label>
                     <button class="styledButton minus">-</button>
                     <button class="styledButton plus">+</button>
                 </div>
-                
+
                 <div class="upgradesExtraction plusMinus">
                     <label>Upgrades &rarr; Extraction</label>
                     <button class="styledButton minus">-</button>
                     <button class="styledButton plus">+</button>
                 </div>
-                
+
                 <div class="upgradesProcessing plusMinus">
                     <label>Upgrades &rarr; Processing</label>
                     <button class="styledButton minus">-</button>
                     <button class="styledButton plus">+</button>
                 </div>
-                
+
                 <div class="upgradesPainting plusMinus">
                     <label>Upgrades &rarr; Painting</label>
                     <button class="styledButton minus">-</button>
@@ -145,7 +145,7 @@ export class HUDSandboxController extends BaseHUDPart {
         });
 
         this.visible = !G_IS_DEV;
-        this.domAttach = new DynamicDomAttach(this.root, this.element);
+        this.domAttach = new DynamicDomAttach(this.element);
     }
 
     toggle() {

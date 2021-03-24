@@ -10,7 +10,6 @@
  * }} SpriteDefinition
  *
  * @typedef {{
- *   app: string,
  *   version: string,
  *   image: string,
  *   format: string,

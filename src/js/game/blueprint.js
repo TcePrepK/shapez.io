@@ -1,10 +1,8 @@
 import { globalConfig } from "../core/config";
-import { DrawParameters } from "../core/draw_parameters";
 import { findNiceIntegerValue } from "../core/utils";
 import { Vector } from "../core/vector";
 import { Entity } from "./entity";
 import { ACHIEVEMENTS } from "../platform/achievement_provider";
-import { GameRoot } from "./root";
 
 export class Blueprint {
     /**
@@ -27,10 +25,10 @@ export class Blueprint {
 
     /**
      * Creates a new blueprint from the given entity uids
-     * @param {GameRoot} root
      * @param {Array<number>} uids
      */
-    static fromUids(root, uids) {
+    static fromUids(uids) {
+        const root = globalConfig.root;
         const newEntities = [];
 
         let averagePosition = new Vector();
@@ -70,9 +68,9 @@ export class Blueprint {
 
     /**
      * Draws the blueprint at the given origin
-     * @param {DrawParameters} parameters
      */
-    draw(parameters, tile) {
+    draw(tile) {
+        const parameters = globalConfig.parameters;
         parameters.context.globalAlpha = 0.8;
         for (let i = 0; i < this.entities.length; ++i) {
             const entity = this.entities[i];
@@ -88,7 +86,7 @@ export class Blueprint {
                 parameters.context.globalAlpha = 1;
             }
 
-            staticComp.drawSpriteOnBoundsClipped(parameters, staticComp.getBlueprintSprite(), 0, newPos);
+            staticComp.drawSpriteOnBoundsClipped(staticComp.getBlueprintSprite(), 0, newPos);
         }
         parameters.context.globalAlpha = 1;
     }
@@ -119,10 +117,10 @@ export class Blueprint {
 
     /**
      * Checks if the blueprint can be placed at the given tile
-     * @param {GameRoot} root
      * @param {Vector} tile
      */
-    canPlace(root, tile) {
+    canPlace(tile) {
+        const root = globalConfig.root;
         let anyPlaceable = false;
 
         for (let i = 0; i < this.entities.length; ++i) {
@@ -135,19 +133,17 @@ export class Blueprint {
         return anyPlaceable;
     }
 
-    /**
-     * @param {GameRoot} root
-     */
-    canAfford(root) {
+    canAfford() {
+        const root = globalConfig.root;
         return root.hubGoals.getShapesStoredByKey(root.gameMode.getBlueprintShapeKey()) >= this.getCost();
     }
 
     /**
      * Attempts to place the blueprint at the given tile
-     * @param {GameRoot} root
      * @param {Vector} tile
      */
-    tryPlace(root, tile) {
+    tryPlace(tile) {
+        const root = globalConfig.root;
         return root.logic.performBulkOperation(() => {
             let count = 0;
             for (let i = 0; i < this.entities.length; ++i) {

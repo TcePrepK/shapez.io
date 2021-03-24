@@ -1,17 +1,8 @@
-/* typehints:start */
-import { GameRoot } from "../root";
-/* typehints:end */
-
 import { BasicSerializableObject } from "../../savegame/serialization";
 
 export class BaseGameSpeed extends BasicSerializableObject {
-    /**
-     * @param {GameRoot} root
-     */
-    constructor(root) {
+    constructor() {
         super();
-        this.root = root;
-        this.initializeAfterDeserialize(root);
     }
 
     /** @returns {string} */

@@ -1,21 +1,17 @@
 /* typehints:start */
-import { Application } from "../application";
 import { InputReceiver } from "./input_receiver";
 /* typehints:end */
 
 import { Signal, STOP_PROPAGATION } from "./signal";
 import { createLogger } from "./logging";
 import { arrayDeleteValue, fastArrayDeleteValue } from "./utils";
+import { globalConfig } from "./config";
 
 const logger = createLogger("input_distributor");
 
 export class InputDistributor {
-    /**
-     *
-     * @param {Application} app
-     */
-    constructor(app) {
-        this.app = app;
+    constructor() {
+        this.app = globalConfig.app;
 
         /** @type {Array<InputReceiver>} */
         this.recieverStack = [];

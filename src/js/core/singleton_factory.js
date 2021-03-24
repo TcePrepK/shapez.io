@@ -1,3 +1,4 @@
+import { globalConfig } from "./config";
 import { createLogger } from "./logging";
 
 const logger = createLogger("singleton_factory");

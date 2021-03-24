@@ -42,7 +42,7 @@ export class HUDEntityDebugger extends BaseHUDPart {
 
         this.lastUpdate = 0;
 
-        this.domAttach = new DynamicDomAttach(this.root, this.element);
+        this.domAttach = new DynamicDomAttach(this.element);
     }
 
     pickEntity() {

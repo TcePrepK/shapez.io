@@ -46,7 +46,7 @@ export class HUDDebugInfo extends BaseHUDPart {
         this.lastTick = 0;
 
         this.trackedMode = new TrackedState(this.onModeChanged, this);
-        this.domAttach = new DynamicDomAttach(this.root, this.element);
+        this.domAttach = new DynamicDomAttach(this.element);
 
         this.root.keyMapper.getBinding(KEYMAPPINGS.ingame.toggleFPSInfo).add(() => this.cycleModes());
 

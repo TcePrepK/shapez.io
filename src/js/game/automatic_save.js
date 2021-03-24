@@ -1,6 +1,5 @@
 import { globalConfig } from "../core/config";
 import { createLogger } from "../core/logging";
-import { GameRoot } from "./root";
 
 // How important it is that a savegame is created
 /**
@@ -14,9 +13,8 @@ export const enumSavePriority = {
 const logger = createLogger("autosave");
 
 export class AutomaticSave {
-    constructor(root) {
-        /** @type {GameRoot} */
-        this.root = root;
+    constructor() {
+        this.root = globalConfig.root;
 
         // Store the current maximum save importance
         this.saveImportance = enumSavePriority.regular;

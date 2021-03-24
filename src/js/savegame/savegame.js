@@ -18,7 +18,6 @@ const logger = createLogger("savegame");
 
 /**
  * @typedef {import("../application").Application} Application
- * @typedef {import("../game/root").GameRoot} GameRoot
  * @typedef {import("./savegame_typedefs").SavegameData} SavegameData
  * @typedef {import("./savegame_typedefs").SavegameMetadata} SavegameMetadata
  * @typedef {import("./savegame_typedefs").SavegameStats} SavegameStats
@@ -27,14 +26,12 @@ const logger = createLogger("savegame");
 
 export class Savegame extends ReadWriteProxy {
     /**
-     *
-     * @param {Application} app
      * @param {object} param0
      * @param {string} param0.internalId
      * @param {SavegameMetadata} param0.metaDataRef Handle to the meta data
      */
-    constructor(app, { internalId, metaDataRef }) {
-        super(app, "savegame-" + internalId + ".bin");
+    constructor({ internalId, metaDataRef }) {
+        super("savegame-" + internalId + ".bin");
         this.internalId = internalId;
         this.metaDataRef = metaDataRef;
 
@@ -227,16 +224,12 @@ export class Savegame extends ReadWriteProxy {
         this.currentData.lastUpdate = time;
     }
 
-    /**
-     *
-     * @param {GameRoot} root
-     */
-    updateData(root) {
+    updateData() {
         // Construct a new serializer
         const serializer = new SavegameSerializer();
 
         // let timer = performance.now();
-        const dump = serializer.generateDumpFromGameRoot(root);
+        const dump = serializer.generateDumpFromGameRoot();
         if (!dump) {
             return false;
         }

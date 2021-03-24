@@ -1,4 +1,3 @@
-import { GameRoot } from "./root";
 import { ShapeDefinition } from "./shape_definition";
 import { globalConfig } from "../core/config";
 import { BaseItem } from "./base_item";
@@ -17,12 +16,8 @@ export class ProductionAnalytics extends BasicSerializableObject {
         return "ProductionAnalytics";
     }
 
-    /**
-     * @param {GameRoot} root
-     */
-    constructor(root) {
+    constructor() {
         super();
-        this.root = root;
 
         this.history = {
             [enumAnalyticsDataSource.produced]: [],

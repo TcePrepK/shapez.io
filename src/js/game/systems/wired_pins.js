@@ -1,5 +1,4 @@
 import { globalConfig } from "../../core/config";
-import { DrawParameters } from "../../core/draw_parameters";
 import { drawRotatedSprite } from "../../core/draw_utils";
 import { Loader } from "../../core/loader";
 import { STOP_PROPAGATION } from "../../core/signal";
@@ -17,8 +16,8 @@ const enumTypeToSize = {
 };
 
 export class WiredPinsSystem extends GameSystemWithFilter {
-    constructor(root) {
-        super(root, [WiredPinsComponent]);
+    constructor() {
+        super([WiredPinsComponent]);
 
         this.pinSprites = {
             [enumPinSlotType.logicalEjector]: Loader.getSprite("sprites/wires/logical_ejector.png"),
@@ -151,10 +150,10 @@ export class WiredPinsSystem extends GameSystemWithFilter {
 
     /**
      * Draws a given entity
-     * @param {DrawParameters} parameters
      * @param {MapChunkView} chunk
      */
-    drawChunk(parameters, chunk) {
+    drawChunk(chunk) {
+        const parameters = globalConfig.parameters;
         const contents = chunk.containedEntities;
 
         for (let i = 0; i < contents.length; ++i) {
@@ -190,7 +189,6 @@ export class WiredPinsSystem extends GameSystemWithFilter {
 
                 if (staticComp.getMetaBuilding().getRenderPins()) {
                     drawRotatedSprite({
-                        parameters,
                         sprite: this.pinSprites[slot.type],
                         x: worldPos.x,
                         y: worldPos.y,
@@ -209,7 +207,6 @@ export class WiredPinsSystem extends GameSystemWithFilter {
                     value.drawItemCenteredClipped(
                         worldPos.x + offset.x,
                         worldPos.y + offset.y,
-                        parameters,
                         enumTypeToSize[value.getItemType()]
                     );
                 }

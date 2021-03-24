@@ -8,8 +8,8 @@ import { BOOL_TRUE_SINGLETON } from "../items/boolean_item";
 const MAX_ITEMS_IN_QUEUE = 2;
 
 export class FilterSystem extends GameSystemWithFilter {
-    constructor(root) {
-        super(root, [FilterComponent]);
+    constructor() {
+        super([FilterComponent]);
     }
 
     update() {

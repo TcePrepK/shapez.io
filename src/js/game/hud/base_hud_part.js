@@ -1,17 +1,11 @@
-/* typehints:start */
-import { GameRoot } from "../root";
-import { DrawParameters } from "../../core/draw_parameters";
-/* typehints:end */
-
 import { ClickDetector } from "../../core/click_detector";
+import { globalConfig } from "../../core/config";
 import { KeyActionMapper } from "../key_action_mapper";
 
 export class BaseHUDPart {
-    /**
-     * @param {GameRoot} root
-     */
-    constructor(root) {
-        this.root = root;
+    constructor() {
+        this.root = globalConfig.root;
+        this.app = globalConfig.app;
 
         /** @type {Array<ClickDetector>} */
         this.clickDetectors = [];
@@ -37,15 +31,13 @@ export class BaseHUDPart {
 
     /**
      * Should draw the hud
-     * @param {DrawParameters} parameters
      */
-    draw(parameters) {}
+    draw() {}
 
     /**
      * Should draw any overlays (screen space)
-     * @param {DrawParameters} parameters
      */
-    drawOverlays(parameters) {}
+    drawOverlays() {}
 
     /**
      * Should return true if the widget has a modal dialog opened and thus

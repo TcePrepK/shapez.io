@@ -6,8 +6,8 @@ import { globalConfig } from "../../core/config";
 import { Loader } from "../../core/loader";
 
 export class LeverSystem extends GameSystemWithFilter {
-    constructor(root) {
-        super(root, [LeverComponent]);
+    constructor() {
+        super([LeverComponent]);
 
         this.spriteOn = Loader.getSprite("sprites/wires/lever_on.png");
         this.spriteOff = Loader.getSprite("sprites/buildings/lever.png");
@@ -27,17 +27,16 @@ export class LeverSystem extends GameSystemWithFilter {
 
     /**
      * Draws a given chunk
-     * @param {import("../../core/draw_utils").DrawParameters} parameters
      * @param {MapChunkView} chunk
      */
-    drawChunk(parameters, chunk) {
+    drawChunk(chunk) {
         const contents = chunk.containedEntitiesByLayer.regular;
         for (let i = 0; i < contents.length; ++i) {
             const entity = contents[i];
             const leverComp = entity.components.Lever;
             if (leverComp) {
                 const sprite = leverComp.toggled ? this.spriteOn : this.spriteOff;
-                entity.components.StaticMapEntity.drawSpriteOnBoundsClipped(parameters, sprite);
+                entity.components.StaticMapEntity.drawSpriteOnBoundsClipped(sprite);
             }
         }
     }

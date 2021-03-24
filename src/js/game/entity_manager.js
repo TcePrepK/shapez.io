@@ -1,6 +1,5 @@
 import { arrayDeleteValue, newEmptyMap, fastArrayDeleteValue } from "../core/utils";
 import { Component } from "./component";
-import { GameRoot } from "./root";
 import { Entity } from "./entity";
 import { BasicSerializableObject, types } from "../savegame/serialization";
 import { createLogger } from "../core/logging";
@@ -14,11 +13,10 @@ const logger = createLogger("entity_manager");
 // This is slower but we need it for the street path generation
 
 export class EntityManager extends BasicSerializableObject {
-    constructor(root) {
+    constructor() {
         super();
 
-        /** @type {GameRoot} */
-        this.root = root;
+        this.root = globalConfig.root;
 
         /** @type {Array<Entity>} */
         this.entities = [];

@@ -38,8 +38,8 @@ const MAX_QUEUED_CHARGES = 2;
  */
 
 export class ItemProcessorSystem extends GameSystemWithFilter {
-    constructor(root) {
-        super(root, [ItemProcessorComponent]);
+    constructor() {
+        super([ItemProcessorComponent]);
 
         /**
          * @type {Object<enumItemProcessorTypes, function(ProcessorImplementationPayload) : string>}

@@ -1,4 +1,3 @@
-import { GameRoot } from "./root";
 import { createLogger } from "../core/logging";
 import { globalConfig } from "../core/config";
 
@@ -7,12 +6,8 @@ const logger = createLogger("dynamic_tickrate");
 const fpsAccumulationTime = 1000;
 
 export class DynamicTickrate {
-    /**
-     *
-     * @param {GameRoot} root
-     */
-    constructor(root) {
-        this.root = root;
+    constructor() {
+        this.root = globalConfig.root;
 
         this.currentTickStart = null;
         this.capturedTicks = [];

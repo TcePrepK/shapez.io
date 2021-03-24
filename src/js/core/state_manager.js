@@ -1,11 +1,8 @@
-/* typehints:start*/
-import { Application } from "../application";
-/* typehints:end*/
-
 import { GameState } from "./game_state";
 import { createLogger } from "./logging";
 import { APPLICATION_ERROR_OCCURED } from "./error_handler";
 import { waitNextFrame, removeAllChildren } from "./utils";
+import { globalConfig } from "./config";
 
 const logger = createLogger("state_manager");
 
@@ -13,11 +10,8 @@ const logger = createLogger("state_manager");
  * This is the main state machine which drives the game states.
  */
 export class StateManager {
-    /**
-     * @param {Application} app
-     */
-    constructor(app) {
-        this.app = app;
+    constructor() {
+        this.app = globalConfig.app;
 
         /** @type {GameState} */
         this.currentState = null;
@@ -77,7 +71,7 @@ export class StateManager {
         }
 
         this.currentState = this.constructState(key);
-        this.currentState.internalRegisterCallback(this, this.app);
+        this.currentState.internalRegisterCallback(this);
 
         // Clean up old elements
         removeAllChildren(document.body);

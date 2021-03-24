@@ -46,9 +46,7 @@ export function initDrawUtils() {
 }
 
 /**
- *
  * @param {object} param0
- * @param {DrawParameters} param0.parameters
  * @param {AtlasSprite} param0.sprite
  * @param {number} param0.x
  * @param {number} param0.y
@@ -57,15 +55,16 @@ export function initDrawUtils() {
  * @param {number=} param0.offsetX
  * @param {number=} param0.offsetY
  */
-export function drawRotatedSprite({ parameters, sprite, x, y, angle, size, offsetX = 0, offsetY = 0 }) {
+export function drawRotatedSprite({ sprite, x, y, angle, size, offsetX = 0, offsetY = 0 }) {
+    const parameters = globalConfig.parameters;
     if (angle === 0) {
-        sprite.drawCachedCentered(parameters, x + offsetX, y + offsetY, size);
+        sprite.drawCachedCentered(x + offsetX, y + offsetY, size);
         return;
     }
 
     parameters.context.translate(x, y);
     parameters.context.rotate(angle);
-    sprite.drawCachedCentered(parameters, offsetX, offsetY, size, false);
+    sprite.drawCachedCentered(offsetX, offsetY, size, false);
     parameters.context.rotate(-angle);
     parameters.context.translate(-x, -y);
 }
@@ -75,7 +74,6 @@ let warningsShown = 0;
 /**
  * Draws a sprite with clipping
  * @param {object} param0
- * @param {DrawParameters} param0.parameters
  * @param {HTMLCanvasElement} param0.sprite
  * @param {number} param0.x
  * @param {number} param0.y
@@ -84,7 +82,8 @@ let warningsShown = 0;
  * @param {number} param0.originalW
  * @param {number} param0.originalH
  */
-export function drawSpriteClipped({ parameters, sprite, x, y, w, h, originalW, originalH }) {
+export function drawSpriteClipped({ sprite, x, y, w, h, originalW, originalH }) {
+    const parameters = globalConfig.parameters;
     const rect = new Rectangle(x, y, w, h);
     const intersection = rect.getIntersection(parameters.visibleRect);
     if (!intersection) {

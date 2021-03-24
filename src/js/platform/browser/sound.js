@@ -174,14 +174,14 @@ class MusicInstance extends MusicInstanceInterface {
 }
 
 export class SoundImplBrowser extends SoundInterface {
-    constructor(app) {
+    constructor() {
         Howler.mobileAutoEnable = true;
         Howler.autoUnlock = true;
         Howler.autoSuspend = false;
         Howler.html5PoolSize = 20;
         Howler.pos(0, 0, 0);
 
-        super(app, WrappedSoundInstance, MusicInstance);
+        super(WrappedSoundInstance, MusicInstance);
     }
 
     initialize() {

@@ -1,7 +1,4 @@
-/* typehints:start */
-import { GameRoot } from "./root";
-/* typehints:end */
-
+import { globalConfig } from "../core/config";
 import { Vector } from "../core/vector";
 import { SOUNDS } from "../platform/sound";
 
@@ -11,11 +8,8 @@ const maxOngoingUiSounds = 5;
 
 // Proxy to the application sound instance
 export class SoundProxy {
-    /**
-     * @param {GameRoot} root
-     */
-    constructor(root) {
-        this.root = root;
+    constructor() {
+        this.root = globalConfig.root;
 
         // Store a list of sounds and when we started them
         this.playing3DSounds = [];
@@ -67,7 +61,7 @@ export class SoundProxy {
             return false;
         }
 
-        this.root.app.sound.play3DSound(id, pos, this.root);
+        this.root.app.sound.play3DSound(id, pos);
         this.playing3DSounds.push(this.root.time.realtimeNow());
         return true;
     }

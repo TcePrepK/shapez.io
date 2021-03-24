@@ -5,10 +5,11 @@ import { formatBigNumber, lerp } from "../../core/utils";
 import { Loader } from "../../core/loader";
 import { BOOL_TRUE_SINGLETON, BOOL_FALSE_SINGLETON } from "../items/boolean_item";
 import { MapChunkView } from "../map_chunk_view";
+import { globalConfig } from "../../core/config";
 
 export class StorageSystem extends GameSystemWithFilter {
-    constructor(root) {
-        super(root, [StorageComponent]);
+    constructor() {
+        super([StorageComponent]);
 
         this.storageOverlaySprite = Loader.getSprite("sprites/misc/storage_overlay.png");
 
@@ -56,10 +57,10 @@ export class StorageSystem extends GameSystemWithFilter {
     }
 
     /**
-     * @param {DrawParameters} parameters
      * @param {MapChunkView} chunk
      */
-    drawChunk(parameters, chunk) {
+    drawChunk(chunk) {
+        const parameters = globalConfig.parameters;
         const contents = chunk.containedEntitiesByLayer.regular;
         for (let i = 0; i < contents.length; ++i) {
             const entity = contents[i];
@@ -84,9 +85,9 @@ export class StorageSystem extends GameSystemWithFilter {
             const context = parameters.context;
             context.globalAlpha = storageComp.overlayOpacity;
             const center = staticComp.getTileSpaceBounds().getCenter().toWorldSpace();
-            storedItem.drawItemCenteredClipped(center.x, center.y, parameters, 30);
+            storedItem.drawItemCenteredClipped(center.x, center.y, 30);
 
-            this.storageOverlaySprite.drawCached(parameters, center.x - 15, center.y + 15, 30, 15);
+            this.storageOverlaySprite.drawCached(center.x - 15, center.y + 15, 30, 15);
 
             if (parameters.visibleRect.containsCircle(center.x, center.y + 25, 20)) {
                 context.font = "bold 10px GameFont";

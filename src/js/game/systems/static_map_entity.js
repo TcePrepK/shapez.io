@@ -1,11 +1,10 @@
 import { globalConfig } from "../../core/config";
-import { DrawParameters } from "../../core/draw_parameters";
 import { GameSystem } from "../game_system";
 import { MapChunkView } from "../map_chunk_view";
 
 export class StaticMapEntitySystem extends GameSystem {
-    constructor(root) {
-        super(root);
+    constructor() {
+        super();
 
         /** @type {Set<number>} */
         this.drawnUids = new Set();
@@ -22,10 +21,9 @@ export class StaticMapEntitySystem extends GameSystem {
 
     /**
      * Draws the static entities
-     * @param {DrawParameters} parameters
      * @param {MapChunkView} chunk
      */
-    drawChunk(parameters, chunk) {
+    drawChunk(chunk) {
         if (G_IS_DEV && globalConfig.debug.doNotRenderStatics) {
             return;
         }
@@ -44,17 +42,16 @@ export class StaticMapEntitySystem extends GameSystem {
                 }
 
                 this.drawnUids.add(entity.uid);
-                staticComp.drawSpriteOnBoundsClipped(parameters, sprite, 2);
+                staticComp.drawSpriteOnBoundsClipped(sprite, 2);
             }
         }
     }
 
     /**
      * Draws the static wire entities
-     * @param {DrawParameters} parameters
      * @param {MapChunkView} chunk
      */
-    drawWiresChunk(parameters, chunk) {
+    drawWiresChunk(chunk) {
         if (G_IS_DEV && globalConfig.debug.doNotRenderStatics) {
             return;
         }
@@ -73,7 +70,7 @@ export class StaticMapEntitySystem extends GameSystem {
 
                     const sprite = staticComp.getSprite();
                     if (sprite) {
-                        staticComp.drawSpriteOnBoundsClipped(parameters, sprite, 2);
+                        staticComp.drawSpriteOnBoundsClipped(sprite, 2);
                     }
                 }
             }

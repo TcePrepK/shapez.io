@@ -1,18 +1,13 @@
-/* typehints:start */
-import { Application } from "../application";
-/* typehints:end */
-
+import { globalConfig } from "../core/config";
 import { randomChoice } from "../core/utils";
 import { T } from "../translations";
 
 export class GameLoadingOverlay {
     /**
-     *
-     * @param {Application} app
      * @param {HTMLElement} parent
      */
-    constructor(app, parent) {
-        this.app = app;
+    constructor(parent) {
+        this.app = globalConfig.app;
         this.parent = parent;
 
         /** @type {HTMLElement} */

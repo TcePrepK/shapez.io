@@ -4,7 +4,6 @@ import { BasicSerializableObject, types } from "../savegame/serialization";
 import { BaseItem } from "./base_item";
 import { Entity } from "./entity";
 import { MapChunkView } from "./map_chunk_view";
-import { GameRoot } from "./root";
 
 export class BaseMap extends BasicSerializableObject {
     static getId() {
@@ -17,13 +16,9 @@ export class BaseMap extends BasicSerializableObject {
         };
     }
 
-    /**
-     *
-     * @param {GameRoot} root
-     */
-    constructor(root) {
+    constructor() {
         super();
-        this.root = root;
+        this.root = globalConfig.root;
 
         this.seed = 0;
 
@@ -47,7 +42,7 @@ export class BaseMap extends BasicSerializableObject {
         }
 
         if (createIfNotExistent) {
-            const instance = new MapChunkView(this.root, chunkX, chunkY);
+            const instance = new MapChunkView(chunkX, chunkY);
             this.chunksById.set(chunkIdentifier, instance);
             return instance;
         }
@@ -180,8 +175,8 @@ export class BaseMap extends BasicSerializableObject {
         this.getOrCreateChunkAtTile(tile.x, tile.y).setLayerContentFromWorldCords(
             tile.x,
             tile.y,
-            entity,
-            entity.layer
+            entity.layer,
+            entity
         );
 
         const staticComponent = entity.components.StaticMapEntity;
@@ -200,7 +195,7 @@ export class BaseMap extends BasicSerializableObject {
             for (let dy = 0; dy < rect.h; ++dy) {
                 const x = rect.x + dx;
                 const y = rect.y + dy;
-                this.getOrCreateChunkAtTile(x, y).setLayerContentFromWorldCords(x, y, entity, entity.layer);
+                this.getOrCreateChunkAtTile(x, y).setLayerContentFromWorldCords(x, y, entity.layer, entity);
             }
         }
     }
@@ -217,7 +212,7 @@ export class BaseMap extends BasicSerializableObject {
             for (let dy = 0; dy < rect.h; ++dy) {
                 const x = rect.x + dx;
                 const y = rect.y + dy;
-                this.getOrCreateChunkAtTile(x, y).setLayerContentFromWorldCords(x, y, null, entity.layer);
+                this.getOrCreateChunkAtTile(x, y).setLayerContentFromWorldCords(x, y, entity.layer, null);
             }
         }
     }

@@ -1,4 +1,3 @@
-import { GameRoot } from "../root";
 import { globalConfig } from "../../core/config";
 import { Vector, mixVector } from "../../core/vector";
 import { lerp } from "../../core/utils";
@@ -9,12 +8,8 @@ import trailerPoints from "./trailer_points";
 const tickrate = 1 / 165;
 
 export class TrailerMaker {
-    /**
-     *
-     * @param {GameRoot} root
-     */
-    constructor(root) {
-        this.root = root;
+    constructor() {
+        this.root = globalConfig.root;
 
         this.markers = [];
         this.playbackMarkers = null;

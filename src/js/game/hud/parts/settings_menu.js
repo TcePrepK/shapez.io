@@ -77,12 +77,12 @@ export class HUDSettingsMenu extends BaseHUDPart {
     initialize() {
         this.root.keyMapper.getBinding(KEYMAPPINGS.general.back).add(this.show, this);
 
-        this.domAttach = new DynamicDomAttach(this.root, this.background, {
+        this.domAttach = new DynamicDomAttach(this.background, {
             attachClass: "visible",
         });
 
         this.inputReciever = new InputReceiver("settingsmenu");
-        this.keyActionMapper = new KeyActionMapper(this.root, this.inputReciever);
+        this.keyActionMapper = new KeyActionMapper(this.inputReciever);
         this.keyActionMapper.getBinding(KEYMAPPINGS.general.back).add(this.close, this);
 
         this.close();

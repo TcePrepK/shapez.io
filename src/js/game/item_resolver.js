@@ -3,13 +3,14 @@ import { gItemRegistry } from "../core/global_registries";
 import { BooleanItem, BOOL_TRUE_SINGLETON, BOOL_FALSE_SINGLETON } from "./items/boolean_item";
 import { ShapeItem } from "./items/shape_item";
 import { ColorItem, COLOR_ITEM_SINGLETONS } from "./items/color_item";
+import { globalConfig } from "../core/config";
 
 /**
  * Resolves items so we share instances
- * @param {import("../savegame/savegame_serializer").GameRoot} root
  * @param {{$: string, data: any }} data
  */
-export function itemResolverSingleton(root, data) {
+export function itemResolverSingleton(data) {
+    const root = globalConfig.root;
     const itemType = data.$;
     const itemData = data.data;
 

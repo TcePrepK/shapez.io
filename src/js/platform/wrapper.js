@@ -1,13 +1,8 @@
-/* typehints:start */
-import { Application } from "../application";
-/* typehints:end */
-
-import { IS_MOBILE } from "../core/config";
+import { globalConfig, IS_MOBILE } from "../core/config";
 
 export class PlatformWrapperInterface {
-    constructor(app) {
-        /** @type {Application} */
-        this.app = app;
+    constructor() {
+        this.app = globalConfig.app;
     }
 
     /** @returns {string} */

@@ -45,7 +45,7 @@ export class PreloadState extends GameState {
             }
         }
 
-        this.dialogs = new HUDModalDialogs(null, this.app);
+        this.dialogs = new HUDModalDialogs();
         const dialogsElement = document.body.querySelector(".modalDialogParent");
         this.dialogs.initializeToElement(dialogsElement);
 

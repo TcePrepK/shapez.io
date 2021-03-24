@@ -10,12 +10,11 @@ export class StaleAreaDetector {
     /**
      *
      * @param {object} param0
-     * @param {import("../game/root").GameRoot} param0.root
      * @param {string} param0.name The name for reference
      * @param {(Rectangle) => void} param0.recomputeMethod Method which recomputes the given area
      */
-    constructor({ root, name, recomputeMethod }) {
-        this.root = root;
+    constructor({ name, recomputeMethod }) {
+        this.root = globalConfig.root;
         this.name = name;
         this.recomputeMethod = recomputeMethod;
 
@@ -79,7 +78,7 @@ export class StaleAreaDetector {
      */
     update() {
         if (this.staleArea) {
-            logger.log(this.name, "is recomputing", this.staleArea.toString());
+            //logger.log(this.name, "is recomputing", this.staleArea.toString());
             if (G_IS_DEV && globalConfig.debug.renderChanges) {
                 this.root.hud.parts.changesDebugger.renderChange(this.name, this.staleArea, "#fd145b");
             }

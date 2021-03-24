@@ -14,8 +14,8 @@ import { COLOR_ITEM_SINGLETONS } from "../items/color_item";
 import { ShapeDefinition } from "../shape_definition";
 
 export class ConstantSignalSystem extends GameSystemWithFilter {
-    constructor(root) {
-        super(root, [ConstantSignalComponent]);
+    constructor() {
+        super([ConstantSignalComponent]);
 
         this.root.signals.entityManuallyPlaced.add(entity =>
             this.editConstantSignal(entity, { deleteOnCancel: true })

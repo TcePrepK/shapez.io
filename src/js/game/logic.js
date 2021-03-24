@@ -8,7 +8,6 @@ import { enumWireVariant } from "./components/wire";
 import { Entity } from "./entity";
 import { CHUNK_OVERLAY_RES } from "./map_chunk_view";
 import { MetaBuilding } from "./meta_building";
-import { GameRoot } from "./root";
 import { WireNetwork } from "./systems/wire";
 
 const logger = createLogger("ingame/logic");
@@ -41,12 +40,8 @@ const logger = createLogger("ingame/logic");
  */
 
 export class GameLogic {
-    /**
-     *
-     * @param {GameRoot} root
-     */
-    constructor(root) {
-        this.root = root;
+    constructor() {
+        this.root = globalConfig.root;
     }
 
     /**
@@ -99,7 +94,6 @@ export class GameLogic {
      */
     tryPlaceBuilding({ origin, rotation, rotationVariant, originalRotation, variant, building }) {
         const entity = building.createEntity({
-            root: this.root,
             origin,
             rotation,
             originalRotation,

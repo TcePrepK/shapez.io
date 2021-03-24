@@ -1,13 +1,10 @@
-/* typehints:start */
-import { Application } from "../application";
-/* typehints:end */
+import { globalConfig } from "../core/config";
 
 export const FILE_NOT_FOUND = "file_not_found";
 
 export class StorageInterface {
-    constructor(app) {
-        /** @type {Application} */
-        this.app = app;
+    constructor() {
+        this.app = globalConfig.app;
     }
 
     /**
