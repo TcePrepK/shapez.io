@@ -1,7 +1,3 @@
-/* typehints:start */
-import { GameRoot } from "./root";
-/* typehints:end */
-
 import { createLogger } from "../core/logging";
 import { BeltSystem } from "./systems/belt";
 import { ItemEjectorSystem } from "./systems/item_ejector";
@@ -25,16 +21,13 @@ import { BeltReaderSystem } from "./systems/belt_reader";
 import { FilterSystem } from "./systems/filter";
 import { ItemProducerSystem } from "./systems/item_producer";
 import { CommandControllerSystem } from "./systems/command_controller";
+import { globalConfig } from "../core/config";
 
 const logger = createLogger("game_system_manager");
 
 export class GameSystemManager {
-    /**
-     *
-     * @param {GameRoot} root
-     */
-    constructor(root) {
-        this.root = root;
+    constructor() {
+        this.root = globalConfig.root;
 
         this.systems = {
             /* typehints:start */

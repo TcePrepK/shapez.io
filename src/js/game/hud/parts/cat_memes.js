@@ -11,7 +11,7 @@ export class HUDCatMemes extends BaseHUDPart {
     }
 
     initialize() {
-        this.domAttach = new DynamicDomAttach(this.root, this.element);
+        this.domAttach = new DynamicDomAttach(this.element);
     }
 
     update() {

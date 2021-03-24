@@ -1,6 +1,5 @@
 import { makeOffscreenBuffer } from "../../../core/buffer_utils";
 import { globalConfig } from "../../../core/config";
-import { DrawParameters } from "../../../core/draw_parameters";
 import { Loader } from "../../../core/loader";
 import { lerp } from "../../../core/utils";
 import { SOUNDS } from "../../../platform/sound";
@@ -53,6 +52,7 @@ export class HUDWiresOverlay extends BaseHUDPart {
             label: "wires-tile-pattern",
         });
         context.clearRect(0, 0, dims, dims);
+        console.log(context);
         overlayTile.draw(context, 0, 0, dims, dims);
         this.tilePatternCanvas = canvas;
     }
@@ -108,11 +108,8 @@ export class HUDWiresOverlay extends BaseHUDPart {
         }
     }
 
-    /**
-     *
-     * @param {DrawParameters} parameters
-     */
-    draw(parameters) {
+    draw() {
+        const parameters = globalConfig.parameters;
         if (this.currentAlpha < 0.02) {
             return;
         }

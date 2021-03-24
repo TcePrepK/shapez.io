@@ -1,5 +1,4 @@
 import { globalConfig } from "../core/config";
-import { DrawParameters } from "../core/draw_parameters";
 import { BasicSerializableObject } from "../savegame/serialization";
 
 /** @type {ItemType[]} **/
@@ -73,12 +72,12 @@ export class BaseItem extends BasicSerializableObject {
      * Draws the item at the given position
      * @param {number} x
      * @param {number} y
-     * @param {DrawParameters} parameters
      * @param {number=} diameter
      */
-    drawItemCenteredClipped(x, y, parameters, diameter = globalConfig.defaultItemDiameter) {
+    drawItemCenteredClipped(x, y, diameter = globalConfig.defaultItemDiameter) {
+        const parameters = globalConfig.parameters;
         if (parameters.visibleRect.containsCircle(x, y, diameter / 2)) {
-            this.drawItemCenteredImpl(x, y, parameters, diameter);
+            this.drawItemCenteredImpl(x, y, diameter);
         }
     }
 
@@ -86,10 +85,9 @@ export class BaseItem extends BasicSerializableObject {
      * INTERNAL
      * @param {number} x
      * @param {number} y
-     * @param {DrawParameters} parameters
      * @param {number=} diameter
      */
-    drawItemCenteredImpl(x, y, parameters, diameter = globalConfig.defaultItemDiameter) {
+    drawItemCenteredImpl(x, y, diameter = globalConfig.defaultItemDiameter) {
         abstract;
     }
 

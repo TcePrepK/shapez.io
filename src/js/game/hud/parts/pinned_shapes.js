@@ -11,8 +11,8 @@ import { BaseHUDPart } from "../base_hud_part";
  * Manages the pinned shapes on the left side of the screen
  */
 export class HUDPinnedShapes extends BaseHUDPart {
-    constructor(root) {
-        super(root);
+    constructor() {
+        super();
         /**
          * Store a list of pinned shapes
          * @type {Array<string>}

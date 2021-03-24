@@ -1,13 +1,8 @@
-import { globalConfig } from "../../core/config";
-import { generateMatrixRotations } from "../../core/utils";
 import { enumDirection, Vector } from "../../core/vector";
 import { CommandControllerComponent } from "../components/command_controller";
-import { enumLogicGateType, LogicGateComponent } from "../components/logic_gate";
 import { enumPinSlotType, WiredPinsComponent } from "../components/wired_pins";
 import { Entity } from "../entity";
 import { MetaBuilding } from "../meta_building";
-import { GameRoot } from "../root";
-import { enumHubGoalRewards } from "../tutorial_goals";
 
 export class MetaCommandControllerBuilding extends MetaBuilding {
     constructor() {
@@ -18,10 +13,7 @@ export class MetaCommandControllerBuilding extends MetaBuilding {
         return "#000000";
     }
 
-    /**
-     * @param {GameRoot} root
-     */
-    getIsUnlocked(root) {
+    getIsUnlocked() {
         return true; //root.hubGoals.isRewardUnlocked(enumHubGoalRewards.reward_virtual_processing);
     }
 

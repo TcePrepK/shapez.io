@@ -1,5 +1,4 @@
 import { globalConfig } from "../../core/config";
-import { DrawParameters } from "../../core/draw_parameters";
 import { enumDirectionToVector } from "../../core/vector";
 import { BaseItem } from "../base_item";
 import { MinerComponent } from "../components/miner";
@@ -8,8 +7,8 @@ import { GameSystemWithFilter } from "../game_system_with_filter";
 import { MapChunkView } from "../map_chunk_view";
 
 export class MinerSystem extends GameSystemWithFilter {
-    constructor(root) {
-        super(root, [MinerComponent]);
+    constructor() {
+        super([MinerComponent]);
 
         this.needsRecompute = true;
 
@@ -158,11 +157,10 @@ export class MinerSystem extends GameSystemWithFilter {
     }
 
     /**
-     *
-     * @param {DrawParameters} parameters
      * @param {MapChunkView} chunk
      */
-    drawChunk(parameters, chunk) {
+    drawChunk(chunk) {
+        const parameters = globalConfig.parameters;
         const contents = chunk.containedEntitiesByLayer.regular;
 
         for (let i = 0; i < contents.length; ++i) {
@@ -193,7 +191,6 @@ export class MinerSystem extends GameSystemWithFilter {
             minerComp.cachedMinedItem.drawItemCenteredClipped(
                 (0.5 + staticComp.origin.x) * globalConfig.tileSize,
                 (0.5 + staticComp.origin.y) * globalConfig.tileSize,
-                parameters,
                 globalConfig.defaultItemDiameter
             );
         }

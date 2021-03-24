@@ -5,7 +5,7 @@ import { T } from "../../../translations";
 import { BaseHUDPart } from "../base_hud_part";
 import { DynamicDomAttach } from "../dynamic_dom_attach";
 
-const showIntervalSeconds = 30 * 60;
+const showIntervalSeconds = 9 * 60;
 
 export class HUDStandaloneAdvantages extends BaseHUDPart {
     createElements(parent) {
@@ -25,7 +25,7 @@ export class HUDStandaloneAdvantages extends BaseHUDPart {
                         ([key, trans]) => `
                 <div class="point ${key}">
                     <strong>${trans.title}</strong>
-                    <p>${trans.desc}</p> 
+                    <p>${trans.desc}</p>
                 </div>`
                     )
                     .join("")}
@@ -53,14 +53,14 @@ export class HUDStandaloneAdvantages extends BaseHUDPart {
     }
 
     initialize() {
-        this.domAttach = new DynamicDomAttach(this.root, this.background, {
+        this.domAttach = new DynamicDomAttach(this.background, {
             attachClass: "visible",
         });
 
         this.inputReciever = new InputReceiver("standalone-advantages");
         this.close();
 
-        this.lastShown = this.root.gameIsFresh ? this.root.time.now() : 0;
+        this.lastShown = -1e10;
     }
 
     show() {

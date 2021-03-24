@@ -9,8 +9,8 @@ import { ShapeItem } from "../items/shape_item";
 import { ShapeDefinition } from "../shape_definition";
 
 export class LogicGateSystem extends GameSystemWithFilter {
-    constructor(root) {
-        super(root, [LogicGateComponent]);
+    constructor() {
+        super([LogicGateComponent]);
 
         this.boundOperations = {
             [enumLogicGateType.and]: this.compute_AND.bind(this),

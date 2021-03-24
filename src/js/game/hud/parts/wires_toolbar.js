@@ -15,8 +15,8 @@ import { MetaStorageBuilding } from "../../buildings/storage";
 import { MetaCommandControllerBuilding } from "../../buildings/command_controller";
 
 export class HUDWiresToolbar extends HUDBaseToolbar {
-    constructor(root) {
-        super(root, {
+    constructor() {
+        super({
             primaryBuildings: [
                 MetaWireBuilding,
                 MetaWireTunnelBuilding,

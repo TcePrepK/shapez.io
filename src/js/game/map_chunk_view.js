@@ -1,9 +1,7 @@
 import { globalConfig } from "../core/config";
-import { DrawParameters } from "../core/draw_parameters";
 import { getBuildingDataFromCode } from "./building_codes";
 import { Entity } from "./entity";
 import { MapChunk } from "./map_chunk";
-import { GameRoot } from "./root";
 import { THEME } from "./theme";
 import { drawSpriteClipped } from "../core/draw_utils";
 
@@ -11,13 +9,11 @@ export const CHUNK_OVERLAY_RES = 3;
 
 export class MapChunkView extends MapChunk {
     /**
-     *
-     * @param {GameRoot} root
      * @param {number} x
      * @param {number} y
      */
-    constructor(root, x, y) {
-        super(root, x, y);
+    constructor(x, y) {
+        super(x, y);
 
         /**
          * Whenever something changes, we increase this number - so we know we need to redraw
@@ -37,46 +33,44 @@ export class MapChunkView extends MapChunk {
 
     /**
      * Draws the background layer
-     * @param {DrawParameters} parameters
      */
-    drawBackgroundLayer(parameters) {
+    drawBackgroundLayer() {
         const systems = this.root.systemMgr.systems;
-        systems.mapResources.drawChunk(parameters, this);
-        systems.beltUnderlays.drawChunk(parameters, this);
-        systems.belt.drawChunk(parameters, this);
+
+        systems.mapResources.drawChunk(this);
+        systems.beltUnderlays.drawChunk(this);
+        systems.belt.drawChunk(this);
     }
 
     /**
      * Draws the dynamic foreground layer
-     * @param {DrawParameters} parameters
      */
-    drawForegroundDynamicLayer(parameters) {
+    drawForegroundDynamicLayer() {
         const systems = this.root.systemMgr.systems;
 
-        systems.itemEjector.drawChunk(parameters, this);
-        systems.itemAcceptor.drawChunk(parameters, this);
-        systems.miner.drawChunk(parameters, this);
+        systems.itemEjector.drawChunk(this);
+        systems.itemAcceptor.drawChunk(this);
+        systems.miner.drawChunk(this);
     }
 
     /**
      * Draws the static foreground layer
-     * @param {DrawParameters} parameters
      */
-    drawForegroundStaticLayer(parameters) {
+    drawForegroundStaticLayer() {
         const systems = this.root.systemMgr.systems;
 
-        systems.staticMapEntities.drawChunk(parameters, this);
-        systems.lever.drawChunk(parameters, this);
-        systems.display.drawChunk(parameters, this);
-        systems.storage.drawChunk(parameters, this);
-        systems.itemProcessorOverlays.drawChunk(parameters, this);
+        systems.staticMapEntities.drawChunk(this);
+        systems.lever.drawChunk(this);
+        systems.display.drawChunk(this);
+        systems.storage.drawChunk(this);
+        systems.itemProcessorOverlays.drawChunk(this);
     }
 
     /**
      * Overlay
-     * @param {DrawParameters} parameters
      */
-    drawOverlay(parameters) {
+    drawOverlay() {
+        const parameters = globalConfig.parameters;
         const overlaySize = globalConfig.mapChunkSize * CHUNK_OVERLAY_RES;
         const sprite = this.root.buffers.getForKey({
             key: "chunk@" + this.root.currentLayer,
@@ -93,7 +87,6 @@ export class MapChunkView extends MapChunk {
         // Draw chunk "pixel" art
         parameters.context.imageSmoothingEnabled = false;
         drawSpriteClipped({
-            parameters,
             sprite,
             x: this.x * dims - extrude,
             y: this.y * dims - extrude,
@@ -115,7 +108,7 @@ export class MapChunkView extends MapChunk {
                 if (patch.item.getItemType() === "shape") {
                     const destX = this.x * dims + patch.pos.x * globalConfig.tileSize;
                     const destY = this.y * dims + patch.pos.y * globalConfig.tileSize;
-                    patch.item.drawItemCenteredClipped(destX, destY, parameters, diameter);
+                    patch.item.drawItemCenteredClipped(destX, destY, diameter);
                 }
             }
         }
@@ -287,12 +280,11 @@ export class MapChunkView extends MapChunk {
 
     /**
      * Draws the wires layer
-     * @param {DrawParameters} parameters
      */
-    drawWiresForegroundLayer(parameters) {
+    drawWiresForegroundLayer() {
         const systems = this.root.systemMgr.systems;
-        systems.wire.drawChunk(parameters, this);
-        systems.staticMapEntities.drawWiresChunk(parameters, this);
-        systems.wiredPins.drawChunk(parameters, this);
+        systems.wire.drawChunk(this);
+        systems.staticMapEntities.drawWiresChunk(this);
+        systems.wiredPins.drawChunk(this);
     }
 }

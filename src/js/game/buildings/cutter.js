@@ -6,7 +6,6 @@ import { ItemEjectorComponent } from "../components/item_ejector";
 import { enumItemProcessorTypes, ItemProcessorComponent } from "../components/item_processor";
 import { Entity } from "../entity";
 import { defaultBuildingVariant, MetaBuilding } from "../meta_building";
-import { GameRoot } from "../root";
 import { enumHubGoalRewards } from "../tutorial_goals";
 
 /** @enum {string} */
@@ -33,12 +32,11 @@ export class MetaCutterBuilding extends MetaBuilding {
     }
 
     /**
-     * @param {GameRoot} root
      * @param {string} variant
      * @returns {Array<[string, string]>}
      */
-    getAdditionalStatistics(root, variant) {
-        const speed = root.hubGoals.getProcessorBaseSpeed(
+    getAdditionalStatistics(variant) {
+        const speed = this.root.hubGoals.getProcessorBaseSpeed(
             variant === enumCutterVariants.quad
                 ? enumItemProcessorTypes.cutterQuad
                 : enumItemProcessorTypes.cutter
@@ -46,21 +44,15 @@ export class MetaCutterBuilding extends MetaBuilding {
         return [[T.ingame.buildingPlacement.infoTexts.speed, formatItemsPerSecond(speed)]];
     }
 
-    /**
-     * @param {GameRoot} root
-     */
-    getAvailableVariants(root) {
-        if (root.hubGoals.isRewardUnlocked(enumHubGoalRewards.reward_cutter_quad)) {
+    getAvailableVariants() {
+        if (this.root.hubGoals.isRewardUnlocked(enumHubGoalRewards.reward_cutter_quad)) {
             return [defaultBuildingVariant, enumCutterVariants.quad];
         }
-        return super.getAvailableVariants(root);
+        return super.getAvailableVariants();
     }
 
-    /**
-     * @param {GameRoot} root
-     */
-    getIsUnlocked(root) {
-        return root.hubGoals.isRewardUnlocked(enumHubGoalRewards.reward_cutter_and_trash);
+    getIsUnlocked() {
+        return this.root.hubGoals.isRewardUnlocked(enumHubGoalRewards.reward_cutter_and_trash);
     }
 
     /**

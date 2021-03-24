@@ -15,18 +15,15 @@ const HUB_SIZE_TILES = 4;
 const HUB_SIZE_PIXELS = HUB_SIZE_TILES * globalConfig.tileSize;
 
 export class HubSystem extends GameSystemWithFilter {
-    constructor(root) {
-        super(root, [HubComponent]);
+    constructor() {
+        super([HubComponent]);
 
         this.hubSprite = Loader.getSprite("sprites/buildings/hub.png");
     }
 
-    /**
-     * @param {DrawParameters} parameters
-     */
-    draw(parameters) {
+    draw() {
         for (let i = 0; i < this.allEntities.length; ++i) {
-            this.drawEntity(parameters, this.allEntities[i]);
+            this.drawEntity(this.allEntities[i]);
         }
     }
 
@@ -43,7 +40,6 @@ export class HubSystem extends GameSystemWithFilter {
     /**
      *
      * @param {HTMLCanvasElement} canvas
-     * @param {CanvasRenderingContext2D} context
      * @param {number} w
      * @param {number} h
      * @param {number} dpi
@@ -58,7 +54,6 @@ export class HubSystem extends GameSystemWithFilter {
             visibleRect: new Rectangle(0, 0, w, h),
             desiredAtlasScale: ORIGINAL_SPRITE_SCALE,
             zoomLevel: dpi * 0.75,
-            root: this.root,
         });
 
         context.clearRect(0, 0, w, h);
@@ -77,7 +72,15 @@ export class HubSystem extends GameSystemWithFilter {
         }
 
         const definition = this.root.hubGoals.currentGoal.definition;
-        definition.drawCentered(45, 58, parameters, 36);
+
+        // Swap parameters for draw
+        const temp = globalConfig.parameters;
+        globalConfig.parameters = parameters;
+
+        definition.drawCentered(45, 58, 36);
+
+        // Swap back
+        globalConfig.parameters = temp;
 
         const goals = this.root.hubGoals.currentGoal;
 
@@ -158,12 +161,12 @@ export class HubSystem extends GameSystemWithFilter {
     }
 
     /**
-     * @param {DrawParameters} parameters
      * @param {Entity} entity
      */
-    drawEntity(parameters, entity) {
+    drawEntity(entity) {
+        const parameters = globalConfig.parameters;
         const staticComp = entity.components.StaticMapEntity;
-        if (!staticComp.shouldBeDrawn(parameters)) {
+        if (!staticComp.shouldBeDrawn()) {
             return;
         }
 
@@ -183,7 +186,6 @@ export class HubSystem extends GameSystemWithFilter {
 
         const extrude = 8;
         drawSpriteClipped({
-            parameters,
             sprite: canvas,
             x: staticComp.origin.x * globalConfig.tileSize - extrude,
             y: staticComp.origin.y * globalConfig.tileSize - extrude,

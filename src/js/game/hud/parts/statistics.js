@@ -111,12 +111,12 @@ export class HUDStatistics extends BaseHUDPart {
     }
 
     initialize() {
-        this.domAttach = new DynamicDomAttach(this.root, this.background, {
+        this.domAttach = new DynamicDomAttach(this.background, {
             attachClass: "visible",
         });
 
         this.inputReciever = new InputReceiver("statistics");
-        this.keyActionMapper = new KeyActionMapper(this.root, this.inputReciever);
+        this.keyActionMapper = new KeyActionMapper(this.inputReciever);
 
         this.keyActionMapper.getBinding(KEYMAPPINGS.general.back).add(this.close, this);
         this.keyActionMapper.getBinding(KEYMAPPINGS.ingame.menuClose).add(this.close, this);
@@ -241,7 +241,6 @@ export class HUDStatistics extends BaseHUDPart {
             if (!handle) {
                 const definition = this.root.shapeDefinitionMgr.getShapeFromShortKey(shapeKey);
                 handle = this.activeHandles[shapeKey] = new HUDShapeStatisticsHandle(
-                    this.root,
                     definition,
                     this.intersectionObserver
                 );

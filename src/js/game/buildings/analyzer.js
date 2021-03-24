@@ -4,7 +4,6 @@ import { enumLogicGateType, LogicGateComponent } from "../components/logic_gate"
 import { enumPinSlotType, WiredPinsComponent } from "../components/wired_pins";
 import { Entity } from "../entity";
 import { MetaBuilding } from "../meta_building";
-import { GameRoot } from "../root";
 import { enumHubGoalRewards } from "../tutorial_goals";
 
 const overlayMatrix = generateMatrixRotations([1, 1, 0, 1, 1, 1, 0, 1, 0]);
@@ -18,11 +17,8 @@ export class MetaAnalyzerBuilding extends MetaBuilding {
         return "#3a52bc";
     }
 
-    /**
-     * @param {GameRoot} root
-     */
-    getIsUnlocked(root) {
-        return root.hubGoals.isRewardUnlocked(enumHubGoalRewards.reward_virtual_processing);
+    getIsUnlocked() {
+        return this.root.hubGoals.isRewardUnlocked(enumHubGoalRewards.reward_virtual_processing);
     }
 
     /** @returns {"wires"} **/

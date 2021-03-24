@@ -3,7 +3,6 @@ import { Component } from "./component";
 import { Entity } from "./entity";
 /* typehints:end */
 
-import { GameRoot } from "./root";
 import { GameSystem } from "./game_system";
 import { arrayDelete, arrayDeleteValue } from "../core/utils";
 import { globalConfig } from "../core/config";
@@ -12,11 +11,10 @@ export class GameSystemWithFilter extends GameSystem {
     /**
      * Constructs a new game system with the given component filter. It will process
      * all entities which have *all* of the passed components
-     * @param {GameRoot} root
      * @param {Array<typeof Component>} requiredComponents
      */
-    constructor(root, requiredComponents) {
-        super(root);
+    constructor(requiredComponents) {
+        super();
         this.requiredComponents = requiredComponents;
         this.requiredComponentIds = requiredComponents.map(component => component.getId());
 

@@ -1,10 +1,10 @@
 /* typehints:start */
-import { GameRoot } from "../game/root";
 import { BasicSerializableObject } from "./serialization";
 /* typehints:end */
 
 import { Vector } from "../core/vector";
 import { round4Digits } from "../core/utils";
+import { globalConfig } from "../core/config";
 export const globalJsonSchemaDefs = {};
 
 /**
@@ -64,12 +64,11 @@ export class BaseDataType {
     /**
      * Deserializes a serialized value into the target object under the given key
      * @param {any} value
-     * @param {GameRoot} root
      * @param {object} targetObject
      * @param {string|number} targetKey
      * @returns {string|void} String error code or null on success
      */
-    deserialize(value, targetObject, targetKey, root) {
+    deserialize(value, targetObject, targetKey) {
         abstract;
     }
 
@@ -110,12 +109,11 @@ export class BaseDataType {
     /**
      * Deserializes a serialized value, but performs integrity checks before
      * @param {any} value
-     * @param {GameRoot} root
      * @param {object} targetObject
      * @param {string|number} targetKey
      * @returns {string|void} String error code or null on success
      */
-    deserializeWithVerify(value, targetObject, targetKey, root) {
+    deserializeWithVerify(value, targetObject, targetKey) {
         const errorCode = this.verifySerializedValue(value);
         if (errorCode) {
             return (
@@ -126,7 +124,7 @@ export class BaseDataType {
                 "]"
             );
         }
-        return this.deserialize(value, targetObject, targetKey, root);
+        return this.deserialize(value, targetObject, targetKey);
     }
 
     /**
@@ -147,12 +145,11 @@ export class TypeInteger extends BaseDataType {
     /**
      * @see BaseDataType.deserialize
      * @param {any} value
-     * @param {GameRoot} root
      * @param {object} targetObject
      * @param {string|number} targetKey
      * @returns {string|void} String error code or null on success
      */
-    deserialize(value, targetObject, targetKey, root) {
+    deserialize(value, targetObject, targetKey) {
         targetObject[targetKey] = value;
     }
 
@@ -183,12 +180,11 @@ export class TypePositiveInteger extends BaseDataType {
     /**
      * @see BaseDataType.deserialize
      * @param {any} value
-     * @param {GameRoot} root
      * @param {object} targetObject
      * @param {string|number} targetKey
      * @returns {string|void} String error code or null on success
      */
-    deserialize(value, targetObject, targetKey, root) {
+    deserialize(value, targetObject, targetKey) {
         targetObject[targetKey] = value;
     }
 
@@ -222,12 +218,11 @@ export class TypeBoolean extends BaseDataType {
     /**
      * @see BaseDataType.deserialize
      * @param {any} value
-     * @param {GameRoot} root
      * @param {object} targetObject
      * @param {string|number} targetKey
      * @returns {string|void} String error code or null on success
      */
-    deserialize(value, targetObject, targetKey, root) {
+    deserialize(value, targetObject, targetKey) {
         targetObject[targetKey] = value;
     }
 
@@ -257,12 +252,11 @@ export class TypeString extends BaseDataType {
     /**
      * @see BaseDataType.deserialize
      * @param {any} value
-     * @param {GameRoot} root
      * @param {object} targetObject
      * @param {string|number} targetKey
      * @returns {string|void} String error code or null on success
      */
-    deserialize(value, targetObject, targetKey, root) {
+    deserialize(value, targetObject, targetKey) {
         targetObject[targetKey] = value;
     }
     getAsJsonSchemaUncached() {
@@ -305,12 +299,11 @@ export class TypeVector extends BaseDataType {
     /**
      * @see BaseDataType.deserialize
      * @param {any} value
-     * @param {GameRoot} root
      * @param {object} targetObject
      * @param {string|number} targetKey
      * @returns {string|void} String error code or null on success
      */
-    deserialize(value, targetObject, targetKey, root) {
+    deserialize(value, targetObject, targetKey) {
         targetObject[targetKey] = new Vector(value.x, value.y);
     }
 
@@ -351,12 +344,11 @@ export class TypeTileVector extends BaseDataType {
     /**
      * @see BaseDataType.deserialize
      * @param {any} value
-     * @param {GameRoot} root
      * @param {object} targetObject
      * @param {string|number} targetKey
      * @returns {string|void} String error code or null on success
      */
-    deserialize(value, targetObject, targetKey, root) {
+    deserialize(value, targetObject, targetKey) {
         targetObject[targetKey] = new Vector(value.x, value.y);
     }
 
@@ -390,12 +382,11 @@ export class TypeNumber extends BaseDataType {
     /**
      * @see BaseDataType.deserialize
      * @param {any} value
-     * @param {GameRoot} root
      * @param {object} targetObject
      * @param {string|number} targetKey
      * @returns {string|void} String error code or null on success
      */
-    deserialize(value, targetObject, targetKey, root) {
+    deserialize(value, targetObject, targetKey) {
         targetObject[targetKey] = value;
     }
 
@@ -420,12 +411,11 @@ export class TypePositiveNumber extends BaseDataType {
     /**
      * @see BaseDataType.deserialize
      * @param {any} value
-     * @param {GameRoot} root
      * @param {object} targetObject
      * @param {string|number} targetKey
      * @returns {string|void} String error code or null on success
      */
-    deserialize(value, targetObject, targetKey, root) {
+    deserialize(value, targetObject, targetKey) {
         targetObject[targetKey] = value;
     }
 
@@ -467,12 +457,11 @@ export class TypeEnum extends BaseDataType {
     /**
      * @see BaseDataType.deserialize
      * @param {any} value
-     * @param {GameRoot} root
      * @param {object} targetObject
      * @param {string|number} targetKey
      * @returns {string|void} String error code or null on success
      */
-    deserialize(value, targetObject, targetKey, root) {
+    deserialize(value, targetObject, targetKey) {
         targetObject[targetKey] = value;
     }
 
@@ -514,12 +503,12 @@ export class TypeEntity extends BaseDataType {
     /**
      * @see BaseDataType.deserialize
      * @param {any} value
-     * @param {GameRoot} root
      * @param {object} targetObject
      * @param {string|number} targetKey
      * @returns {string|void} String error code or null on success
      */
-    deserialize(value, targetObject, targetKey, root) {
+    deserialize(value, targetObject, targetKey) {
+        const root = globalConfig.root;
         const entity = root.entityMgr.findByUid(value);
         if (!entity) {
             return "Entity not found by uid: " + value;
@@ -555,12 +544,12 @@ export class TypeEntityWeakref extends BaseDataType {
     /**
      * @see BaseDataType.deserialize
      * @param {any} value
-     * @param {GameRoot} root
      * @param {object} targetObject
      * @param {string|number} targetKey
      * @returns {string|void} String error code or null on success
      */
-    deserialize(value, targetObject, targetKey, root) {
+    deserialize(value, targetObject, targetKey) {
+        const root = globalConfig.root;
         if (value === null) {
             targetObject[targetKey] = null;
             return;
@@ -595,7 +584,7 @@ export class TypeClass extends BaseDataType {
     /**
      *
      * @param {FactoryTemplate<*>} registry
-     * @param {(GameRoot, object) => object} customResolver
+     * @param {(object) => object} customResolver
      */
     constructor(registry, customResolver = null) {
         super();
@@ -636,16 +625,16 @@ export class TypeClass extends BaseDataType {
     /**
      * @see BaseDataType.deserialize
      * @param {any} value
-     * @param {GameRoot} root
      * @param {object} targetObject
      * @param {string|number} targetKey
      * @returns {string|void} String error code or null on success
      */
-    deserialize(value, targetObject, targetKey, root) {
+    deserialize(value, targetObject, targetKey) {
+        const root = globalConfig.root;
         let instance;
 
         if (this.customResolver) {
-            instance = this.customResolver(root, value);
+            instance = this.customResolver(value);
             if (!instance) {
                 return "Failed to call custom resolver";
             }
@@ -708,12 +697,11 @@ export class TypeClassData extends BaseDataType {
     /**
      * @see BaseDataType.deserialize
      * @param {any} value
-     * @param {GameRoot} root
      * @param {object} targetObject
      * @param {string|number} targetKey
      * @returns {string|void} String error code or null on success
      */
-    deserialize(value, targetObject, targetKey, root) {
+    deserialize(value, targetObject, targetKey) {
         assert(false, "can not deserialize class data of type " + this.registry.getId());
     }
 
@@ -764,12 +752,11 @@ export class TypeClassFromMetaclass extends BaseDataType {
     /**
      * @see BaseDataType.deserialize
      * @param {any} value
-     * @param {GameRoot} root
      * @param {object} targetObject
      * @param {string|number} targetKey
      * @returns {string|void} String error code or null on success
      */
-    deserialize(value, targetObject, targetKey, root) {
+    deserialize(value, targetObject, targetKey) {
         const metaClassInstance = this.registry.findById(value.$);
         if (!metaClassInstance || !metaClassInstance.prototype) {
             return "Invalid meta class id (runtime-err): " + value.$ + "->" + metaClassInstance;
@@ -816,12 +803,11 @@ export class TypeMetaClass extends BaseDataType {
     /**
      * @see BaseDataType.deserialize
      * @param {any} value
-     * @param {GameRoot} root
      * @param {object} targetObject
      * @param {string|number} targetKey
      * @returns {string|void} String error code or null on success
      */
-    deserialize(value, targetObject, targetKey, root) {
+    deserialize(value, targetObject, targetKey) {
         const instanceClass = this.registry.findById(value);
         if (!instanceClass) {
             return "Invalid class id (runtime-err): " + value;
@@ -877,12 +863,11 @@ export class TypeArray extends BaseDataType {
     /**
      * @see BaseDataType.deserialize
      * @param {any} value
-     * @param {GameRoot} root
      * @param {object} targetObject
      * @param {string|number} targetKey
      * @returns {string|void} String error code or null on success
      */
-    deserialize(value, targetObject, targetKey, root) {
+    deserialize(value, targetObject, targetKey) {
         let destination = targetObject[targetKey];
         if (!destination) {
             targetObject[targetKey] = destination = new Array(value.length);
@@ -891,7 +876,7 @@ export class TypeArray extends BaseDataType {
         const size = this.fixedSize ? Math.min(value.length, destination.length) : value.length;
 
         for (let i = 0; i < size; ++i) {
-            const errorStatus = this.innerType.deserializeWithVerify(value[i], destination, i, root);
+            const errorStatus = this.innerType.deserializeWithVerify(value[i], destination, i);
             if (errorStatus) {
                 return errorStatus;
             }
@@ -934,12 +919,11 @@ export class TypeFixedClass extends BaseDataType {
     /**
      * @see BaseDataType.deserialize
      * @param {any} value
-     * @param {GameRoot} root
      * @param {object} targetObject
      * @param {string|number} targetKey
      * @returns {string|void} String error code or null on success
      */
-    deserialize(value, targetObject, targetKey, root) {
+    deserialize(value, targetObject, targetKey) {
         const instance = Object.create(this.baseclass.prototype);
         const errorState = instance.deserialize(value);
         if (errorState) {
@@ -1001,15 +985,14 @@ export class TypeKeyValueMap extends BaseDataType {
     /**
      * @see BaseDataType.deserialize
      * @param {any} value
-     * @param {GameRoot} root
      * @param {object} targetObject
      * @param {string|number} targetKey
      * @returns {string|void} String error code or null on success
      */
-    deserialize(value, targetObject, targetKey, root) {
+    deserialize(value, targetObject, targetKey) {
         let result = {};
         for (const key in value) {
-            const errorCode = this.valueType.deserializeWithVerify(value[key], result, key, root);
+            const errorCode = this.valueType.deserializeWithVerify(value[key], result, key);
             if (errorCode) {
                 return errorCode;
             }
@@ -1053,12 +1036,11 @@ export class TypeClassId extends BaseDataType {
     /**
      * @see BaseDataType.deserialize
      * @param {any} value
-     * @param {GameRoot} root
      * @param {object} targetObject
      * @param {string|number} targetKey
      * @returns {string|void} String error code or null on success
      */
-    deserialize(value, targetObject, targetKey, root) {
+    deserialize(value, targetObject, targetKey) {
         targetObject[targetKey] = value;
     }
 
@@ -1105,19 +1087,18 @@ export class TypePair extends BaseDataType {
     /**
      * @see BaseDataType.deserialize
      * @param {any} value
-     * @param {GameRoot} root
      * @param {object} targetObject
      * @param {string|number} targetKey
      * @returns {string|void} String error code or null on success
      */
-    deserialize(value, targetObject, targetKey, root) {
+    deserialize(value, targetObject, targetKey) {
         const result = [undefined, undefined];
 
-        let errorCode = this.type1.deserialize(value[0], result, 0, root);
+        let errorCode = this.type1.deserialize(value[0], result, 0);
         if (errorCode) {
             return errorCode;
         }
-        errorCode = this.type2.deserialize(value[1], result, 1, root);
+        errorCode = this.type2.deserialize(value[1], result, 1);
         if (errorCode) {
             return errorCode;
         }
@@ -1175,17 +1156,16 @@ export class TypeNullable extends BaseDataType {
     /**
      * @see BaseDataType.deserialize
      * @param {any} value
-     * @param {GameRoot} root
      * @param {object} targetObject
      * @param {string|number} targetKey
      * @returns {string|void} String error code or null on success
      */
-    deserialize(value, targetObject, targetKey, root) {
+    deserialize(value, targetObject, targetKey) {
         if (value === null || value === undefined) {
             targetObject[targetKey] = null;
             return;
         }
-        return this.wrapped.deserialize(value, targetObject, targetKey, root);
+        return this.wrapped.deserialize(value, targetObject, targetKey);
     }
 
     verifySerializedValue(value) {
@@ -1237,12 +1217,11 @@ export class TypeStructuredObject extends BaseDataType {
     /**
      * @see BaseDataType.deserialize
      * @param {any} value
-     * @param {GameRoot} root
      * @param {object} targetObject
      * @param {string|number} targetKey
      * @returns {string|void} String error code or null on success
      */
-    deserialize(value, targetObject, targetKey, root) {
+    deserialize(value, targetObject, targetKey) {
         let target = targetObject[targetKey];
         if (!target) {
             targetObject[targetKey] = target = {};
@@ -1250,7 +1229,7 @@ export class TypeStructuredObject extends BaseDataType {
 
         for (const key in value) {
             const valueType = this.descriptor[key];
-            const errorCode = valueType.deserializeWithVerify(value[key], target, key, root);
+            const errorCode = valueType.deserializeWithVerify(value[key], target, key);
             if (errorCode) {
                 return errorCode;
             }

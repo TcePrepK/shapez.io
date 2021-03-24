@@ -11,11 +11,8 @@ export class HUDWireInfo extends BaseHUDPart {
         this.spriteConflict = Loader.getSprite("sprites/wires/network_conflict.png");
     }
 
-    /**
-     *
-     * @param {import("../../../core/draw_utils").DrawParameters} parameters
-     */
-    drawOverlays(parameters) {
+    drawOverlays() {
+        const parameters = globalConfig.parameters;
         if (this.root.currentLayer !== "wires") {
             // Not in the wires layer
             return;
@@ -57,34 +54,27 @@ export class HUDWireInfo extends BaseHUDPart {
 
         for (let i = 0; i < networks.length; ++i) {
             const network = networks[i];
-            this.drawHighlightedNetwork(parameters, network);
+            this.drawHighlightedNetwork(network);
         }
 
         if (networks.length === 1) {
             const network = networks[0];
 
             if (network.valueConflict) {
-                this.spriteConflict.draw(parameters.context, mousePos.x + 15, mousePos.y - 10, 60, 60);
+                this.spriteConflict.draw(mousePos.x + 15, mousePos.y - 10, 60, 60);
             } else if (!network.currentValue) {
                 this.spriteEmpty.draw(parameters.context, mousePos.x + 15, mousePos.y - 10, 60, 60);
             } else {
-                network.currentValue.drawItemCenteredClipped(
-                    mousePos.x + 40,
-                    mousePos.y + 10,
-                    parameters,
-                    60
-                );
+                network.currentValue.drawItemCenteredClipped(mousePos.x + 40, mousePos.y + 10, 60);
             }
         }
     }
 
     /**
-     *
-     *
-     * @param {import("../../../core/draw_utils").DrawParameters} parameters
      * @param {WireNetwork} network
      */
-    drawHighlightedNetwork(parameters, network) {
+    drawHighlightedNetwork(network) {
+        const parameters = globalConfig.parameters;
         parameters.context.globalAlpha = 0.5;
 
         for (let i = 0; i < network.wires.length; ++i) {

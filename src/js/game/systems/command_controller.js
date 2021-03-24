@@ -1,12 +1,9 @@
 import { globalConfig } from "../../core/config";
-import { DrawParameters } from "../../core/draw_parameters";
 import { gMetaBuildingRegistry } from "../../core/global_registries";
 import { DialogWithForm } from "../../core/modal_dialog_elements";
-import { FormCommandInput, FormElementInput } from "../../core/modal_dialog_forms";
-import { fillInLinkIntoTranslation } from "../../core/utils";
+import { FormCommandInput } from "../../core/modal_dialog_forms";
 import { Vector } from "../../core/vector";
 import { T } from "../../translations";
-import { placeBuilding } from "../commands/ingame_commands";
 import { CommandControllerComponent } from "../components/command_controller";
 import { Entity } from "../entity";
 import { GameSystemWithFilter } from "../game_system_with_filter";
@@ -91,27 +88,28 @@ const lineBuilding = function ({
     }
 };
 
-const foundEntity = function ({ x = 0, y = 0, layer = "regular" }) {
+const findEntity = function ({ x = 0, y = 0, layer = "regular" }) {
     const root = CommandControllerSystem.root;
     return root.map.getTileContent(new Vector(x, y), layer);
 };
 
 //  lineBuilding(root, {x1: 0, y1: -5, x2: 10, y2: -5, building: 'display'});
 export class CommandControllerSystem extends GameSystemWithFilter {
-    constructor(root) {
-        super(root, [CommandControllerComponent]);
+    constructor() {
+        super([CommandControllerComponent]);
 
         this.root.signals.entityManuallyPlaced.add(entity => this.editCommandController(entity));
 
         this.variables = {};
 
         CommandControllerSystem.root = this.root;
+        // CommandControllerSystem.context = this.context;
 
         // FUNCTIONS
 
         this.setTile = setTile;
         this.lineBuilding = lineBuilding;
-        this.foundEntity = foundEntity;
+        this.findEntity = findEntity;
     }
 
     update() {
@@ -152,7 +150,7 @@ export class CommandControllerSystem extends GameSystemWithFilter {
      */
     getFunction(val) {
         return new Function(
-            "{ root, variables, setTile, lineBuilding, foundEntity }, globalConfig, Vector, entity",
+            "{ root, variables, setTile, lineBuilding, findEntity }, globalConfig, Vector, entity",
             val
         );
     }

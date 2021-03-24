@@ -19,6 +19,7 @@
 @import "application_error";
 @import "textual_game_state";
 @import "adinplay";
+@import "changelog_skins";
 
 @import "states/preload";
 @import "states/main_menu";
@@ -118,13 +119,5 @@ body.uiHidden {
     #ingame_HUD_Waypoints,
     #ingame_HUD_Waypoints_Hint {
         display: none !important;
-    }
-}
-
-body.modalDialogActive,
-body.externalAdOpen,
-body.ingameDialogOpen {
-    > *:not(.ingameDialog):not(.modalDialogParent):not(.loadingDialog):not(.gameLoadingOverlay):not(#ingame_HUD_ModalDialogs):not(.noBlur) {
-        // filter: blur(5px) !important;
     }
 }

@@ -1,13 +1,13 @@
 import { BaseHUDPart } from "../base_hud_part";
 import { Vector } from "../../../core/vector";
 import { STOP_PROPAGATION } from "../../../core/signal";
-import { DrawParameters } from "../../../core/draw_parameters";
 import { Entity } from "../../entity";
 import { Loader } from "../../../core/loader";
 import { globalConfig } from "../../../core/config";
 import { makeDiv, formatBigNumber, formatBigNumberFull } from "../../../core/utils";
 import { DynamicDomAttach } from "../dynamic_dom_attach";
 import { createLogger } from "../../../core/logging";
+import { ACHIEVEMENTS } from "../../../platform/achievement_provider";
 import { enumMouseButton } from "../../camera";
 import { T } from "../../../translations";
 import { KEYMAPPINGS } from "../../key_action_mapper";
@@ -100,6 +100,7 @@ export class HUDMassSelector extends BaseHUDPart {
          */
         const mapUidToEntity = this.root.entityMgr.getFrozenUidSearchMap();
 
+        let count = 0;
         this.root.logic.performBulkOperation(() => {
             for (let i = 0; i < entityUids.length; ++i) {
                 const uid = entityUids[i];
@@ -111,8 +112,12 @@ export class HUDMassSelector extends BaseHUDPart {
 
                 if (!this.root.logic.tryDeleteBuilding(entity)) {
                     logger.error("Error in mass delete, could not remove building");
+                } else {
+                    count++;
                 }
             }
+
+            this.root.signals.achievementCheck.dispatch(ACHIEVEMENTS.destroy1000, count);
         });
 
         // Clear uids later
@@ -178,8 +183,8 @@ export class HUDMassSelector extends BaseHUDPart {
                 }
             };
 
-            const blueprint = Blueprint.fromUids(this.root, entityUids);
-            if (blueprint.canAfford(this.root)) {
+            const blueprint = Blueprint.fromUids(entityUids);
+            if (blueprint.canAfford()) {
                 cutAction();
             } else {
                 const { cancel, ok } = this.root.hud.parts.dialogs.showWarning(
@@ -255,11 +260,8 @@ export class HUDMassSelector extends BaseHUDPart {
         }
     }
 
-    /**
-     *
-     * @param {DrawParameters} parameters
-     */
-    draw(parameters) {
+    draw() {
+        const parameters = globalConfig.parameters;
         const boundsBorder = 2;
 
         if (this.currentSelectionStartWorld) {

@@ -4,18 +4,18 @@ import { Vector } from "../core/vector";
 import { SOUNDS } from "../platform/sound";
 import { StaticMapEntityComponent } from "./components/static_map_entity";
 import { Entity } from "./entity";
-import { GameRoot } from "./root";
 import { getCodeFromBuildingData } from "./building_codes";
+import { globalConfig } from "../core/config";
 
 export const defaultBuildingVariant = "default";
 
 export class MetaBuilding {
     /**
-     *
      * @param {string} id Building id
      */
     constructor(id) {
         this.id = id;
+        this.root = globalConfig.root;
     }
 
     /**
@@ -29,7 +29,7 @@ export class MetaBuilding {
      * Returns the edit layer of the building
      * @returns {Layer}
      */
-    getLayer(root) {
+    getLayer() {
         return "regular";
     }
 
@@ -68,11 +68,10 @@ export class MetaBuilding {
 
     /**
      * Should return additional statistics about this building
-     * @param {GameRoot} root
      * @param {string} variant
      * @returns {Array<[string, string]>}
      */
-    getAdditionalStatistics(root, variant) {
+    getAdditionalStatistics(variant) {
         return [];
     }
 
@@ -122,10 +121,7 @@ export class MetaBuilding {
         return SOUNDS.placeBuilding;
     }
 
-    /**
-     * @param {GameRoot} root
-     */
-    getAvailableVariants(root) {
+    getAvailableVariants() {
         return [defaultBuildingVariant];
     }
 
@@ -166,9 +162,8 @@ export class MetaBuilding {
 
     /**
      * Returns whether this building is unlocked for the given game
-     * @param {GameRoot} root
      */
-    getIsUnlocked(root) {
+    getIsUnlocked() {
         return true;
     }
 
@@ -192,16 +187,15 @@ export class MetaBuilding {
     /**
      * Creates the entity without placing it
      * @param {object} param0
-     * @param {GameRoot} param0.root
      * @param {Vector} param0.origin Origin tile
      * @param {number=} param0.rotation Rotation
      * @param {number} param0.originalRotation Original Rotation
      * @param {number} param0.rotationVariant Rotation variant
      * @param {string} param0.variant
      */
-    createEntity({ root, origin, rotation, originalRotation, rotationVariant, variant }) {
-        const entity = new Entity(root);
-        entity.layer = this.getLayer(root);
+    createEntity({ origin, rotation, originalRotation, rotationVariant, variant }) {
+        const entity = new Entity();
+        entity.layer = this.getLayer();
         entity.addComponent(
             new StaticMapEntityComponent({
                 origin: new Vector(origin.x, origin.y),
@@ -211,7 +205,7 @@ export class MetaBuilding {
                 code: getCodeFromBuildingData(this, variant, rotationVariant),
             })
         );
-        this.setupEntityComponents(entity, root);
+        this.setupEntityComponents(entity);
         this.updateVariants(entity, rotationVariant, variant);
         return entity;
     }
@@ -234,14 +228,13 @@ export class MetaBuilding {
     /**
      * Should compute the optimal rotation variant on the given tile
      * @param {object} param0
-     * @param {GameRoot} param0.root
      * @param {Vector} param0.tile
      * @param {number} param0.rotation
      * @param {string} param0.variant
      * @param {Layer} param0.layer
      * @return {{ rotation: number, rotationVariant: number, connectedEntities?: Array<Entity> }}
      */
-    computeOptimalDirectionAndRotationVariantAtTile({ root, tile, rotation, variant, layer }) {
+    computeOptimalDirectionAndRotationVariantAtTile({ tile, rotation, variant, layer }) {
         if (!this.getIsRotateable(variant)) {
             return {
                 rotation: 0,
@@ -267,9 +260,8 @@ export class MetaBuilding {
     /**
      * Should setup the entity components
      * @param {Entity} entity
-     * @param {GameRoot} root
      */
-    setupEntityComponents(entity, root) {
+    setupEntityComponents(entity) {
         abstract;
     }
 }

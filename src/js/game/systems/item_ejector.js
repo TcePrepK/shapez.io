@@ -1,9 +1,9 @@
 import { globalConfig } from "../../core/config";
-import { DrawParameters } from "../../core/draw_parameters";
 import { createLogger } from "../../core/logging";
 import { Rectangle } from "../../core/rectangle";
 import { StaleAreaDetector } from "../../core/stale_area_detector";
 import { enumDirection, enumDirectionToVector } from "../../core/vector";
+import { ACHIEVEMENTS } from "../../platform/achievement_provider";
 import { BaseItem } from "../base_item";
 import { BeltComponent } from "../components/belt";
 import { ItemAcceptorComponent } from "../components/item_acceptor";
@@ -15,11 +15,10 @@ import { MapChunkView } from "../map_chunk_view";
 const logger = createLogger("systems/ejector");
 
 export class ItemEjectorSystem extends GameSystemWithFilter {
-    constructor(root) {
-        super(root, [ItemEjectorComponent]);
+    constructor() {
+        super([ItemEjectorComponent]);
 
         this.staleAreaDetector = new StaleAreaDetector({
-            root: this.root,
             name: "item-ejector",
             recomputeMethod: this.recomputeArea.bind(this),
         });
@@ -294,10 +293,9 @@ export class ItemEjectorSystem extends GameSystemWithFilter {
     }
 
     /**
-     * @param {DrawParameters} parameters
      * @param {MapChunkView} chunk
      */
-    drawChunk(parameters, chunk) {
+    drawChunk(chunk) {
         if (this.root.app.settings.getAllSettings().simplifiedBelts) {
             // Disabled in potato mode
             return;
@@ -401,12 +399,7 @@ export class ItemEjectorSystem extends GameSystemWithFilter {
                 const worldX = tileX * globalConfig.tileSize;
                 const worldY = tileY * globalConfig.tileSize;
 
-                ejectedItem.drawItemCenteredClipped(
-                    worldX,
-                    worldY,
-                    parameters,
-                    globalConfig.defaultItemDiameter
-                );
+                ejectedItem.drawItemCenteredClipped(worldX, worldY, globalConfig.defaultItemDiameter);
             }
         }
     }

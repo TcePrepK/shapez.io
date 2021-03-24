@@ -434,7 +434,7 @@ export class InGameState extends GameState {
             return this.currentSavePromise;
         }
         logger.log("Starting to save game ...");
-        this.savegame.updateData(this.core.root);
+        this.savegame.updateData();
 
         this.currentSavePromise = this.savegame
             .writeSavegameAndMetadata()

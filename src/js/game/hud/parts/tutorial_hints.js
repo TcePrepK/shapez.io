@@ -39,7 +39,7 @@ export class HUDPartTutorialHints extends BaseHUDPart {
     initialize() {
         this.trackClicks(this.element.querySelector(".toggleHint"), this.toggleHintEnlarged);
 
-        this.videoAttach = new DynamicDomAttach(this.root, this.videoElement, {
+        this.videoAttach = new DynamicDomAttach(this.videoElement, {
             timeToKeepSeconds: 0.3,
         });
 
@@ -47,10 +47,10 @@ export class HUDPartTutorialHints extends BaseHUDPart {
         this.enlarged = false;
 
         this.inputReciever = new InputReceiver("tutorial_hints");
-        this.keyActionMapper = new KeyActionMapper(this.root, this.inputReciever);
+        this.keyActionMapper = new KeyActionMapper(this.inputReciever);
         this.keyActionMapper.getBinding(KEYMAPPINGS.general.back).add(this.close, this);
 
-        this.domAttach = new DynamicDomAttach(this.root, this.element);
+        this.domAttach = new DynamicDomAttach(this.element);
 
         this.currentShownLevel = new TrackedState(this.updateVideoUrl, this);
     }

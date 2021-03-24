@@ -1,4 +1,3 @@
-import { DrawParameters } from "../../core/draw_parameters";
 import { types } from "../../savegame/serialization";
 import { BaseItem } from "../base_item";
 import { ShapeDefinition } from "../shape_definition";
@@ -69,10 +68,9 @@ export class ShapeItem extends BaseItem {
     /**
      * @param {number} x
      * @param {number} y
-     * @param {DrawParameters} parameters
      * @param {number=} diameter
      */
-    drawItemCenteredImpl(x, y, parameters, diameter = globalConfig.defaultItemDiameter) {
-        this.definition.drawCentered(x, y, parameters, diameter);
+    drawItemCenteredImpl(x, y, diameter = globalConfig.defaultItemDiameter) {
+        this.definition.drawCentered(x, y, diameter);
     }
 }

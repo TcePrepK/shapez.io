@@ -8,12 +8,13 @@ import { BaseHUDPart } from "../base_hud_part";
 import { Dialog, DialogLoading, DialogOptionChooser } from "../../../core/modal_dialog_elements";
 import { makeDiv } from "../../../core/utils";
 import { T } from "../../../translations";
-import { THIRDPARTY_URLS } from "../../../core/config";
+import { globalConfig, THIRDPARTY_URLS } from "../../../core/config";
 
 export class HUDModalDialogs extends BaseHUDPart {
-    constructor(root, app) {
+    constructor(app) {
         // Important: Root is not always available here! Its also used in the main menu
-        super(root);
+        super();
+        const root = globalConfig.root;
 
         /** @type {Application} */
         this.app = root ? root.app : app;
@@ -25,7 +26,7 @@ export class HUDModalDialogs extends BaseHUDPart {
     // For use inside of the game, implementation of base hud part
     initialize() {
         this.dialogParent = document.getElementById("ingame_HUD_ModalDialogs");
-        this.domWatcher = new DynamicDomAttach(this.root, this.dialogParent);
+        this.domWatcher = new DynamicDomAttach(this.dialogParent);
     }
 
     shouldPauseRendering() {

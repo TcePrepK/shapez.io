@@ -5,7 +5,6 @@ import { BasicSerializableObject, types } from "../savegame/serialization";
 import { enumColors } from "./colors";
 import { enumItemProcessorTypes } from "./components/item_processor";
 import { enumAnalyticsDataSource } from "./production_analytics";
-import { GameRoot } from "./root";
 import { enumSubShape, ShapeDefinition } from "./shape_definition";
 import { enumHubGoalRewards } from "./tutorial_goals";
 
@@ -25,9 +24,9 @@ export class HubGoals extends BasicSerializableObject {
     /**
      *
      * @param {*} data
-     * @param {GameRoot} root
      */
-    deserialize(data, root) {
+    deserialize(data) {
+        const root = globalConfig.root;
         const errorCode = super.deserialize(data);
         if (errorCode) {
             return errorCode;
@@ -64,13 +63,10 @@ export class HubGoals extends BasicSerializableObject {
         this.computeNextGoal();
     }
 
-    /**
-     * @param {GameRoot} root
-     */
-    constructor(root) {
+    constructor() {
         super();
 
-        this.root = root;
+        this.root = globalConfig.root;
 
         this.level = 1;
 

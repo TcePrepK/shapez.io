@@ -67,7 +67,7 @@ export class HUDGameMenu extends BaseHUDPart {
                 this.visibilityToUpdate.push({
                     button,
                     condition: visible,
-                    domAttach: new DynamicDomAttach(this.root, button),
+                    domAttach: new DynamicDomAttach(button),
                 });
             }
 

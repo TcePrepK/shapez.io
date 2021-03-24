@@ -139,7 +139,7 @@ export class HUDBuildingPlacerLogic extends BaseHUDPart {
     onEditModeChanged(layer) {
         const metaBuilding = this.currentMetaBuilding.get();
         if (metaBuilding) {
-            if (metaBuilding.getLayer(this.root) !== layer) {
+            if (metaBuilding.getLayer() !== layer) {
                 // This layer doesn't fit the edit mode anymore
                 this.currentMetaBuilding.set(null);
             }
@@ -409,11 +409,10 @@ export class HUDBuildingPlacerLogic extends BaseHUDPart {
 
         const metaBuilding = this.currentMetaBuilding.get();
         const { rotation, rotationVariant } = metaBuilding.computeOptimalDirectionAndRotationVariantAtTile({
-            root: this.root,
             tile,
             rotation: this.currentBaseRotation,
             variant: this.currentVariant.get(),
-            layer: metaBuilding.getLayer(this.root),
+            layer: metaBuilding.getLayer(),
         });
 
         const entity = this.root.logic.tryPlaceBuilding({
@@ -462,7 +461,7 @@ export class HUDBuildingPlacerLogic extends BaseHUDPart {
         if (!metaBuilding) {
             this.currentVariant.set(defaultBuildingVariant);
         } else {
-            const availableVariants = metaBuilding.getAvailableVariants(this.root);
+            const availableVariants = metaBuilding.getAvailableVariants();
             let index = availableVariants.indexOf(this.currentVariant.get());
             if (index < 0) {
                 index = 0;
@@ -606,7 +605,7 @@ export class HUDBuildingPlacerLogic extends BaseHUDPart {
         this.abortDragging();
         this.root.hud.signals.selectedPlacementBuildingChanged.dispatch(metaBuilding);
         if (metaBuilding) {
-            const availableVariants = metaBuilding.getAvailableVariants(this.root);
+            const availableVariants = metaBuilding.getAvailableVariants();
             const preferredVariant = this.preferredVariants[metaBuilding.getId()];
 
             // Choose last stored variant if possible, otherwise the default one
@@ -619,8 +618,8 @@ export class HUDBuildingPlacerLogic extends BaseHUDPart {
 
             this.currentVariant.set(variant);
 
-            this.fakeEntity = new Entity(null);
-            metaBuilding.setupEntityComponents(this.fakeEntity, null);
+            this.fakeEntity = new Entity();
+            metaBuilding.setupEntityComponents(this.fakeEntity);
 
             this.fakeEntity.addComponent(
                 new StaticMapEntityComponent({

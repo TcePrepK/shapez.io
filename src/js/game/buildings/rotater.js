@@ -6,7 +6,6 @@ import { ItemEjectorComponent } from "../components/item_ejector";
 import { enumItemProcessorTypes, ItemProcessorComponent } from "../components/item_processor";
 import { Entity } from "../entity";
 import { defaultBuildingVariant, MetaBuilding } from "../meta_building";
-import { GameRoot } from "../root";
 import { enumHubGoalRewards } from "../tutorial_goals";
 
 /** @enum {string} */
@@ -43,47 +42,39 @@ export class MetaRotaterBuilding extends MetaBuilding {
     }
 
     /**
-     * @param {GameRoot} root
      * @param {string} variant
      * @returns {Array<[string, string]>}
      */
-    getAdditionalStatistics(root, variant) {
+    getAdditionalStatistics(variant) {
         switch (variant) {
             case defaultBuildingVariant: {
-                const speed = root.hubGoals.getProcessorBaseSpeed(enumItemProcessorTypes.rotater);
+                const speed = this.root.hubGoals.getProcessorBaseSpeed(enumItemProcessorTypes.rotater);
                 return [[T.ingame.buildingPlacement.infoTexts.speed, formatItemsPerSecond(speed)]];
             }
             case enumRotaterVariants.ccw: {
-                const speed = root.hubGoals.getProcessorBaseSpeed(enumItemProcessorTypes.rotaterCCW);
+                const speed = this.root.hubGoals.getProcessorBaseSpeed(enumItemProcessorTypes.rotaterCCW);
                 return [[T.ingame.buildingPlacement.infoTexts.speed, formatItemsPerSecond(speed)]];
             }
             case enumRotaterVariants.rotate180: {
-                const speed = root.hubGoals.getProcessorBaseSpeed(enumItemProcessorTypes.rotater180);
+                const speed = this.root.hubGoals.getProcessorBaseSpeed(enumItemProcessorTypes.rotater180);
                 return [[T.ingame.buildingPlacement.infoTexts.speed, formatItemsPerSecond(speed)]];
             }
         }
     }
 
-    /**
-     *
-     * @param {GameRoot} root
-     */
-    getAvailableVariants(root) {
+    getAvailableVariants() {
         let variants = [defaultBuildingVariant];
-        if (root.hubGoals.isRewardUnlocked(enumHubGoalRewards.reward_rotater_ccw)) {
+        if (this.root.hubGoals.isRewardUnlocked(enumHubGoalRewards.reward_rotater_ccw)) {
             variants.push(enumRotaterVariants.ccw);
         }
-        if (root.hubGoals.isRewardUnlocked(enumHubGoalRewards.reward_rotater_180)) {
+        if (this.root.hubGoals.isRewardUnlocked(enumHubGoalRewards.reward_rotater_180)) {
             variants.push(enumRotaterVariants.rotate180);
         }
         return variants;
     }
 
-    /**
-     * @param {GameRoot} root
-     */
-    getIsUnlocked(root) {
-        return root.hubGoals.isRewardUnlocked(enumHubGoalRewards.reward_rotater);
+    getIsUnlocked() {
+        return this.root.hubGoals.isRewardUnlocked(enumHubGoalRewards.reward_rotater);
     }
 
     /**

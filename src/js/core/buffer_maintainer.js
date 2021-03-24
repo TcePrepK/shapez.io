@@ -1,5 +1,6 @@
 import { GameRoot } from "../game/root";
 import { clearBufferBacklog, freeCanvas, getBufferStats, makeOffscreenBuffer } from "./buffer_utils";
+import { globalConfig } from "./config";
 import { createLogger } from "./logging";
 import { round1Digit } from "./utils";
 
@@ -16,11 +17,8 @@ const logger = createLogger("buffers");
 const bufferGcDurationSeconds = 0.5;
 
 export class BufferMaintainer {
-    /**
-     * @param {GameRoot} root
-     */
-    constructor(root) {
-        this.root = root;
+    constructor() {
+        this.root = globalConfig.root;
 
         /** @type {Map<string, Map<string, CacheEntry>>} */
         this.cache = new Map();

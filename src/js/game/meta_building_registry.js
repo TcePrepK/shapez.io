@@ -63,9 +63,11 @@ export function initMetaBuildingRegistry() {
     gMetaBuildingRegistry.register(MetaCommandControllerBuilding);
 
     // Belt
+    console.log("------------------------------------");
     registerBuildingVariant(1, MetaBeltBuilding, defaultBuildingVariant, 0);
     registerBuildingVariant(2, MetaBeltBuilding, defaultBuildingVariant, 1);
     registerBuildingVariant(3, MetaBeltBuilding, defaultBuildingVariant, 2);
+    console.log("------------------------------------");
 
     // Balancer
     registerBuildingVariant(4, MetaBalancerBuilding);

@@ -454,8 +454,8 @@ const fullVersionLevels = generateLevelDefinitions(false);
 const demoVersionLevels = generateLevelDefinitions(true);
 
 export class RegularGameMode extends GameMode {
-    constructor(root) {
-        super(root);
+    constructor() {
+        super();
     }
 
     getUpgrades() {

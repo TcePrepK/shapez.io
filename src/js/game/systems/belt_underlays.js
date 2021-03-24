@@ -1,5 +1,4 @@
 import { globalConfig } from "../../core/config";
-import { DrawParameters } from "../../core/draw_parameters";
 import { Loader } from "../../core/loader";
 import { Rectangle } from "../../core/rectangle";
 import { FULL_CLIP_RECT } from "../../core/sprites";
@@ -32,8 +31,8 @@ const enumUnderlayTypeToClipRect = {
 };
 
 export class BeltUnderlaysSystem extends GameSystemWithFilter {
-    constructor(root) {
-        super(root, [BeltUnderlaysComponent]);
+    constructor() {
+        super([BeltUnderlaysComponent]);
 
         this.underlayBeltSprites = [];
 
@@ -43,7 +42,6 @@ export class BeltUnderlaysSystem extends GameSystemWithFilter {
 
         // Automatically recompute areas
         this.staleArea = new StaleAreaDetector({
-            root,
             name: "belt-underlay",
             recomputeMethod: this.recomputeStaleArea.bind(this),
         });
@@ -218,10 +216,10 @@ export class BeltUnderlaysSystem extends GameSystemWithFilter {
 
     /**
      * Draws a given chunk
-     * @param {DrawParameters} parameters
      * @param {MapChunkView} chunk
      */
-    drawChunk(parameters, chunk) {
+    drawChunk(chunk) {
+        const parameters = globalConfig.parameters;
         // Limit speed to avoid belts going backwards
         const speedMultiplier = Math.min(this.root.hubGoals.getBeltBaseSpeed(), 10);
 
@@ -285,7 +283,6 @@ export class BeltUnderlaysSystem extends GameSystemWithFilter {
                 this.underlayBeltSprites[
                     animationIndex % this.underlayBeltSprites.length
                 ].drawCachedWithClipRect(
-                    parameters,
                     -globalConfig.halfTileSize,
                     -globalConfig.halfTileSize,
                     globalConfig.tileSize,

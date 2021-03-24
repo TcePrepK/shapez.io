@@ -98,11 +98,11 @@ export class HUDLayerPreview extends BaseHUDPart {
 
     /**
      * Renders the preview at the given position
-     * @param {import("../../../core/draw_utils").DrawParameters} parameters
      * @param {Vector} worldPos
      * @param {number} scale 1 / zoomLevel
      */
-    renderPreview(parameters, worldPos, scale) {
+    renderPreview(worldPos, scale) {
+        const parameters = globalConfig.parameters;
         if (this.root.currentLayer !== "regular") {
             // Only supporting wires right now
             return;

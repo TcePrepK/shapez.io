@@ -1,9 +1,7 @@
 /* typehints:start */
-import { DrawParameters } from "../core/draw_parameters";
 import { Component } from "./component";
 /* typehints:end */
 
-import { GameRoot } from "./root";
 import { globalConfig } from "../core/config";
 import { enumDirectionToVector, enumDirectionToAngle } from "../core/vector";
 import { BasicSerializableObject, types } from "../savegame/serialization";
@@ -14,16 +12,13 @@ import { gComponentRegistry } from "../core/global_registries";
 import { getBuildingDataFromCode } from "./building_codes";
 
 export class Entity extends BasicSerializableObject {
-    /**
-     * @param {GameRoot} root
-     */
-    constructor(root) {
+    constructor() {
         super();
 
         /**
          * Handle to the global game root
          */
-        this.root = root;
+        this.root = globalConfig.root;
 
         /**
          * The components of the entity
@@ -90,7 +85,6 @@ export class Entity extends BasicSerializableObject {
         const buildingData = getBuildingDataFromCode(staticComp.code);
 
         const clone = buildingData.metaInstance.createEntity({
-            root: this.root,
             origin: staticComp.origin,
             originalRotation: staticComp.originalRotation,
             rotation: staticComp.rotation,
@@ -144,9 +138,9 @@ export class Entity extends BasicSerializableObject {
 
     /**
      * Draws the entity, to override use @see Entity.drawImpl
-     * @param {DrawParameters} parameters
      */
-    drawDebugOverlays(parameters) {
+    drawDebugOverlays() {
+        const parameters = globalConfig.parameters;
         const context = parameters.context;
         const staticComp = this.components.StaticMapEntity;
 
@@ -181,7 +175,6 @@ export class Entity extends BasicSerializableObject {
 
                     context.globalAlpha = slot.item ? 1 : 0.2;
                     drawRotatedSprite({
-                        parameters,
                         sprite: ejectorSprite,
                         x: (slotTile.x + 0.5 + directionVector.x * 0.37) * globalConfig.tileSize,
                         y: (slotTile.y + 0.5 + directionVector.y * 0.37) * globalConfig.tileSize,
@@ -203,7 +196,6 @@ export class Entity extends BasicSerializableObject {
                         const angle = Math.radians(enumDirectionToAngle[direction] + 180);
                         context.globalAlpha = 0.4;
                         drawRotatedSprite({
-                            parameters,
                             sprite: acceptorSprite,
                             x: (slotTile.x + 0.5 + directionVector.x * 0.37) * globalConfig.tileSize,
                             y: (slotTile.y + 0.5 + directionVector.y * 0.37) * globalConfig.tileSize,
@@ -225,9 +217,8 @@ export class Entity extends BasicSerializableObject {
 
     /**
      * override, should draw the entity
-     * @param {DrawParameters} parameters
      */
-    drawImpl(parameters) {
+    drawImpl() {
         abstract;
     }
 }

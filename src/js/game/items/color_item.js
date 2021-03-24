@@ -1,5 +1,4 @@
 import { globalConfig } from "../../core/config";
-import { DrawParameters } from "../../core/draw_parameters";
 import { Loader } from "../../core/loader";
 import { types } from "../../savegame/serialization";
 import { BaseItem } from "../base_item";
@@ -70,14 +69,13 @@ export class ColorItem extends BaseItem {
      * @param {number} x
      * @param {number} y
      * @param {number} diameter
-     * @param {DrawParameters} parameters
      */
-    drawItemCenteredClipped(x, y, parameters, diameter = globalConfig.defaultItemDiameter) {
+    drawItemCenteredClipped(x, y, diameter = globalConfig.defaultItemDiameter) {
         const realDiameter = diameter * 0.6;
         if (!this.cachedSprite) {
             this.cachedSprite = Loader.getSprite("sprites/colors/" + this.color + ".png");
         }
-        this.cachedSprite.drawCachedCentered(parameters, x, y, realDiameter);
+        this.cachedSprite.drawCachedCentered(x, y, realDiameter);
     }
 }
 

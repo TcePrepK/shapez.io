@@ -1,5 +1,5 @@
+import { globalConfig } from "../../core/config";
 import { TrackedState } from "../../core/tracked_state";
-import { GameRoot } from "../root";
 
 // Automatically attaches and detaches elements from the dom
 // Also supports detaching elements after a given time, useful if there is a
@@ -9,8 +9,6 @@ import { GameRoot } from "../root";
 
 export class DynamicDomAttach {
     /**
-     *
-     * @param {GameRoot} root
      * @param {HTMLElement} element
      * @param {object} param2
      * @param {number=} param2.timeToKeepSeconds How long to keep the element visible (in ms) after it should be hidden.
@@ -19,9 +17,8 @@ export class DynamicDomAttach {
      * @param {boolean=} param2.trackHover If set, attaches the 'hovered' class if the cursor is above the element. Useful
      *                                     for fading out the element if its below the cursor for example.
      */
-    constructor(root, element, { timeToKeepSeconds = 0, attachClass = null, trackHover = false } = {}) {
-        /** @type {GameRoot} */
-        this.root = root;
+    constructor(element, { timeToKeepSeconds = 0, attachClass = null, trackHover = false } = {}) {
+        this.root = globalConfig.root;
 
         /** @type {HTMLElement} */
         this.element = element;

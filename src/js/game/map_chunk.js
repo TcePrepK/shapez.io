@@ -7,7 +7,6 @@ import { BaseItem } from "./base_item";
 import { enumColors } from "./colors";
 import { Entity } from "./entity";
 import { COLOR_ITEM_SINGLETONS } from "./items/color_item";
-import { GameRoot } from "./root";
 import { enumSubShape } from "./shape_definition";
 import { Rectangle } from "../core/rectangle";
 
@@ -15,13 +14,11 @@ const logger = createLogger("map_chunk");
 
 export class MapChunk {
     /**
-     *
-     * @param {GameRoot} root
      * @param {number} x
      * @param {number} y
      */
-    constructor(root, x, y) {
-        this.root = root;
+    constructor(x, y) {
+        this.root = globalConfig.root;
         this.x = x;
         this.y = y;
         this.tileX = x * globalConfig.mapChunkSize;
@@ -427,7 +424,7 @@ export class MapChunk {
      * @param {Entity=} contents
      * @param {Layer} layer
      */
-    setLayerContentFromWorldCords(tileX, tileY, contents, layer) {
+    setLayerContentFromWorldCords(tileX, tileY, layer, contents) {
         const localX = tileX - this.tileX;
         const localY = tileY - this.tileY;
         assert(localX >= 0, "Local X is < 0");

@@ -1,6 +1,5 @@
 import { ClickDetector } from "../../../core/click_detector";
 import { globalConfig } from "../../../core/config";
-import { DrawParameters } from "../../../core/draw_parameters";
 import { drawRotatedSprite } from "../../../core/draw_utils";
 import { Loader } from "../../../core/loader";
 import { clamp, makeDiv, removeAllChildren } from "../../../core/utils";
@@ -55,8 +54,8 @@ export class HUDBuildingPlacer extends HUDBuildingPlacerLogic {
         this.signals.variantChanged.add(this.rerenderVariants, this);
         this.root.hud.signals.buildingSelectedForPlacement.add(this.startSelection, this);
 
-        this.domAttach = new DynamicDomAttach(this.root, this.element, { trackHover: true });
-        this.variantsAttach = new DynamicDomAttach(this.root, this.variantsElement, {});
+        this.domAttach = new DynamicDomAttach(this.element, { trackHover: true });
+        this.variantsAttach = new DynamicDomAttach(this.variantsElement, {});
 
         this.currentInterpolatedCornerTile = new Vector();
 
@@ -142,7 +141,7 @@ export class HUDBuildingPlacer extends HUDBuildingPlacerLogic {
         );
 
         removeAllChildren(this.buildingInfoElements.additionalInfo);
-        const additionalInfo = metaBuilding.getAdditionalStatistics(this.root, this.currentVariant.get());
+        const additionalInfo = metaBuilding.getAdditionalStatistics(this.currentVariant.get());
         for (let i = 0; i < additionalInfo.length; ++i) {
             const [label, contents] = additionalInfo[i];
             this.buildingInfoElements.additionalInfo.innerHTML += `
@@ -183,7 +182,7 @@ export class HUDBuildingPlacer extends HUDBuildingPlacerLogic {
         if (!metaBuilding) {
             return;
         }
-        const availableVariants = metaBuilding.getAvailableVariants(this.root);
+        const availableVariants = metaBuilding.getAvailableVariants();
         if (availableVariants.length === 1) {
             return;
         }
@@ -216,8 +215,8 @@ export class HUDBuildingPlacer extends HUDBuildingPlacerLogic {
             const dimensions = metaBuilding.getDimensions(variant);
             const sprite = metaBuilding.getPreviewSprite(0, variant);
             const spriteWrapper = makeDiv(element, null, ["iconWrap"]);
-            spriteWrapper.setAttribute("data-tile-w", dimensions.x.toString());
-            spriteWrapper.setAttribute("data-tile-h", dimensions.y.toString());
+            spriteWrapper.setAttribute("data-tile-w", String(dimensions.x));
+            spriteWrapper.setAttribute("data-tile-h", String(dimensions.y));
 
             spriteWrapper.innerHTML = sprite.getAsHTML(iconSize * dimensions.x, iconSize * dimensions.y);
 
@@ -229,11 +228,7 @@ export class HUDBuildingPlacer extends HUDBuildingPlacerLogic {
         }
     }
 
-    /**
-     *
-     * @param {DrawParameters} parameters
-     */
-    draw(parameters) {
+    draw() {
         if (this.root.camera.zoomLevel < globalConfig.mapChunkOverviewMinZoom) {
             // Dont allow placing in overview mode
             this.domAttach.update(false);
@@ -251,21 +246,17 @@ export class HUDBuildingPlacer extends HUDBuildingPlacerLogic {
 
         // Draw direction lock
         if (this.isDirectionLockActive) {
-            this.drawDirectionLock(parameters);
+            this.drawDirectionLock();
         } else {
-            this.drawRegularPlacement(parameters);
+            this.drawRegularPlacement();
         }
 
         if (metaBuilding.getShowWiresLayerPreview()) {
-            this.drawLayerPeek(parameters);
+            this.drawLayerPeek();
         }
     }
 
-    /**
-     *
-     * @param {DrawParameters} parameters
-     */
-    drawLayerPeek(parameters) {
+    drawLayerPeek() {
         const mousePosition = this.root.app.mousePosition;
         if (!mousePosition) {
             // Not on screen
@@ -275,17 +266,11 @@ export class HUDBuildingPlacer extends HUDBuildingPlacerLogic {
         const worldPosition = this.root.camera.screenToWorld(mousePosition);
 
         // Draw peeker
-        this.root.hud.parts.layerPreview.renderPreview(
-            parameters,
-            worldPosition,
-            1 / this.root.camera.zoomLevel
-        );
+        this.root.hud.parts.layerPreview.renderPreview(worldPosition, 1 / this.root.camera.zoomLevel);
     }
 
-    /**
-     * @param {DrawParameters} parameters
-     */
-    drawRegularPlacement(parameters) {
+    drawRegularPlacement() {
+        const parameters = globalConfig.parameters;
         const mousePosition = this.root.app.mousePosition;
         if (!mousePosition) {
             // Not on screen
@@ -303,11 +288,10 @@ export class HUDBuildingPlacer extends HUDBuildingPlacerLogic {
             rotationVariant,
             connectedEntities,
         } = metaBuilding.computeOptimalDirectionAndRotationVariantAtTile({
-            root: this.root,
             tile: mouseTile,
             rotation: this.currentBaseRotation,
             variant: this.currentVariant.get(),
-            layer: metaBuilding.getLayer(this.root),
+            layer: metaBuilding.getLayer(),
         });
 
         // Check if there are connected entities
@@ -342,7 +326,7 @@ export class HUDBuildingPlacer extends HUDBuildingPlacerLogic {
         }
 
         // Synchronize rotation and origin
-        this.fakeEntity.layer = metaBuilding.getLayer(this.root);
+        this.fakeEntity.layer = metaBuilding.getLayer();
         const staticComp = this.fakeEntity.components.StaticMapEntity;
         staticComp.origin = mouseTile;
         staticComp.rotation = rotation;
@@ -369,12 +353,9 @@ export class HUDBuildingPlacer extends HUDBuildingPlacerLogic {
             parameters.context.fillStyle = "rgba(255, 0, 0, 0.2)";
         }
 
-        const mouseTileX = entityBounds.x; //(worldPos.x - globalConfig.tileSize / 2) / globalConfig.tileSize;
-        const mouseTileY = entityBounds.y; //(worldPos.y - globalConfig.tileSize / 2) / globalConfig.tileSize;
-
         parameters.context.beginRoundedRect(
-            mouseTileX * globalConfig.tileSize - drawBorder,
-            mouseTileY * globalConfig.tileSize - drawBorder,
+            entityBounds.x * globalConfig.tileSize - drawBorder,
+            entityBounds.y * globalConfig.tileSize - drawBorder,
             entityBounds.w * globalConfig.tileSize + 2 * drawBorder,
             entityBounds.h * globalConfig.tileSize + 2 * drawBorder,
             4
@@ -386,19 +367,17 @@ export class HUDBuildingPlacer extends HUDBuildingPlacerLogic {
         // HACK to draw the entity sprite
         const previewSprite = metaBuilding.getBlueprintSprite(rotationVariant, this.currentVariant.get());
         staticComp.origin = worldPos.divideScalar(globalConfig.tileSize).subScalars(0.5, 0.5);
-        staticComp.drawSpriteOnBoundsClipped(parameters, previewSprite);
+        staticComp.drawSpriteOnBoundsClipped(previewSprite);
         staticComp.origin = mouseTile;
 
         // Draw ejectors
         if (canBuild) {
-            this.drawMatchingAcceptorsAndEjectors(parameters);
+            this.drawMatchingAcceptorsAndEjectors();
         }
     }
 
-    /**
-     * @param {DrawParameters} parameters
-     */
-    drawDirectionLock(parameters) {
+    drawDirectionLock() {
+        const parameters = globalConfig.parameters;
         const mousePosition = this.root.app.mousePosition;
         if (!mousePosition) {
             // Not on screen
@@ -457,10 +436,8 @@ export class HUDBuildingPlacer extends HUDBuildingPlacerLogic {
         }
     }
 
-    /**
-     * @param {DrawParameters} parameters
-     */
-    drawMatchingAcceptorsAndEjectors(parameters) {
+    drawMatchingAcceptorsAndEjectors() {
+        const parameters = globalConfig.parameters;
         const acceptorComp = this.fakeEntity.components.ItemAcceptor;
         const ejectorComp = this.fakeEntity.components.ItemEjector;
         const staticComp = this.fakeEntity.components.StaticMapEntity;
@@ -547,7 +524,6 @@ export class HUDBuildingPlacer extends HUDBuildingPlacerLogic {
 
                 parameters.context.globalAlpha = alpha;
                 drawRotatedSprite({
-                    parameters,
                     sprite,
                     x: acceptorSlotWsPos.x,
                     y: acceptorSlotWsPos.y,
@@ -607,7 +583,6 @@ export class HUDBuildingPlacer extends HUDBuildingPlacerLogic {
 
             parameters.context.globalAlpha = alpha;
             drawRotatedSprite({
-                parameters,
                 sprite,
                 x: ejectorSLotWsPos.x,
                 y: ejectorSLotWsPos.y,

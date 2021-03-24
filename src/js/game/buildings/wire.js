@@ -5,7 +5,6 @@ import { SOUNDS } from "../../platform/sound";
 import { enumWireType, enumWireVariant, WireComponent } from "../components/wire";
 import { Entity } from "../entity";
 import { defaultBuildingVariant, MetaBuilding } from "../meta_building";
-import { GameRoot } from "../root";
 import { enumHubGoalRewards } from "../tutorial_goals";
 
 export const arrayWireRotationVariantToType = [
@@ -78,11 +77,8 @@ export class MetaWireBuilding extends MetaBuilding {
         return true;
     }
 
-    /**
-     * @param {GameRoot} root
-     */
-    getIsUnlocked(root) {
-        return root.hubGoals.isRewardUnlocked(enumHubGoalRewards.reward_wires_painter_and_levers);
+    getIsUnlocked() {
+        return this.root.hubGoals.isRewardUnlocked(enumHubGoalRewards.reward_wires_painter_and_levers);
     }
 
     /**
@@ -149,20 +145,19 @@ export class MetaWireBuilding extends MetaBuilding {
     /**
      * Should compute the optimal rotation variant on the given tile
      * @param {object} param0
-     * @param {GameRoot} param0.root
      * @param {Vector} param0.tile
      * @param {number} param0.rotation
      * @param {string} param0.variant
      * @param {string} param0.layer
      * @return {{ rotation: number, rotationVariant: number, connectedEntities?: Array<Entity> }}
      */
-    computeOptimalDirectionAndRotationVariantAtTile({ root, tile, rotation, variant, layer }) {
+    computeOptimalDirectionAndRotationVariantAtTile({ tile, rotation, variant, layer }) {
         const wireVariant = enumWireVariantToVariant[variant];
         const connections = {
-            top: root.logic.computeWireEdgeStatus({ tile, wireVariant, edge: enumDirection.top }),
-            right: root.logic.computeWireEdgeStatus({ tile, wireVariant, edge: enumDirection.right }),
-            bottom: root.logic.computeWireEdgeStatus({ tile, wireVariant, edge: enumDirection.bottom }),
-            left: root.logic.computeWireEdgeStatus({ tile, wireVariant, edge: enumDirection.left }),
+            top: this.root.logic.computeWireEdgeStatus({ tile, wireVariant, edge: enumDirection.top }),
+            right: this.root.logic.computeWireEdgeStatus({ tile, wireVariant, edge: enumDirection.right }),
+            bottom: this.root.logic.computeWireEdgeStatus({ tile, wireVariant, edge: enumDirection.bottom }),
+            left: this.root.logic.computeWireEdgeStatus({ tile, wireVariant, edge: enumDirection.left }),
         };
 
         let flag = 0;

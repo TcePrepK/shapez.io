@@ -3,7 +3,6 @@ import { createLogger } from "../core/logging";
 import { Vector } from "../core/vector";
 import { getBuildingDataFromCode } from "../game/building_codes";
 import { Entity } from "../game/entity";
-import { GameRoot } from "../game/root";
 
 const logger = createLogger("serializer_internal");
 
@@ -25,23 +24,20 @@ export class SerializerInternal {
     }
 
     /**
-     *
-     * @param {GameRoot} root
      * @param {Array<Entity>} array
      * @returns {string|void}
      */
-    deserializeEntityArray(root, array) {
+    deserializeEntityArray(array) {
         for (let i = 0; i < array.length; ++i) {
-            this.deserializeEntity(root, array[i]);
+            this.deserializeEntity(array[i]);
         }
     }
 
     /**
-     *
-     * @param {GameRoot} root
      * @param {Entity} payload
      */
-    deserializeEntity(root, payload) {
+    deserializeEntity(payload) {
+        const root = globalConfig.root;
         const staticData = payload.components.StaticMapEntity;
         assert(staticData, "entity has no static data");
 
@@ -51,7 +47,6 @@ export class SerializerInternal {
         const metaBuilding = data.metaInstance;
 
         const entity = metaBuilding.createEntity({
-            root,
             origin: Vector.fromSerializedObject(staticData.origin),
             rotation: staticData.rotation,
             originalRotation: staticData.originalRotation,
@@ -61,7 +56,7 @@ export class SerializerInternal {
 
         entity.uid = payload.uid;
 
-        this.deserializeComponents(root, entity, payload.components);
+        this.deserializeComponents(entity, payload.components);
 
         root.entityMgr.registerEntity(entity, payload.uid);
         root.map.placeStaticEntity(entity);
@@ -71,12 +66,11 @@ export class SerializerInternal {
 
     /**
      * Deserializes components of an entity
-     * @param {GameRoot} root
      * @param {Entity} entity
      * @param {Object.<string, any>} data
      * @returns {string|void}
      */
-    deserializeComponents(root, entity, data) {
+    deserializeComponents(entity, data) {
         for (const componentId in data) {
             if (!entity.components[componentId]) {
                 if (G_IS_DEV && !globalConfig.debug.disableSlowAsserts) {
@@ -88,7 +82,7 @@ export class SerializerInternal {
                 continue;
             }
 
-            const errorStatus = entity.components[componentId].deserialize(data[componentId], root);
+            const errorStatus = entity.components[componentId].deserialize(data[componentId]);
             if (errorStatus) {
                 return errorStatus;
             }

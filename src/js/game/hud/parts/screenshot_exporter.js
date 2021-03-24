@@ -88,16 +88,22 @@ export class HUDScreenshotExporter extends BaseHUDPart {
             context,
             visibleRect,
             desiredAtlasScale: 0.25,
-            root: this.root,
             zoomLevel: chunkScale,
         });
 
         context.scale(chunkScale, chunkScale);
         context.translate(-visibleRect.x, -visibleRect.y);
 
+        // Swap parameters for drawing
+        const temp = globalConfig.parameters;
+        globalConfig.parameters = parameters;
+
         // Render all relevant chunks
-        this.root.map.drawBackground(parameters);
-        this.root.map.drawForeground(parameters);
+        this.root.map.drawBackground();
+        this.root.map.drawForeground();
+
+        // Swap Back
+        globalConfig.parameters = temp;
 
         // Offer export
         logger.log("Rendered buffer, exporting ...");

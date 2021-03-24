@@ -1,3 +1,4 @@
+import { globalConfig } from "./config";
 import { createLogger } from "./logging";
 
 const logger = createLogger("singleton_factory");
@@ -18,7 +19,9 @@ export class SingletonFactory {
 
     register(classHandle) {
         // First, construct instance
+        console.log("------------------------------------");
         const instance = new classHandle();
+        console.log("------------------------------------");
 
         // Extract id
         const id = instance.getId();

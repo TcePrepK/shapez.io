@@ -13,6 +13,14 @@ export class CommandControllerComponent extends Component {
     }
 
     /**
+     * Copy the current state to another component
+     * @param {CommandControllerComponent} otherComponent
+     */
+    copyAdditionalStateTo(otherComponent) {
+        otherComponent.command = this.command;
+    }
+
+    /**
      * @param {string} command
      */
     constructor(command = "") {

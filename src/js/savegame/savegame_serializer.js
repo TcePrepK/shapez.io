@@ -2,12 +2,12 @@ import { ExplainedResult } from "../core/explained_result";
 import { createLogger } from "../core/logging";
 import { gComponentRegistry } from "../core/global_registries";
 import { SerializerInternal } from "./serializer_internal";
+import { globalConfig } from "../core/config";
 
 /**
  * @typedef {import("../game/component").Component} Component
  * @typedef {import("../game/component").StaticComponent} StaticComponent
  * @typedef {import("../game/entity").Entity} Entity
- * @typedef {import("../game/root").GameRoot} GameRoot
  * @typedef {import("../savegame/savegame_typedefs").SerializedGame} SerializedGame
  */
 
@@ -23,11 +23,11 @@ export class SavegameSerializer {
 
     /**
      * Serializes the game root into a dump
-     * @param {GameRoot} root
      * @param {boolean=} sanityChecks Whether to check for validity
      * @returns {object}
      */
-    generateDumpFromGameRoot(root, sanityChecks = true) {
+    generateDumpFromGameRoot(sanityChecks = true) {
+        const root = globalConfig.root;
         /** @type {SerializedGame} */
         const data = {
             camera: root.camera.serialize(),
@@ -115,10 +115,10 @@ export class SavegameSerializer {
     /**
      * Tries to load the savegame from a given dump
      * @param {SerializedGame} savegame
-     * @param {GameRoot} root
      * @returns {ExplainedResult}
      */
-    deserialize(savegame, root) {
+    deserialize(savegame) {
+        const root = globalConfig.root;
         // Sanity
         const verifyResult = this.verifyLogicalErrors(savegame);
         if (!verifyResult.result) {
@@ -130,10 +130,10 @@ export class SavegameSerializer {
         errorReason = errorReason || root.time.deserialize(savegame.time);
         errorReason = errorReason || root.camera.deserialize(savegame.camera);
         errorReason = errorReason || root.map.deserialize(savegame.map);
-        errorReason = errorReason || root.hubGoals.deserialize(savegame.hubGoals, root);
+        errorReason = errorReason || root.hubGoals.deserialize(savegame.hubGoals);
         errorReason = errorReason || root.hud.parts.pinnedShapes.deserialize(savegame.pinnedShapes);
         errorReason = errorReason || root.hud.parts.waypoints.deserialize(savegame.waypoints);
-        errorReason = errorReason || this.internal.deserializeEntityArray(root, savegame.entities);
+        errorReason = errorReason || this.internal.deserializeEntityArray(savegame.entities);
         errorReason = errorReason || root.systemMgr.systems.belt.deserializePaths(savegame.beltPaths);
 
         // Check for errors

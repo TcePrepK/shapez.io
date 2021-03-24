@@ -18,8 +18,8 @@ import { GameSystemWithFilter } from "../game_system_with_filter";
 const logger = createLogger("tunnels");
 
 export class UndergroundBeltSystem extends GameSystemWithFilter {
-    constructor(root) {
-        super(root, [UndergroundBeltComponent]);
+    constructor() {
+        super([UndergroundBeltComponent]);
 
         this.beltSprites = {
             [enumUndergroundBeltMode.sender]: Loader.getSprite(
@@ -31,7 +31,6 @@ export class UndergroundBeltSystem extends GameSystemWithFilter {
         };
 
         this.staleAreaWatcher = new StaleAreaDetector({
-            root: this.root,
             name: "underground-belt",
             recomputeMethod: this.recomputeArea.bind(this),
         });

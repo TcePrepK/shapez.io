@@ -1,11 +1,10 @@
 /* typehints:start */
-import { GameRoot } from "./root";
 import { InputReceiver } from "../core/input_receiver";
 import { Application } from "../application";
 /* typehints:end */
 
 import { Signal, STOP_PROPAGATION } from "../core/signal";
-import { IS_MOBILE } from "../core/config";
+import { globalConfig, IS_MOBILE } from "../core/config";
 import { T } from "../translations";
 function key(str) {
     return str.toUpperCase().charCodeAt(0);
@@ -346,12 +345,10 @@ export class Keybinding {
 
 export class KeyActionMapper {
     /**
-     *
-     * @param {GameRoot} root
      * @param {InputReceiver} inputReciever
      */
-    constructor(root, inputReciever) {
-        this.root = root;
+    constructor(inputReciever) {
+        this.root = globalConfig.root;
         this.inputReceiver = inputReciever;
 
         inputReciever.keydown.add(this.handleKeydown, this);
@@ -360,7 +357,7 @@ export class KeyActionMapper {
         /** @type {Object.<string, Keybinding>} */
         this.keybindings = {};
 
-        const overrides = root.app.settings.getKeybindingOverrides();
+        const overrides = this.root.app.settings.getKeybindingOverrides();
 
         for (const category in KEYMAPPINGS) {
             for (const key in KEYMAPPINGS[category]) {

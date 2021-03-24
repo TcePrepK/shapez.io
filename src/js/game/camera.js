@@ -7,7 +7,6 @@ import { clamp } from "../core/utils";
 import { mixVector, Vector } from "../core/vector";
 import { BasicSerializableObject, types } from "../savegame/serialization";
 import { KEYMAPPINGS } from "./key_action_mapper";
-import { GameRoot } from "./root";
 
 const logger = createLogger("camera");
 
@@ -31,11 +30,9 @@ export const enumMouseButton = {
 };
 
 export class Camera extends BasicSerializableObject {
-    constructor(root) {
+    constructor() {
         super();
-
-        /** @type {GameRoot} */
-        this.root = root;
+        this.root = globalConfig.root;
 
         // Zoom level, 2 means double size
 

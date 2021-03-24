@@ -1,6 +1,5 @@
 import { makeOffscreenBuffer } from "../../../core/buffer_utils";
 import { globalConfig, THIRDPARTY_URLS } from "../../../core/config";
-import { DrawParameters } from "../../../core/draw_parameters";
 import { gMetaBuildingRegistry } from "../../../core/global_registries";
 import { Loader } from "../../../core/loader";
 import { DialogWithForm } from "../../../core/modal_dialog_elements";
@@ -15,6 +14,7 @@ import {
     removeAllChildren,
 } from "../../../core/utils";
 import { Vector } from "../../../core/vector";
+import { ACHIEVEMENTS } from "../../../platform/achievement_provider";
 import { T } from "../../../translations";
 import { BaseItem } from "../../base_item";
 import { MetaHubBuilding } from "../../buildings/hub";
@@ -106,7 +106,7 @@ export class HUDWaypoints extends BaseHUDPart {
                 label: null,
                 center: { x: 0, y: 0 },
                 zoomLevel: 3,
-                layer: gMetaBuildingRegistry.findByClass(MetaHubBuilding).getLayer(this.root),
+                layer: gMetaBuildingRegistry.findByClass(MetaHubBuilding).getLayer(),
             },
         ];
 
@@ -118,7 +118,7 @@ export class HUDWaypoints extends BaseHUDPart {
 
         // Dynamically attach/detach the lower right hint in the map overview
         if (this.hintElement) {
-            this.domAttach = new DynamicDomAttach(this.root, this.hintElement);
+            this.domAttach = new DynamicDomAttach(this.hintElement);
         }
 
         // Catch mouse and key events
@@ -349,6 +349,10 @@ export class HUDWaypoints extends BaseHUDPart {
             T.ingame.waypoints.creationSuccessNotification,
             enumNotificationType.success
         );
+        this.root.signals.achievementCheck.dispatch(
+            ACHIEVEMENTS.mapMarkers15,
+            this.waypoints.length - 1 // Disregard HUB
+        );
 
         // Re-render the list and thus add it
         this.rerenderWaypointList();
@@ -558,9 +562,9 @@ export class HUDWaypoints extends BaseHUDPart {
 
     /**
      * Draws the waypoints on the map
-     * @param {DrawParameters} parameters
      */
-    drawOverlays(parameters) {
+    drawOverlays() {
+        const parameters = globalConfig.parameters;
         const mousePos = this.root.app.mousePosition;
         const desiredOpacity = this.root.camera.getIsMapOverlayActive() ? 1 : 0;
         this.currentMarkerOpacity = lerp(this.currentMarkerOpacity, desiredOpacity, 0.08);

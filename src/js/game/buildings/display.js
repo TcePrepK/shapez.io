@@ -2,7 +2,6 @@ import { enumDirection, Vector } from "../../core/vector";
 import { enumPinSlotType, WiredPinsComponent } from "../components/wired_pins";
 import { Entity } from "../entity";
 import { MetaBuilding } from "../meta_building";
-import { GameRoot } from "../root";
 import { DisplayComponent } from "../components/display";
 import { enumHubGoalRewards } from "../tutorial_goals";
 
@@ -15,11 +14,8 @@ export class MetaDisplayBuilding extends MetaBuilding {
         return "#aaaaaa";
     }
 
-    /**
-     * @param {GameRoot} root
-     */
-    getIsUnlocked(root) {
-        return root.hubGoals.isRewardUnlocked(enumHubGoalRewards.reward_display);
+    getIsUnlocked() {
+        return this.root.hubGoals.isRewardUnlocked(enumHubGoalRewards.reward_display);
     }
 
     getDimensions() {

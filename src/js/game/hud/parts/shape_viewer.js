@@ -32,14 +32,14 @@ export class HUDShapeViewer extends BaseHUDPart {
     initialize() {
         this.root.hud.signals.viewShapeDetailsRequested.add(this.renderForShape, this);
 
-        this.domAttach = new DynamicDomAttach(this.root, this.background, {
+        this.domAttach = new DynamicDomAttach(this.background, {
             attachClass: "visible",
         });
 
         this.currentShapeKey = null;
 
         this.inputReciever = new InputReceiver("shape_viewer");
-        this.keyActionMapper = new KeyActionMapper(this.root, this.inputReciever);
+        this.keyActionMapper = new KeyActionMapper(this.inputReciever);
 
         this.keyActionMapper.getBinding(KEYMAPPINGS.general.back).add(this.close, this);
 

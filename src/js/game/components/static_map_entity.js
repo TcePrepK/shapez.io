@@ -1,5 +1,4 @@
 import { globalConfig } from "../../core/config";
-import { DrawParameters } from "../../core/draw_parameters";
 import { Rectangle } from "../../core/rectangle";
 import { AtlasSprite } from "../../core/sprites";
 import { enumDirection, Vector } from "../../core/vector";
@@ -191,9 +190,9 @@ export class StaticMapEntityComponent extends Component {
 
     /**
      * Returns whether the entity should be drawn for the given parameters
-     * @param {DrawParameters} parameters
      */
-    shouldBeDrawn(parameters) {
+    shouldBeDrawn() {
+        const parameters = globalConfig.parameters;
         let x = 0;
         let y = 0;
         let w = 0;
@@ -243,13 +242,13 @@ export class StaticMapEntityComponent extends Component {
 
     /**
      * Draws a sprite over the whole space of the entity
-     * @param {DrawParameters} parameters
      * @param {AtlasSprite} sprite
      * @param {number=} extrudePixels How many pixels to extrude the sprite
      * @param {Vector=} overridePosition Whether to drwa the entity at a different location
      */
-    drawSpriteOnBoundsClipped(parameters, sprite, extrudePixels = 0, overridePosition = null) {
-        if (!this.shouldBeDrawn(parameters) && !overridePosition) {
+    drawSpriteOnBoundsClipped(sprite, extrudePixels = 0, overridePosition = null) {
+        const parameters = globalConfig.parameters;
+        if (!this.shouldBeDrawn() && !overridePosition) {
             return;
         }
         const size = this.getTileSize();
@@ -264,7 +263,6 @@ export class StaticMapEntityComponent extends Component {
         if (this.rotation === 0) {
             // Early out, is faster
             sprite.drawCached(
-                parameters,
                 worldX - extrudePixels * size.x,
                 worldY - extrudePixels * size.y,
                 globalConfig.tileSize * size.x + 2 * extrudePixels * size.x,
@@ -277,7 +275,6 @@ export class StaticMapEntityComponent extends Component {
             parameters.context.translate(rotationCenterX, rotationCenterY);
             parameters.context.rotate(Math.radians(this.rotation));
             sprite.drawCached(
-                parameters,
                 -globalConfig.halfTileSize - extrudePixels * size.x,
                 -globalConfig.halfTileSize - extrudePixels * size.y,
                 globalConfig.tileSize * size.x + 2 * extrudePixels * size.x,

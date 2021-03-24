@@ -15,7 +15,7 @@ export class HUDUnlockNotification extends BaseHUDPart {
     initialize() {
         this.visible = false;
 
-        this.domAttach = new DynamicDomAttach(this.root, this.element, {
+        this.domAttach = new DynamicDomAttach(this.element, {
             timeToKeepSeconds: 0,
         });
 
@@ -75,7 +75,7 @@ export class HUDUnlockNotification extends BaseHUDPart {
         <div class="rewardName">
             ${T.ingame.levelCompleteNotification.unlockText.replace("<reward>", rewardName)}
         </div>
-        
+
         <div class="rewardDesc">
             ${T.storyRewards[reward].desc}
         </div>

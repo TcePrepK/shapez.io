@@ -8,6 +8,7 @@ import { createLogger } from "../core/logging";
 import { GameTime } from "./time/game_time";
 import { EntityManager } from "./entity_manager";
 import { GameSystemManager } from "./game_system_manager";
+import { AchievementProxy } from "./achievement_proxy";
 import { GameHUD } from "./hud/hud";
 import { MapView } from "./map_view";
 import { Camera } from "./camera";
@@ -30,8 +31,6 @@ import { Vector } from "../core/vector";
 import { GameMode } from "./game_mode";
 /* typehints:end */
 
-const logger = createLogger("game/root");
-
 /** @type {Array<Layer>} */
 export const layers = ["regular", "wires"];
 
@@ -48,6 +47,10 @@ export class GameRoot {
     constructor(app) {
         this.app = app;
 
+        this.setVariables();
+    }
+
+    setVariables() {
         /** @type {Savegame} */
         this.savegame = null;
 
@@ -119,6 +122,9 @@ export class GameRoot {
         /** @type {SoundProxy} */
         this.soundProxy = null;
 
+        /** @type {AchievementProxy} */
+        this.achievementProxy = null;
+
         /** @type {ShapeDefinitionManager} */
         this.shapeDefinitionMgr = null;
 
@@ -175,6 +181,10 @@ export class GameRoot {
             // Called before actually placing an entity, use to perform additional logic
             // for freeing space before actually placing.
             freeEntityAreaBeforeBuild: /** @type {TypedSignal<[Entity]>} */ (new Signal()),
+
+            // Called with an achievement key and necessary args to validate it can be unlocked.
+            achievementCheck: /** @type {TypedSignal<[string, *]>} */ (new Signal()),
+            bulkAchievementCheck: /** @type {TypedSignal<(string|any)[]>} */ (new Signal()),
         };
 
         // RNG's
@@ -191,7 +201,7 @@ export class GameRoot {
      * Destructs the game root
      */
     destruct() {
-        logger.log("destructing root");
+        createLogger("game/root").log("destructing root");
         this.signals.aboutToDestruct.dispatch();
 
         this.reset();

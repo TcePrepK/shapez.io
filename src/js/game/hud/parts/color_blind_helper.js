@@ -3,7 +3,6 @@ import { makeDiv } from "../../../core/utils";
 import { TrackedState } from "../../../core/tracked_state";
 import { enumColors } from "../../colors";
 import { ColorItem } from "../../items/color_item";
-import { DrawParameters } from "../../../core/draw_parameters";
 import { THEME } from "../../theme";
 import { globalConfig } from "../../../core/config";
 import { T } from "../../../translations";
@@ -86,9 +85,9 @@ export class HUDColorBlindHelper extends BaseHUDPart {
 
     /**
      * Draws the currently selected tile
-     * @param {DrawParameters} parameters
      */
-    draw(parameters) {
+    draw() {
+        const parameters = globalConfig.parameters;
         const mousePosition = this.root.app.mousePosition;
         if (!mousePosition) {
             // Not on screen

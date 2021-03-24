@@ -6,7 +6,7 @@ import { globalConfig } from "./config";
  */
 
 export class DrawParameters {
-    constructor({ context, visibleRect, desiredAtlasScale, zoomLevel, root }) {
+    constructor({ context, visibleRect, desiredAtlasScale, zoomLevel }) {
         /** @type {CanvasRenderingContext2D} */
         this.context = context;
 
@@ -20,6 +20,6 @@ export class DrawParameters {
         this.zoomLevel = zoomLevel;
 
         /** @type {GameRoot} */
-        this.root = root;
+        this.root = globalConfig.root;
     }
 }

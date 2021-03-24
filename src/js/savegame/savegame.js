@@ -12,12 +12,12 @@ import { SavegameInterface_V1004 } from "./schemas/1004";
 import { SavegameInterface_V1005 } from "./schemas/1005";
 import { SavegameInterface_V1006 } from "./schemas/1006";
 import { SavegameInterface_V1007 } from "./schemas/1007";
+import { SavegameInterface_V1008 } from "./schemas/1008";
 
 const logger = createLogger("savegame");
 
 /**
  * @typedef {import("../application").Application} Application
- * @typedef {import("../game/root").GameRoot} GameRoot
  * @typedef {import("./savegame_typedefs").SavegameData} SavegameData
  * @typedef {import("./savegame_typedefs").SavegameMetadata} SavegameMetadata
  * @typedef {import("./savegame_typedefs").SavegameStats} SavegameStats
@@ -52,7 +52,7 @@ export class Savegame extends ReadWriteProxy {
      * @returns {number}
      */
     static getCurrentVersion() {
-        return 1007;
+        return 1008;
     }
 
     /**
@@ -77,7 +77,11 @@ export class Savegame extends ReadWriteProxy {
         return {
             version: this.getCurrentVersion(),
             dump: null,
-            stats: {},
+            stats: {
+                failedMam: false,
+                trashedCount: 0,
+                usedInverseRotater: false,
+            },
             lastUpdate: Date.now(),
         };
     }
@@ -124,6 +128,11 @@ export class Savegame extends ReadWriteProxy {
         if (data.version === 1006) {
             SavegameInterface_V1007.migrate1006to1007(data);
             data.version = 1007;
+        }
+
+        if (data.version === 1007) {
+            SavegameInterface_V1008.migrate1007to1008(data);
+            data.version = 1008;
         }
 
         return ExplainedResult.good();
@@ -217,16 +226,12 @@ export class Savegame extends ReadWriteProxy {
         this.currentData.lastUpdate = time;
     }
 
-    /**
-     *
-     * @param {GameRoot} root
-     */
-    updateData(root) {
+    updateData() {
         // Construct a new serializer
         const serializer = new SavegameSerializer();
 
         // let timer = performance.now();
-        const dump = serializer.generateDumpFromGameRoot(root);
+        const dump = serializer.generateDumpFromGameRoot();
         if (!dump) {
             return false;
         }

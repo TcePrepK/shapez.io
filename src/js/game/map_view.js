@@ -1,5 +1,4 @@
 import { globalConfig } from "../core/config";
-import { DrawParameters } from "../core/draw_parameters";
 import { BaseMap } from "./map";
 import { freeCanvas, makeOffscreenBuffer } from "../core/buffer_utils";
 import { Entity } from "./entity";
@@ -11,8 +10,8 @@ import { MapChunkView } from "./map_chunk_view";
  * to draw it
  */
 export class MapView extends BaseMap {
-    constructor(root) {
-        super(root);
+    constructor() {
+        super();
 
         /**
          * DPI of the background cache images, required in some places
@@ -57,10 +56,10 @@ export class MapView extends BaseMap {
 
     /**
      * Draws all static entities like buildings etc.
-     * @param {DrawParameters} drawParameters
      */
-    drawStaticEntityDebugOverlays(drawParameters) {
+    drawStaticEntityDebugOverlays() {
         if (G_IS_DEV && (globalConfig.debug.showAcceptorEjectors || globalConfig.debug.showEntityBounds)) {
+            const drawParameters = globalConfig.parameters;
             const cullRange = drawParameters.visibleRect.toTileCullRectangle();
             const top = cullRange.top();
             const right = cullRange.right();
@@ -86,7 +85,7 @@ export class MapView extends BaseMap {
                     if (content) {
                         let isBorder = x <= left - 1 || x >= right + 1 || y <= top - 1 || y >= bottom + 1;
                         if (!isBorder) {
-                            content.drawDebugOverlays(drawParameters);
+                            content.drawDebugOverlays();
                         }
                     }
                 }
@@ -124,19 +123,18 @@ export class MapView extends BaseMap {
 
     /**
      * Draws the maps foreground
-     * @param {DrawParameters} parameters
      */
-    drawForeground(parameters) {
-        this.drawVisibleChunks(parameters, MapChunkView.prototype.drawForegroundDynamicLayer);
-        this.drawVisibleChunks(parameters, MapChunkView.prototype.drawForegroundStaticLayer);
+    drawForeground() {
+        this.drawVisibleChunks(MapChunkView.prototype.drawForegroundDynamicLayer);
+        this.drawVisibleChunks(MapChunkView.prototype.drawForegroundStaticLayer);
     }
 
     /**
      * Calls a given method on all given chunks
-     * @param {DrawParameters} parameters
      * @param {function} method
      */
-    drawVisibleChunks(parameters, method) {
+    drawVisibleChunks(method) {
+        const parameters = globalConfig.parameters;
         const cullRange = parameters.visibleRect.allScaled(1 / globalConfig.tileSize);
         const top = cullRange.top();
         const right = cullRange.right();
@@ -159,32 +157,30 @@ export class MapView extends BaseMap {
         for (let chunkX = chunkStartX; chunkX <= chunkEndX; ++chunkX) {
             for (let chunkY = chunkStartY; chunkY <= chunkEndY; ++chunkY) {
                 const chunk = this.root.map.getChunk(chunkX, chunkY, true);
-                method.call(chunk, parameters);
+                method.call(chunk);
             }
         }
     }
 
     /**
      * Draws the wires foreground
-     * @param {DrawParameters} parameters
      */
-    drawWiresForegroundLayer(parameters) {
-        this.drawVisibleChunks(parameters, MapChunkView.prototype.drawWiresForegroundLayer);
+    drawWiresForegroundLayer() {
+        this.drawVisibleChunks(MapChunkView.prototype.drawWiresForegroundLayer);
     }
 
     /**
      * Draws the map overlay
-     * @param {DrawParameters} parameters
      */
     drawOverlay(parameters) {
-        this.drawVisibleChunks(parameters, MapChunkView.prototype.drawOverlay);
+        this.drawVisibleChunks(MapChunkView.prototype.drawOverlay);
     }
 
     /**
      * Draws the map background
-     * @param {DrawParameters} parameters
      */
-    drawBackground(parameters) {
+    drawBackground() {
+        const parameters = globalConfig.parameters;
         // Render tile grid
         if (!this.root.app.settings.getAllSettings().disableTileGrid) {
             const dpi = this.backgroundCacheDPI;
@@ -203,6 +199,6 @@ export class MapView extends BaseMap {
             parameters.context.scale(dpi, dpi);
         }
 
-        this.drawVisibleChunks(parameters, MapChunkView.prototype.drawBackgroundLayer);
+        this.drawVisibleChunks(MapChunkView.prototype.drawBackgroundLayer);
     }
 }

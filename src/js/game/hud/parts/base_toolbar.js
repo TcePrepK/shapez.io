@@ -3,13 +3,11 @@ import { STOP_PROPAGATION } from "../../../core/signal";
 import { makeDiv, safeModulo } from "../../../core/utils";
 import { KEYMAPPINGS } from "../../key_action_mapper";
 import { MetaBuilding } from "../../meta_building";
-import { GameRoot } from "../../root";
 import { BaseHUDPart } from "../base_hud_part";
 import { DynamicDomAttach } from "../dynamic_dom_attach";
 
 export class HUDBaseToolbar extends BaseHUDPart {
     /**
-     * @param {GameRoot} root
      * @param {object} param0
      * @param {Array<typeof MetaBuilding>} param0.primaryBuildings
      * @param {Array<typeof MetaBuilding>=} param0.secondaryBuildings
@@ -17,11 +15,14 @@ export class HUDBaseToolbar extends BaseHUDPart {
      * @param {string} param0.htmlElementId
      * @param {Layer=} param0.layer
      */
-    constructor(
-        root,
-        { primaryBuildings, secondaryBuildings = [], visibilityCondition, htmlElementId, layer = "regular" }
-    ) {
-        super(root);
+    constructor({
+        primaryBuildings,
+        secondaryBuildings = [],
+        visibilityCondition,
+        htmlElementId,
+        layer = "regular",
+    }) {
+        super();
 
         this.primaryBuildings = primaryBuildings;
         this.secondaryBuildings = secondaryBuildings;
@@ -61,7 +62,7 @@ export class HUDBaseToolbar extends BaseHUDPart {
         if (this.secondaryBuildings.length > 0) {
             rowSecondary = makeDiv(this.element, null, ["buildings", "secondary"]);
 
-            this.secondaryDomAttach = new DynamicDomAttach(this.root, rowSecondary, {
+            this.secondaryDomAttach = new DynamicDomAttach(rowSecondary, {
                 attachClass: "visible",
             });
         }
@@ -108,7 +109,7 @@ export class HUDBaseToolbar extends BaseHUDPart {
             this
         );
 
-        this.domAttach = new DynamicDomAttach(this.root, this.element, {
+        this.domAttach = new DynamicDomAttach(this.element, {
             timeToKeepSeconds: 0.12,
             attachClass: "visible",
         });
@@ -127,7 +128,7 @@ export class HUDBaseToolbar extends BaseHUDPart {
             let recomputeSecondaryToolbarVisibility = false;
             for (const buildingId in this.buildingHandles) {
                 const handle = this.buildingHandles[buildingId];
-                const newStatus = handle.metaBuilding.getIsUnlocked(this.root);
+                const newStatus = handle.metaBuilding.getIsUnlocked();
                 if (handle.unlocked !== newStatus) {
                     handle.unlocked = newStatus;
                     handle.element.classList.toggle("unlocked", newStatus);
@@ -139,7 +140,7 @@ export class HUDBaseToolbar extends BaseHUDPart {
                 let anyUnlocked = false;
                 for (let i = 0; i < this.secondaryBuildings.length; ++i) {
                     const metaClass = gMetaBuildingRegistry.findByClass(this.secondaryBuildings[i]);
-                    if (metaClass.getIsUnlocked(this.root)) {
+                    if (metaClass.getIsUnlocked()) {
                         anyUnlocked = true;
                         break;
                     }
@@ -211,7 +212,7 @@ export class HUDBaseToolbar extends BaseHUDPart {
             return;
         }
 
-        if (!metaBuilding.getIsUnlocked(this.root)) {
+        if (!metaBuilding.getIsUnlocked()) {
             this.root.soundProxy.playUiError();
             return STOP_PROPAGATION;
         }

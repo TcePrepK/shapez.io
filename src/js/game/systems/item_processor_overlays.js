@@ -8,8 +8,8 @@ import { isTruthyItem } from "../items/boolean_item";
 import { MapChunkView } from "../map_chunk_view";
 
 export class ItemProcessorOverlaysSystem extends GameSystem {
-    constructor(root) {
-        super(root);
+    constructor() {
+        super();
 
         this.spriteDisabled = Loader.getSprite("sprites/misc/processor_disabled.png");
         this.spriteDisconnected = Loader.getSprite("sprites/misc/processor_disconnected.png");
@@ -25,11 +25,9 @@ export class ItemProcessorOverlaysSystem extends GameSystem {
     }
 
     /**
-     *
-     * @param {import("../../core/draw_utils").DrawParameters} parameters
      * @param {MapChunkView} chunk
      */
-    drawChunk(parameters, chunk) {
+    drawChunk(chunk) {
         const contents = chunk.containedEntitiesByLayer.regular;
         for (let i = 0; i < contents.length; ++i) {
             const entity = contents[i];
@@ -50,13 +48,13 @@ export class ItemProcessorOverlaysSystem extends GameSystem {
 
                 switch (requirement) {
                     case enumItemProcessorRequirements.painterQuad: {
-                        this.drawConnectedSlotRequirement(parameters, entity, { drawIfFalse: true });
+                        this.drawConnectedSlotRequirement(entity, { drawIfFalse: true });
                         break;
                     }
                 }
 
                 if (processorComp.type === enumItemProcessorTypes.reader) {
-                    this.drawReaderOverlays(parameters, entity);
+                    this.drawReaderOverlays(entity);
                 }
             }
 
@@ -67,22 +65,20 @@ export class ItemProcessorOverlaysSystem extends GameSystem {
                 }
                 this.drawnUids.add(entity.uid);
 
-                this.drawConnectedSlotRequirement(parameters, entity, { drawIfFalse: false });
+                this.drawConnectedSlotRequirement(entity, { drawIfFalse: false });
             }
         }
     }
 
     /**
-     *
-     * @param {import("../../core/draw_utils").DrawParameters} parameters
      * @param {Entity} entity
      */
-    drawReaderOverlays(parameters, entity) {
+    drawReaderOverlays(entity) {
+        const parameters = globalConfig.parameters;
         const staticComp = entity.components.StaticMapEntity;
         const readerComp = entity.components.BeltReader;
 
         this.readerOverlaySprite.drawCachedCentered(
-            parameters,
             (staticComp.origin.x + 0.5) * globalConfig.tileSize,
             (staticComp.origin.y + 0.5) * globalConfig.tileSize,
             globalConfig.tileSize
@@ -101,13 +97,12 @@ export class ItemProcessorOverlaysSystem extends GameSystem {
     }
 
     /**
-     *
-     * @param {import("../../core/draw_utils").DrawParameters} parameters
      * @param {Entity} entity
      * @param {object} param0
      * @param {boolean=} param0.drawIfFalse
      */
-    drawConnectedSlotRequirement(parameters, entity, { drawIfFalse = true }) {
+    drawConnectedSlotRequirement(entity, { drawIfFalse = true }) {
+        const parameters = globalConfig.parameters;
         const staticComp = entity.components.StaticMapEntity;
         const pinsComp = entity.components.WiredPins;
 
@@ -131,7 +126,6 @@ export class ItemProcessorOverlaysSystem extends GameSystem {
         parameters.context.globalAlpha = 0.6 + 0.4 * pulse;
         const sprite = anySlotConnected ? this.spriteDisabled : this.spriteDisconnected;
         sprite.drawCachedCentered(
-            parameters,
             (staticComp.origin.x + 0.5) * globalConfig.tileSize,
             (staticComp.origin.y + 0.5) * globalConfig.tileSize,
             globalConfig.tileSize * (0.7 + 0.2 * pulse)

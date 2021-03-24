@@ -1,7 +1,6 @@
 /* typehints:start */
 import { Application } from "../application";
 import { Vector } from "../core/vector";
-import { GameRoot } from "../game/root";
 /* typehints:end */
 
 import { newEmptyMap, clamp } from "../core/utils";
@@ -235,9 +234,9 @@ export class SoundInterface {
      *
      * @param {string} key
      * @param {Vector} worldPosition
-     * @param {GameRoot} root
      */
-    play3DSound(key, worldPosition, root) {
+    play3DSound(key, worldPosition) {
+        const root = globalConfig.root;
         if (!this.sounds[key]) {
             logger.warn("Music", key, "not found, probably not loaded yet");
             return;

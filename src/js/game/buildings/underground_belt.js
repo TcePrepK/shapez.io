@@ -5,7 +5,6 @@ import { ItemEjectorComponent } from "../components/item_ejector";
 import { enumUndergroundBeltMode, UndergroundBeltComponent } from "../components/underground_belt";
 import { Entity } from "../entity";
 import { MetaBuilding, defaultBuildingVariant } from "../meta_building";
-import { GameRoot } from "../root";
 import { globalConfig } from "../../core/config";
 import { enumHubGoalRewards } from "../tutorial_goals";
 import { formatItemsPerSecond, generateMatrixRotations } from "../../core/utils";
@@ -63,15 +62,14 @@ export class MetaUndergroundBeltBuilding extends MetaBuilding {
     }
 
     /**
-     * @param {GameRoot} root
      * @param {string} variant
      * @returns {Array<[string, string]>}
      */
-    getAdditionalStatistics(root, variant) {
+    getAdditionalStatistics(variant) {
         const rangeTiles =
             globalConfig.undergroundBeltMaxTilesByTier[enumUndergroundBeltVariantToTier[variant]];
 
-        const beltSpeed = root.hubGoals.getUndergroundBeltBaseSpeed();
+        const beltSpeed = this.root.hubGoals.getUndergroundBeltBaseSpeed();
         return [
             [
                 T.ingame.buildingPlacement.infoTexts.range,
@@ -81,14 +79,11 @@ export class MetaUndergroundBeltBuilding extends MetaBuilding {
         ];
     }
 
-    /**
-     * @param {GameRoot} root
-     */
-    getAvailableVariants(root) {
-        if (root.hubGoals.isRewardUnlocked(enumHubGoalRewards.reward_underground_belt_tier_2)) {
+    getAvailableVariants() {
+        if (this.root.hubGoals.isRewardUnlocked(enumHubGoalRewards.reward_underground_belt_tier_2)) {
             return [defaultBuildingVariant, enumUndergroundBeltVariants.tier2];
         }
-        return super.getAvailableVariants(root);
+        return super.getAvailableVariants();
     }
 
     /**
@@ -139,11 +134,8 @@ export class MetaUndergroundBeltBuilding extends MetaBuilding {
         return this.getPreviewSprite(rotationVariant, variant);
     }
 
-    /**
-     * @param {GameRoot} root
-     */
-    getIsUnlocked(root) {
-        return root.hubGoals.isRewardUnlocked(enumHubGoalRewards.reward_tunnel);
+    getIsUnlocked() {
+        return this.root.hubGoals.isRewardUnlocked(enumHubGoalRewards.reward_tunnel);
     }
 
     /**
@@ -169,14 +161,14 @@ export class MetaUndergroundBeltBuilding extends MetaBuilding {
     /**
      * Should compute the optimal rotation variant on the given tile
      * @param {object} param0
-     * @param {GameRoot} param0.root
      * @param {Vector} param0.tile
      * @param {number} param0.rotation
      * @param {string} param0.variant
      * @param {Layer} param0.layer
      * @return {{ rotation: number, rotationVariant: number, connectedEntities?: Array<Entity> }}
      */
-    computeOptimalDirectionAndRotationVariantAtTile({ root, tile, rotation, variant, layer }) {
+    computeOptimalDirectionAndRotationVariantAtTile({ tile, rotation, variant, layer }) {
+        const root = globalConfig.root;
         const searchDirection = enumAngleToDirection[rotation];
         const searchVector = enumDirectionToVector[searchDirection];
         const tier = enumUndergroundBeltVariantToTier[variant];

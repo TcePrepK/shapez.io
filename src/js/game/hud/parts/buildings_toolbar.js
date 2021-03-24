@@ -19,8 +19,8 @@ import { queryParamOptions } from "../../../core/query_parameters";
 import { MetaCommandControllerBuilding } from "../../buildings/command_controller";
 
 export class HUDBuildingsToolbar extends HUDBaseToolbar {
-    constructor(root) {
-        super(root, {
+    constructor() {
+        super({
             primaryBuildings: [
                 MetaBeltBuilding,
                 MetaBalancerBuilding,

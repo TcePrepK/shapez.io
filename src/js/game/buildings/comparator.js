@@ -3,7 +3,6 @@ import { enumLogicGateType, LogicGateComponent } from "../components/logic_gate"
 import { enumPinSlotType, WiredPinsComponent } from "../components/wired_pins";
 import { Entity } from "../entity";
 import { MetaBuilding } from "../meta_building";
-import { GameRoot } from "../root";
 import { enumHubGoalRewards } from "../tutorial_goals";
 
 export class MetaComparatorBuilding extends MetaBuilding {
@@ -15,11 +14,8 @@ export class MetaComparatorBuilding extends MetaBuilding {
         return "#823cab";
     }
 
-    /**
-     * @param {GameRoot} root
-     */
-    getIsUnlocked(root) {
-        return root.hubGoals.isRewardUnlocked(enumHubGoalRewards.reward_virtual_processing);
+    getIsUnlocked() {
+        return this.root.hubGoals.isRewardUnlocked(enumHubGoalRewards.reward_virtual_processing);
     }
 
     /** @returns {"wires"} **/

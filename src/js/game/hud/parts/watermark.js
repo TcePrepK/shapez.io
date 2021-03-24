@@ -1,4 +1,4 @@
-import { THIRDPARTY_URLS } from "../../../core/config";
+import { globalConfig, THIRDPARTY_URLS } from "../../../core/config";
 import { makeDiv } from "../../../core/utils";
 import { T } from "../../../translations";
 import { BaseHUDPart } from "../base_hud_part";
@@ -34,7 +34,7 @@ export class HUDWatermark extends BaseHUDPart {
     initialize() {
         this.trackClicks(this.element, this.onWatermarkClick);
 
-        this.domAttach = new DynamicDomAttach(this.root, this.element, {
+        this.domAttach = new DynamicDomAttach(this.element, {
             attachClass: "visible",
             timeToKeepSeconds: 0.5,
         });
@@ -51,11 +51,8 @@ export class HUDWatermark extends BaseHUDPart {
         this.root.hud.parts.standaloneAdvantages.show();
     }
 
-    /**
-     *
-     * @param {import("../../../core/draw_utils").DrawParameters} parameters
-     */
-    drawOverlays(parameters) {
+    drawOverlays() {
+        const parameters = globalConfig.parameters;
         const w = this.root.gameWidth;
 
         parameters.context.fillStyle = "rgba(230, 230, 230, 0.9)";

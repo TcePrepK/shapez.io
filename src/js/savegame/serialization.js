@@ -1,3 +1,4 @@
+import { globalConfig } from "../core/config";
 import { createLogger } from "../core/logging";
 import {
     BaseDataType,
@@ -69,7 +70,7 @@ export const types = {
 
     /**
      * @param {FactoryTemplate<*>} registry
-     * @param {(GameRoot, any) => object=} resolver
+     * @param {(any) => object=} resolver
      */
     obj(registry, resolver = null) {
         return new TypeClass(registry, resolver);
@@ -151,7 +152,9 @@ export class BasicSerializableObject {
      * Fixes typeof DerivedComponent is not assignable to typeof Component, compiled out
      * in non-dev builds
      */
-    constructor(...args) {}
+    constructor(...args) {
+        this.root = globalConfig.root;
+    }
 
     /* dev:end */
 
@@ -200,16 +203,14 @@ export class BasicSerializableObject {
 
     /**
      * @param {any} data
-     * @param {import("./savegame_serializer").GameRoot} root
      * @returns {string|void}
      */
-    deserialize(data, root = null) {
+    deserialize(data) {
         return deserializeSchema(
             this,
             /** @type {typeof BasicSerializableObject} */ (this.constructor).getCachedSchema(),
             data,
-            null,
-            root
+            null
         );
     }
 
@@ -267,10 +268,9 @@ export function serializeSchema(obj, schema, mergeWith = {}) {
  * @param {Schema} schema The schema to use
  * @param {object} data The serialized data
  * @param {string|void|null=} baseclassErrorResult Convenience, if this is a string error code, do nothing and return it
- * @param {import("../game/root").GameRoot=} root Optional game root reference
  * @returns {string|void} String error code or nothing on success
  */
-export function deserializeSchema(obj, schema, data, baseclassErrorResult = null, root) {
+export function deserializeSchema(obj, schema, data, baseclassErrorResult = null) {
     if (baseclassErrorResult) {
         return baseclassErrorResult;
     }
@@ -290,7 +290,7 @@ export function deserializeSchema(obj, schema, data, baseclassErrorResult = null
             return "Non-nullable entry is null: " + key + " of class " + obj.constructor.name;
         }
 
-        const errorStatus = schema[key].deserializeWithVerify(data[key], obj, key, obj.root || root);
+        const errorStatus = schema[key].deserializeWithVerify(data[key], obj, key);
         if (errorStatus) {
             logger.error(
                 "Deserialization failed with error '" + errorStatus + "' on object",

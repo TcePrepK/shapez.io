@@ -311,7 +311,7 @@ export class HUDKeybindingOverlay extends BaseHUDPart {
     }
 
     initialize() {
-        this.domAttach = new DynamicDomAttach(this.root, this.element, {
+        this.domAttach = new DynamicDomAttach(this.element, {
             trackHover: true,
         });
     }

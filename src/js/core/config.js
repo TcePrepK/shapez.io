@@ -1,3 +1,5 @@
+import { GameRoot } from "../game/root";
+
 export const IS_DEBUG =
     G_IS_DEV &&
     typeof window !== "undefined" &&
@@ -39,6 +41,9 @@ export const globalConfig = {
     assetsDpi: 192 / 32,
     assetsSharpness: 1.5,
     shapesSharpness: 1.4,
+
+    // Achievements
+    achievementSliceDuration: 10, // Seconds
 
     // Production analytics
     statisticsGraphDpi: 2.5,
@@ -98,7 +103,7 @@ export const globalConfig = {
     },
 
     rendering: {},
-    debug: require("./config.local").default,
+    debug: require("./config.local.template").default,
 
     // Secret vars
     info: {
@@ -111,6 +116,13 @@ export const globalConfig = {
         // Analytics key
         analyticsApiKey: "baf6a50f0cc7dfdec5a0e21c88a1c69a4b34bc4a",
     },
+
+    // Important Variables
+
+    /** @type {GameRoot} */
+    root: new GameRoot(null),
+    /** @type {import("./draw_utils").DrawParameters} */
+    parameters: null,
 };
 
 export const IS_MOBILE = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);

@@ -1,5 +1,4 @@
 import { globalConfig } from "../../core/config";
-import { DrawParameters } from "../../core/draw_parameters";
 import { gMetaBuildingRegistry } from "../../core/global_registries";
 import { Loader } from "../../core/loader";
 import { createLogger } from "../../core/logging";
@@ -23,8 +22,8 @@ const logger = createLogger("belt");
  * Manages all belts
  */
 export class BeltSystem extends GameSystemWithFilter {
-    constructor(root) {
-        super(root, [BeltComponent]);
+    constructor() {
+        super([BeltComponent]);
         /**
          * @type {Object.<enumDirection, Array<AtlasSprite>>}
          */
@@ -88,7 +87,7 @@ export class BeltSystem extends GameSystemWithFilter {
         }
 
         for (let i = 0; i < data.length; ++i) {
-            const path = BeltPath.fromSerialized(this.root, data[i]);
+            const path = BeltPath.fromSerialized(data[i]);
             // If path is a string, that means its an error
             if (!(path instanceof BeltPath)) {
                 return "Failed to create path from belt data: " + path;
@@ -154,7 +153,6 @@ export class BeltSystem extends GameSystemWithFilter {
                         rotation,
                         rotationVariant,
                     } = metaBelt.computeOptimalDirectionAndRotationVariantAtTile({
-                        root: this.root,
                         tile: new Vector(x, y),
                         rotation: targetStaticComp.originalRotation,
                         variant: defaultBuildingVariant,
@@ -295,7 +293,7 @@ export class BeltSystem extends GameSystemWithFilter {
                 toPath.extendOnBeginning(entity);
             } else {
                 // This is an empty belt path
-                const path = new BeltPath(this.root, [entity]);
+                const path = new BeltPath([entity]);
                 this.beltPaths.push(path);
             }
         }
@@ -322,11 +320,10 @@ export class BeltSystem extends GameSystemWithFilter {
 
     /**
      * Draws all belt paths
-     * @param {DrawParameters} parameters
      */
-    drawBeltItems(parameters) {
+    drawBeltItems() {
         for (let i = 0; i < this.beltPaths.length; ++i) {
-            this.beltPaths[i].draw(parameters);
+            this.beltPaths[i].draw();
         }
     }
 
@@ -461,7 +458,7 @@ export class BeltSystem extends GameSystemWithFilter {
             }
 
             assert(maxIter > 1, "Ran out of iterations");
-            result.push(new BeltPath(this.root, path));
+            result.push(new BeltPath(path));
         }
 
         logger.log("Found", this.beltPaths.length, "belt paths");
@@ -487,10 +484,9 @@ export class BeltSystem extends GameSystemWithFilter {
 
     /**
      * Draws a given chunk
-     * @param {DrawParameters} parameters
      * @param {MapChunkView} chunk
      */
-    drawChunk(parameters, chunk) {
+    drawChunk(chunk) {
         // Limit speed to avoid belts going backwards
         const speedMultiplier = Math.min(this.root.hubGoals.getBeltBaseSpeed(), 10);
 
@@ -525,7 +521,7 @@ export class BeltSystem extends GameSystemWithFilter {
                     }
 
                     // Culling happens within the static map entity component
-                    entity.components.StaticMapEntity.drawSpriteOnBoundsClipped(parameters, sprite, 0);
+                    entity.components.StaticMapEntity.drawSpriteOnBoundsClipped(sprite, 0);
                 }
             }
         } else {
@@ -536,7 +532,7 @@ export class BeltSystem extends GameSystemWithFilter {
                     const sprite = this.beltAnimations[direction][animationIndex % BELT_ANIM_COUNT];
 
                     // Culling happens within the static map entity component
-                    entity.components.StaticMapEntity.drawSpriteOnBoundsClipped(parameters, sprite, 0);
+                    entity.components.StaticMapEntity.drawSpriteOnBoundsClipped(sprite, 0);
                 }
             }
         }
@@ -544,11 +540,10 @@ export class BeltSystem extends GameSystemWithFilter {
 
     /**
      * Draws the belt path debug overlays
-     * @param {DrawParameters} parameters
      */
-    drawBeltPathDebug(parameters) {
+    drawBeltPathDebug() {
         for (let i = 0; i < this.beltPaths.length; ++i) {
-            this.beltPaths[i].drawDebug(parameters);
+            this.beltPaths[i].drawDebug();
         }
     }
 }
