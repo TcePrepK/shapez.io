@@ -19,6 +19,9 @@ import { DisplayComponent } from "./components/display";
 import { BeltReaderComponent } from "./components/belt_reader";
 import { FilterComponent } from "./components/filter";
 import { ItemProducerComponent } from "./components/item_producer";
+import { PistonComponent } from "./components/piston";
+import { StickyComponent } from "./components/sticky";
+import { ButtonComponent } from "./components/button";
 /* typehints:end */
 
 /**
@@ -88,6 +91,15 @@ export class EntityComponentStorage {
 
         /** @type {ItemProducerComponent} */
         this.ItemProducer;
+
+        /** @type {PistonComponent} */
+        this.Piston;
+
+        /** @type {StickyComponent} */
+        this.Sticky;
+
+        /** @type {ButtonComponent} */
+        this.Button;
 
         /* typehints:end */
     }

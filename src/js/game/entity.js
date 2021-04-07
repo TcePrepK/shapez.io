@@ -3,7 +3,7 @@ import { Component } from "./component";
 /* typehints:end */
 
 import { globalConfig } from "../core/config";
-import { enumDirectionToVector, enumDirectionToAngle } from "../core/vector";
+import { enumDirectionToVector, enumDirectionToAngle, Vector } from "../core/vector";
 import { BasicSerializableObject, types } from "../savegame/serialization";
 import { EntityComponentStorage } from "./entity_components";
 import { Loader } from "../core/loader";
@@ -209,6 +209,26 @@ export class Entity extends BasicSerializableObject {
             context.globalAlpha = 1;
         }
         // this.drawImpl(parameters);
+    }
+
+    /**
+     * @param {Vector} movPos
+     */
+    moveEntity(movPos) {
+        const staticComp = this.components.StaticMapEntity;
+        if (!staticComp) {
+            return;
+        }
+
+        const origin = staticComp.origin;
+        const fakeNewPos = origin.add(movPos);
+        const otherEntity = this.root.map.getLayerContentXY(fakeNewPos.x, fakeNewPos.y, this.layer);
+
+        if (otherEntity) {
+            // otherEntity.moveEntity(movPos);
+        }
+
+        staticComp.moveOrigin(movPos);
     }
 
     ///// Helper interfaces

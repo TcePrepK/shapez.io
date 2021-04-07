@@ -61,7 +61,7 @@ export class HUDWireInfo extends BaseHUDPart {
             const network = networks[0];
 
             if (network.valueConflict) {
-                this.spriteConflict.draw(mousePos.x + 15, mousePos.y - 10, 60, 60);
+                this.spriteConflict.draw(parameters.context, mousePos.x + 15, mousePos.y - 10, 60, 60);
             } else if (!network.currentValue) {
                 this.spriteEmpty.draw(parameters.context, mousePos.x + 15, mousePos.y - 10, 60, 60);
             } else {

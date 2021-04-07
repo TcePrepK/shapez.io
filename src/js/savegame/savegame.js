@@ -202,7 +202,8 @@ export class Savegame extends ReadWriteProxy {
         }
 
         const cls = /** @type {typeof Savegame} */ (this.constructor).getReaderClass();
-        return new cls(this.currentData);
+        const data = new cls(this.currentData);
+        return data;
     }
 
     /**

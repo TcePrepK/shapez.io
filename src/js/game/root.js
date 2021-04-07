@@ -28,7 +28,7 @@ import { DynamicTickrate } from "./dynamic_tickrate";
 import { KeyActionMapper } from "./key_action_mapper";
 import { Vector } from "../core/vector";
 import { GameMode } from "./game_mode";
-import { globalConfig } from "../core/config";
+import { Application } from "../application";
 /* typehints:end */
 
 /** @type {Array<Layer>} */
@@ -43,8 +43,9 @@ export class GameRoot {
     /**
      * Constructs a new game root
      */
-    constructor(app) {
-        this.app = app;
+    constructor() {
+        /** @type {Application} */
+        this.app = null;
 
         this.setVariables();
     }

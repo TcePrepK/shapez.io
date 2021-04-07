@@ -119,7 +119,7 @@ export const globalConfig = {
 
     // Important Variables
 
-    root: new GameRoot(null),
+    root: new GameRoot(),
 
     /** @type {import("../application").Application} */
     app: null,

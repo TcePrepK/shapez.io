@@ -34,9 +34,33 @@ export class SerializerInternal {
     }
 
     /**
+     * @param {Array<Entity>} array
+     * @returns {Array<Entity>}
+     */
+    deserializeEntityArrayWithoutPlacing(array) {
+        const newArray = [];
+        for (let i = 0; i < array.length; ++i) {
+            const entity = this.deserializeEntityWithoutPlacing(array[i]);
+            newArray.push(entity);
+        }
+        return newArray;
+    }
+
+    /**
      * @param {Entity} payload
      */
     deserializeEntity(payload) {
+        const root = globalConfig.root;
+        const staticData = payload.components.StaticMapEntity;
+        assert(staticData, "entity has no static data");
+        const entity = this.deserializeEntityWithoutPlacing(payload);
+        root.map.placeStaticEntity(entity);
+    }
+
+    /**
+     * @param {Entity} payload
+     */
+    deserializeEntityWithoutPlacing(payload) {
         const root = globalConfig.root;
         const staticData = payload.components.StaticMapEntity;
         assert(staticData, "entity has no static data");
@@ -59,7 +83,7 @@ export class SerializerInternal {
         this.deserializeComponents(entity, payload.components);
 
         root.entityMgr.registerEntity(entity, payload.uid);
-        root.map.placeStaticEntity(entity);
+        return entity;
     }
 
     /////// COMPONENTS ////

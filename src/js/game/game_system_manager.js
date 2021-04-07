@@ -20,7 +20,9 @@ import { ItemProcessorOverlaysSystem } from "./systems/item_processor_overlays";
 import { BeltReaderSystem } from "./systems/belt_reader";
 import { FilterSystem } from "./systems/filter";
 import { ItemProducerSystem } from "./systems/item_producer";
+import { PistonSystem } from "./systems/piston";
 import { globalConfig } from "../core/config";
+import { ButtonSystem } from "./systems/button";
 
 const logger = createLogger("game_system_manager");
 
@@ -92,6 +94,13 @@ export class GameSystemManager {
 
             /** @type {ItemProducerSystem} */
             itemProducer: null,
+
+            /** @type {PistonSystem} */
+            piston: null,
+
+            /** @type {ButtonSystem} */
+            button: null,
+
             /* typehints:end */
         };
         this.systemUpdateOrder = [];
@@ -156,6 +165,10 @@ export class GameSystemManager {
         add("display", DisplaySystem);
 
         add("itemProcessorOverlays", ItemProcessorOverlaysSystem);
+
+        add("piston", PistonSystem);
+
+        add("button", ButtonSystem);
 
         logger.log("📦 There are", this.systemUpdateOrder.length, "game systems");
     }

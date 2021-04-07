@@ -7,8 +7,6 @@ const fpsAccumulationTime = 1000;
 
 export class DynamicTickrate {
     constructor() {
-        this.root = globalConfig.root;
-
         this.currentTickStart = null;
         this.capturedTicks = [];
         this.averageTickDuration = 0;
@@ -18,7 +16,7 @@ export class DynamicTickrate {
 
         this.averageFps = 60;
 
-        this.setTickRate(this.root.app.settings.getDesiredFps());
+        this.setTickRate(globalConfig.root.app.settings.getDesiredFps());
 
         if (G_IS_DEV && globalConfig.debug.renderForTrailer) {
             this.setTickRate(300);
@@ -57,7 +55,7 @@ export class DynamicTickrate {
             return;
         }
 
-        const desiredFps = this.root.app.settings.getDesiredFps();
+        const desiredFps = globalConfig.root.app.settings.getDesiredFps();
         this.setTickRate(Math.round(Math.min(desiredFps, this.currentTickRate * 1.2)));
     }
 
@@ -69,7 +67,7 @@ export class DynamicTickrate {
             return;
         }
 
-        const desiredFps = this.root.app.settings.getDesiredFps();
+        const desiredFps = globalConfig.root.app.settings.getDesiredFps();
         this.setTickRate(Math.round(Math.max(desiredFps / 2, this.currentTickRate * 0.8)));
     }
 
@@ -94,7 +92,7 @@ export class DynamicTickrate {
 
             this.averageTickDuration = average;
 
-            const desiredFps = this.root.app.settings.getDesiredFps();
+            const desiredFps = globalConfig.root.app.settings.getDesiredFps();
 
             // Disabled for now: Dynamicall adjusting tick rate
             // if (this.averageFps > desiredFps * 0.9) {

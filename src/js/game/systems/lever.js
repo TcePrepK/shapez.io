@@ -2,7 +2,6 @@ import { GameSystemWithFilter } from "../game_system_with_filter";
 import { LeverComponent } from "../components/lever";
 import { BOOL_TRUE_SINGLETON, BOOL_FALSE_SINGLETON } from "../items/boolean_item";
 import { MapChunkView } from "../map_chunk_view";
-import { globalConfig } from "../../core/config";
 import { Loader } from "../../core/loader";
 
 export class LeverSystem extends GameSystemWithFilter {

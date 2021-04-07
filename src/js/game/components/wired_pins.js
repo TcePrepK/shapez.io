@@ -40,7 +40,6 @@ export class WiredPinsComponent extends Component {
     }
 
     /**
-     *
      * @param {object} param0
      * @param {Array<WirePinSlotDefinition>} param0.slots
      */

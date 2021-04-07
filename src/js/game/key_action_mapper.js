@@ -1,6 +1,7 @@
 import { Signal, STOP_PROPAGATION } from "../core/signal";
 import { globalConfig, IS_MOBILE } from "../core/config";
 import { T } from "../translations";
+import { InputReceiver } from "../core/input_receiver";
 function key(str) {
     return str.toUpperCase().charCodeAt(0);
 }
@@ -64,6 +65,9 @@ export const KEYMAPPINGS = {
         lever: { keyCode: key("I") },
         filter: { keyCode: key("O") },
         display: { keyCode: key("P") },
+        piston: { keyCode: key(".") },
+        sticky_tile: { keyCode: key(".") },
+        button: { keyCode: key(".") },
 
         // Wires toolbar
         wire: { keyCode: key("1") },
@@ -97,7 +101,7 @@ export const KEYMAPPINGS = {
         massSelectCopy: { keyCode: key("C") },
         massSelectCut: { keyCode: key("X") },
         confirmMassDelete: { keyCode: 46 }, // DEL
-        pasteLastBlueprint: { keyCode: key("V") },
+        pasteLastBlueprint: { keyCode: key("H") },
     },
 
     placementModifiers: {

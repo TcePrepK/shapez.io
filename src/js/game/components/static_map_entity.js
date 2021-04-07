@@ -84,7 +84,6 @@ export class StaticMapEntityComponent extends Component {
     }
 
     /**
-     *
      * @param {object} param0
      * @param {Vector=} param0.origin Origin (Top Left corner) of the entity
      * @param {Vector=} param0.tileSize Size of the entity in tiles
@@ -244,20 +243,26 @@ export class StaticMapEntityComponent extends Component {
      * Draws a sprite over the whole space of the entity
      * @param {AtlasSprite} sprite
      * @param {number=} extrudePixels How many pixels to extrude the sprite
-     * @param {Vector=} overridePosition Whether to drwa the entity at a different location
+     * @param {Vector=} overridePosition Whether to draw the entity at a different location
+     * @param {Vector=} positionOffset Change size or not
      */
-    drawSpriteOnBoundsClipped(sprite, extrudePixels = 0, overridePosition = null) {
+    drawSpriteOnBoundsClipped(
+        sprite,
+        extrudePixels = 0,
+        overridePosition = null,
+        positionOffset = new Vector(0, 0)
+    ) {
         const parameters = globalConfig.parameters;
         if (!this.shouldBeDrawn() && !overridePosition) {
             return;
         }
-        const size = this.getTileSize();
-        let worldX = this.origin.x * globalConfig.tileSize;
-        let worldY = this.origin.y * globalConfig.tileSize;
+        let size = this.getTileSize();
+        let worldX = this.origin.x * globalConfig.tileSize + positionOffset.x;
+        let worldY = this.origin.y * globalConfig.tileSize + positionOffset.y;
 
         if (overridePosition) {
-            worldX = overridePosition.x * globalConfig.tileSize;
-            worldY = overridePosition.y * globalConfig.tileSize;
+            worldX = overridePosition.x * globalConfig.tileSize + positionOffset.x;
+            worldY = overridePosition.y * globalConfig.tileSize + positionOffset.y;
         }
 
         if (this.rotation === 0) {
@@ -284,5 +289,9 @@ export class StaticMapEntityComponent extends Component {
             parameters.context.rotate(-Math.radians(this.rotation));
             parameters.context.translate(-rotationCenterX, -rotationCenterY);
         }
+    }
+
+    moveOrigin(movPos) {
+        this.origin.addInplace(movPos);
     }
 }

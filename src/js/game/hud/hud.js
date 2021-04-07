@@ -44,6 +44,7 @@ import { HUDStandaloneAdvantages } from "./parts/standalone_advantages";
 import { HUDCatMemes } from "./parts/cat_memes";
 import { HUDTutorialVideoOffer } from "./parts/tutorial_video_offer";
 import { HUDConstantSignalEdit } from "./parts/constant_signal_edit";
+import { HUDButtonToggle } from "./parts/button_toggle";
 
 export class GameHUD {
     constructor() {
@@ -79,6 +80,7 @@ export class GameHUD {
             waypoints: new HUDWaypoints(),
             wireInfo: new HUDWireInfo(),
             leverToggle: new HUDLeverToggle(),
+            buttonToggle: new HUDButtonToggle(),
             constantSignalEdit: new HUDConstantSignalEdit(),
 
             // Must always exist

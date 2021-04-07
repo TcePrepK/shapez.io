@@ -1,3 +1,5 @@
+const LZString = require("lz-string");
+
 import { STOP_PROPAGATION } from "../../../core/signal";
 import { TrackedState } from "../../../core/tracked_state";
 import { makeDiv } from "../../../core/utils";
@@ -9,6 +11,8 @@ import { enumMouseButton } from "../../camera";
 import { KEYMAPPINGS } from "../../key_action_mapper";
 import { BaseHUDPart } from "../base_hud_part";
 import { DynamicDomAttach } from "../dynamic_dom_attach";
+import { SerializerInternal } from "../../../savegame/serializer_internal";
+import { Entity } from "../../entity";
 
 export class HUDBlueprintPlacer extends BaseHUDPart {
     createElements(parent) {
@@ -32,12 +36,17 @@ export class HUDBlueprintPlacer extends BaseHUDPart {
         this.currentBlueprint = new TrackedState(this.onBlueprintChanged, this);
         /** @type {Blueprint?} */
         this.lastBlueprintUsed = null;
+        /** @type {SerializerInternal} */
+        this.internal = new SerializerInternal();
 
         const keyActionMapper = this.root.keyMapper;
         keyActionMapper.getBinding(KEYMAPPINGS.general.back).add(this.abortPlacement, this);
         keyActionMapper.getBinding(KEYMAPPINGS.placement.pipette).add(this.abortPlacement, this);
         keyActionMapper.getBinding(KEYMAPPINGS.placement.rotateWhilePlacing).add(this.rotateBlueprint, this);
         keyActionMapper.getBinding(KEYMAPPINGS.massSelect.pasteLastBlueprint).add(this.pasteBlueprint, this);
+
+        window.addEventListener("copy", this.copySerializedBlueprint.bind(this));
+        window.addEventListener("paste", this.pasteSerializedBlueprint.bind(this));
 
         this.root.camera.downPreHandler.add(this.onMouseDown, this);
         this.root.camera.movePreHandler.add(this.onMouseMove, this);
@@ -195,5 +204,89 @@ export class HUDBlueprintPlacer extends BaseHUDPart {
         const worldPos = this.root.camera.screenToWorld(mousePosition);
         const tile = worldPos.toTileSpace();
         blueprint.draw(tile);
+    }
+
+    copySerializedBlueprint(event) {
+        if (!this.currentBlueprint.get()) {
+            return;
+        }
+
+        // const internal = new SerializerInternal();
+        const serializedBP = this.internal.serializeEntityArray(this.currentBlueprint.get().entities);
+        const json = JSON.stringify(serializedBP);
+
+        const text = LZString.compress(json);
+
+        event.clipboardData.setData("text/plain", text);
+        event.preventDefault();
+    }
+
+    pasteSerializedBlueprint(event) {
+        const text = event.clipboardData.getData("Text");
+        const str = LZString.decompress(text);
+        if (!str) {
+            return;
+        }
+
+        let serializedBP;
+        try {
+            serializedBP = JSON.parse(str);
+        } catch (error) {
+            return;
+        }
+
+        if (!this.verifyBlueprint(serializedBP)) {
+            return;
+        }
+
+        const entityList = this.internal.deserializeEntityArrayWithoutPlacing(serializedBP);
+        const newBP = new Blueprint(entityList);
+        const oldBP = this.currentBlueprint.get();
+        this.onBlueprintChanged(oldBP);
+        this.currentBlueprint.set(newBP);
+    }
+
+    /**
+     * Verifies given serialized blueprint data
+     */
+    verifyBlueprint(data) {
+        if (!(data instanceof Array)) {
+            return false;
+        }
+
+        for (const content of data) {
+            if (!(content instanceof Object)) {
+                return false;
+            }
+        }
+
+        for (let i = 0; i < data.length; i++) {
+            /** @type {Entity} */
+            const entity = data[i];
+
+            if (typeof entity.uid != "number") {
+                return false;
+            }
+        }
+
+        for (let i = 0; i < data.length; i++) {
+            /** @type {Entity} */
+            const entity = data[i];
+
+            if (!entity.components) {
+                return false;
+            }
+        }
+
+        for (let i = 0; i < data.length; i++) {
+            /** @type {Entity} */
+            const entity = data[i];
+
+            if (!entity.components.StaticMapEntity) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

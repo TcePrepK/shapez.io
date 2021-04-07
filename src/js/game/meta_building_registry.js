@@ -4,6 +4,7 @@ import { T } from "../translations";
 import { MetaAnalyzerBuilding } from "./buildings/analyzer";
 import { enumBalancerVariants, MetaBalancerBuilding } from "./buildings/balancer";
 import { MetaBeltBuilding } from "./buildings/belt";
+import { MetaButtonBuilding } from "./buildings/button";
 import { MetaComparatorBuilding } from "./buildings/comparator";
 import { MetaConstantSignalBuilding } from "./buildings/constant_signal";
 import { enumCutterVariants, MetaCutterBuilding } from "./buildings/cutter";
@@ -16,9 +17,11 @@ import { enumLogicGateVariants, MetaLogicGateBuilding } from "./buildings/logic_
 import { enumMinerVariants, MetaMinerBuilding } from "./buildings/miner";
 import { MetaMixerBuilding } from "./buildings/mixer";
 import { enumPainterVariants, MetaPainterBuilding } from "./buildings/painter";
+import { enumPistonVariants, MetaPistonBuilding } from "./buildings/piston";
 import { MetaReaderBuilding } from "./buildings/reader";
 import { enumRotaterVariants, MetaRotaterBuilding } from "./buildings/rotater";
 import { MetaStackerBuilding } from "./buildings/stacker";
+import { MetaStickyTileBuilding } from "./buildings/sticky_tile";
 import { MetaStorageBuilding } from "./buildings/storage";
 import { enumTransistorVariants, MetaTransistorBuilding } from "./buildings/transistor";
 import { MetaTrashBuilding } from "./buildings/trash";
@@ -59,6 +62,9 @@ export function initMetaBuildingRegistry() {
     gMetaBuildingRegistry.register(MetaAnalyzerBuilding);
     gMetaBuildingRegistry.register(MetaComparatorBuilding);
     gMetaBuildingRegistry.register(MetaItemProducerBuilding);
+    gMetaBuildingRegistry.register(MetaPistonBuilding);
+    gMetaBuildingRegistry.register(MetaStickyTileBuilding);
+    gMetaBuildingRegistry.register(MetaButtonBuilding);
 
     // Belt
     registerBuildingVariant(1, MetaBeltBuilding, defaultBuildingVariant, 0);
@@ -164,6 +170,16 @@ export function initMetaBuildingRegistry() {
 
     // Item producer
     registerBuildingVariant(61, MetaItemProducerBuilding);
+
+    // Piston
+    registerBuildingVariant(100, MetaPistonBuilding);
+    registerBuildingVariant(101, MetaPistonBuilding, enumPistonVariants.sticky);
+
+    // Sticky Tile
+    registerBuildingVariant(103, MetaStickyTileBuilding);
+
+    // Button
+    registerBuildingVariant(104, MetaButtonBuilding);
 
     // Propagate instances
     for (const key in gBuildingVariants) {

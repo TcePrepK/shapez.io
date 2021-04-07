@@ -2,6 +2,7 @@ import { globalConfig } from "../core/config";
 import { Vector } from "../core/vector";
 import { BasicSerializableObject, types } from "../savegame/serialization";
 import { BaseItem } from "./base_item";
+import { enumPistonTypes, enumStatusTypes } from "./components/piston";
 import { Entity } from "./entity";
 import { MapChunkView } from "./map_chunk_view";
 
@@ -216,6 +217,196 @@ export class BaseMap extends BasicSerializableObject {
             }
         }
     }
+
+    /**
+     * Finds which entities to move
+     * @param {Entity} entity
+     * @param {Vector} movPos
+     * @param {Object} moveList
+     * @param {Array<Entity>} moveList.list
+     * @param {Boolean} moveList.moveable
+     */
+    findMoveList(entity, movPos, moveList = { list: [], moveable: true }) {
+        assert(entity.components.StaticMapEntity, "Entity is not static");
+        assert(movPos instanceof Vector, "Movement position is not vector");
+        const staticComp = entity.components.StaticMapEntity;
+        const rect = staticComp.getTileSpaceBounds();
+        const sticky = entity.components.Sticky;
+        const pistonComp = entity.components.Piston;
+
+        if (moveList.list.length == 0) {
+            moveList.list.push(entity);
+        }
+
+        if (
+            pistonComp &&
+            (pistonComp.status == enumStatusTypes.on || pistonComp.type == enumPistonTypes.head)
+        ) {
+            moveList.moveable = false;
+            return moveList;
+        }
+
+        const updateList = [];
+        if (!sticky) {
+            for (let dx = 0; dx < rect.w; ++dx) {
+                for (let dy = 0; dy < rect.h; ++dy) {
+                    const x = rect.x + dx + movPos.x;
+                    const y = rect.y + dy + movPos.y;
+                    const content = this.getOrCreateChunkAtTile(x, y).getLayerContentFromWorldCoords(
+                        x,
+                        y,
+                        entity.layer
+                    );
+
+                    if (!content || content == entity) {
+                        continue;
+                    }
+
+                    const pistonComp = content.components.Piston;
+                    if (
+                        pistonComp &&
+                        (pistonComp.status == enumStatusTypes.on || pistonComp.type == enumPistonTypes.head)
+                    ) {
+                        moveList.moveable = false;
+                        return moveList;
+                    }
+
+                    // console.log("something");
+                    if (moveList.list.indexOf(content) === -1) {
+                        moveList.list.push(content);
+                        updateList.push(content);
+                    }
+                }
+            }
+        } else {
+            for (let i = 0; i < sticky.sides.length; i++) {
+                const offPos = sticky.sides[i];
+
+                const x = rect.x + offPos.x;
+                const y = rect.y + offPos.y;
+
+                const content = this.getOrCreateChunkAtTile(x, y).getLayerContentFromWorldCoords(
+                    x,
+                    y,
+                    entity.layer
+                );
+
+                if (!content || content == entity) {
+                    continue;
+                }
+
+                const pistonComp = content.components.Piston;
+                if (
+                    pistonComp &&
+                    (pistonComp.status == enumStatusTypes.on || pistonComp.type == enumPistonTypes.head)
+                ) {
+                    if (offPos.equals(movPos)) {
+                        moveList.moveable = false;
+                        return moveList;
+                    }
+                    continue;
+                }
+
+                if (moveList.list.indexOf(content) === -1) {
+                    moveList.list.push(content);
+                    updateList.push(content);
+                }
+            }
+        }
+
+        for (const content of updateList) {
+            this.findMoveList(content, movPos, moveList);
+        }
+
+        return moveList;
+    }
+
+    /**
+     * Moves entity with given movemen position
+     * @param {Entity} entity
+     * @param {Vector} movPos
+     */
+    moveStaticEntity(entity, movPos) {
+        if (!entity) {
+            return true;
+        }
+        assert(entity.components.StaticMapEntity, "Entity is not static");
+        assert(movPos instanceof Vector, "Movement position is not vector");
+        const moveList = this.findMoveList(entity, movPos);
+
+        if (!moveList.moveable) {
+            return false;
+        }
+
+        if (movPos.x === 0) {
+            moveList.list.sort((a, b) => {
+                const aY = a.components.StaticMapEntity.origin.y;
+                const bY = b.components.StaticMapEntity.origin.y;
+
+                if (aY > bY) return -movPos.y;
+                if (aY < bY) return movPos.y;
+                return 0;
+            });
+        } else {
+            moveList.list.sort((a, b) => {
+                const aX = a.components.StaticMapEntity.origin.x;
+                const bX = b.components.StaticMapEntity.origin.x;
+
+                if (aX > bX) return -movPos.x;
+                if (aX < bX) return movPos.x;
+                return 0;
+            });
+        }
+
+        // const updateList = this.layerEntitiesByMovPos(moveList.list, movPos);
+
+        // moveList.list.reverse();
+
+        // console.log(moveList.list.length);
+
+        for (const content of moveList.list) {
+            this.removeStaticEntity(content);
+            content.components.StaticMapEntity.moveOrigin(movPos);
+            this.placeStaticEntity(content);
+            this.root.signals.entityChanged.dispatch(content);
+        }
+
+        return true;
+    }
+
+    // Helpers
+
+    // /**
+    //  * Lists entities based on origin via movPos
+    //  * @param {Array<Entity>} array
+    //  * @param {Vector} movPos
+    //  * @returns {Object}
+    //  */
+    // layerEntitiesByMovPos(array, movPos) {
+    //     const layeredArray = {};
+    //     // if (movPos.x == 0) {
+    //     //     for (let i = 0; i < array.length; i++) {
+    //     //         const entity = array[i];
+    //     //         const entityY = entity.components.StaticMapEntity.origin.y;
+    //     //         if (!layeredArray[entityY]) {
+    //     //             layeredArray[entityY] = [];
+    //     //         }
+
+    //     //         layeredArray[entityY].push(entity);
+    //     //     }
+    //     // } else {
+    //     //     // for (let i = 0; i < array.length; i++) {
+    //     //         const entity = array[i];
+    //     //         const entityX = entity.components.StaticMapEntity.origin.x;
+    //     //         if (!layeredArray[entityX]) {
+    //     //             layeredArray[entityX] = [];
+    //     //         }
+
+    //     //     layeredArray[entityX].push(entity);
+    //     //     }
+    //     // }
+    //     return layeredArray;
+    // }
 
     // Internal
 
