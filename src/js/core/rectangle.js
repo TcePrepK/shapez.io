@@ -8,6 +8,30 @@ export class Rectangle {
         this.y = y;
         this.w = w;
         this.h = h;
+
+        this.lt = new Vector(x, y);
+        this.rt = new Vector(x + w, y);
+        this.lb = new Vector(x, y + h);
+        this.rb = new Vector(x + w, y + h);
+    }
+
+    /**
+     * @param {Vector} lt
+     * @param {Vector} rt
+     * @param {Vector} rb
+     * @param {Vector} lb
+     */
+    setCorners(lt, rt, rb, lb) {
+        this.lt = lt;
+        this.rt = rt;
+        this.rb = rb;
+        this.lb = lb;
+
+        this.x = lt.x;
+        this.y = lt.y;
+
+        this.w = Math.abs(lt.sub(rt).length());
+        this.h = Math.abs(rt.sub(rb).length());
     }
 
     /**
@@ -76,10 +100,14 @@ export class Rectangle {
      */
     equalsEpsilon(other, epsilon) {
         return (
-            epsilonCompare(this.x, other.x, epsilon) &&
-            epsilonCompare(this.y, other.y, epsilon) &&
-            epsilonCompare(this.w, other.w, epsilon) &&
-            epsilonCompare(this.h, other.h, epsilon)
+            epsilonCompare(this.lt.x, other.lt.x, epsilon) &&
+            epsilonCompare(this.rt.x, other.rt.x, epsilon) &&
+            epsilonCompare(this.rb.x, other.rb.x, epsilon) &&
+            epsilonCompare(this.lb.x, other.lb.x, epsilon) &&
+            epsilonCompare(this.lt.y, other.lt.y, epsilon) &&
+            epsilonCompare(this.rt.y, other.rt.y, epsilon) &&
+            epsilonCompare(this.rb.y, other.rb.y, epsilon) &&
+            epsilonCompare(this.lb.y, other.lb.y, epsilon)
         );
     }
 
@@ -87,28 +115,48 @@ export class Rectangle {
      * @returns {number}
      */
     left() {
-        return this.x;
+        const values = [this.lt.x, this.rt.x, this.rb.x, this.lb.x].sort((a, b) => {
+            if (a < b) return -1;
+            if (a > b) return 1;
+            return 0;
+        });
+        return values[0];
     }
 
     /**
      * @returns {number}
      */
     right() {
-        return this.x + this.w;
+        const values = [this.lt.x, this.rt.x, this.rb.x, this.lb.x].sort((a, b) => {
+            if (a < b) return 1;
+            if (a > b) return -1;
+            return 0;
+        });
+        return values[0];
     }
 
     /**
      * @returns {number}
      */
     top() {
-        return this.y;
+        const values = [this.lt.y, this.rt.y, this.rb.y, this.lb.y].sort((a, b) => {
+            if (a < b) return -1;
+            if (a > b) return 1;
+            return 0;
+        });
+        return values[0];
     }
 
     /**
      * @returns {number}
      */
     bottom() {
-        return this.y + this.h;
+        const values = [this.lt.y, this.rt.y, this.rb.y, this.lb.y].sort((a, b) => {
+            if (a < b) return 1;
+            if (a > b) return -1;
+            return 0;
+        });
+        return values[0];
     }
 
     /**
@@ -116,7 +164,7 @@ export class Rectangle {
      * @returns {[number, number, number, number]}
      */
     trbl() {
-        return [this.y, this.right(), this.bottom(), this.x];
+        return [this.top(), this.right(), this.bottom(), this.bottom()];
     }
 
     /**
@@ -124,7 +172,59 @@ export class Rectangle {
      * @returns {Vector}
      */
     getCenter() {
-        return new Vector(this.x + this.w / 2, this.y + this.h / 2);
+        const x = (this.left() + this.right()) / 2;
+        const y = (this.top() + this.bottom()) / 2;
+        return new Vector(x, y);
+    }
+
+    /**
+     * Returns new rotated rectangle
+     * @param {number} angle
+     * @returns {Rectangle}
+     */
+    rotate(angle) {
+        // if (angle % 90 != 0) {
+        //     this.rotated = true;
+        // } else {
+        //     this.rotated = false;
+        // }
+
+        const rotate_point = (pointX, pointY, originX, originY, angle) => {
+            angle = (angle * Math.PI) / 180;
+            return new Vector(
+                Math.cos(angle) * (pointX - originX) - Math.sin(angle) * (pointY - originY) + originX,
+                Math.sin(angle) * (pointX - originX) + Math.cos(angle) * (pointY - originY) + originY
+            );
+        };
+
+        // const origin = this.getCenter();
+        const origin = globalConfig.root.camera.center;
+        const p1 = this.lt;
+        const p2 = this.rt;
+        const p3 = this.rb;
+        const p4 = this.lb;
+
+        const rp1 = rotate_point(p1.x, p1.y, origin.x, origin.y, angle).round();
+        const rp2 = rotate_point(p2.x, p2.y, origin.x, origin.y, angle).round();
+        const rp3 = rotate_point(p3.x, p3.y, origin.x, origin.y, angle).round();
+        const rp4 = rotate_point(p4.x, p4.y, origin.x, origin.y, angle).round();
+
+        const newRectangle = new Rectangle();
+        newRectangle.setCorners(rp1, rp2, rp3, rp4);
+
+        const rect = this;
+        const parameters = globalConfig.parameters;
+        parameters.context.strokeStyle = "green";
+        parameters.context.beginPath();
+        parameters.context.moveTo(rect.lt.x, rect.lt.y);
+        parameters.context.lineTo(rect.rt.x, rect.rt.y);
+        parameters.context.lineTo(rect.rb.x, rect.rb.y);
+        parameters.context.lineTo(rect.lb.x, rect.lb.y);
+        parameters.context.stroke();
+
+        console.log(this);
+
+        return newRectangle;
     }
 
     /**
@@ -185,8 +285,15 @@ export class Rectangle {
      * @param {number} y
      */
     moveBy(x, y) {
-        this.x += x;
-        this.y += y;
+        this.lt.x += x;
+        this.rt.x += x;
+        this.rb.x += x;
+        this.lb.x += x;
+
+        this.lt.y += y;
+        this.rt.y += y;
+        this.rb.y += y;
+        this.lb.y += y;
     }
 
     /**
@@ -204,7 +311,15 @@ export class Rectangle {
      * @param {number} factor
      */
     allScaled(factor) {
-        return new Rectangle(this.x * factor, this.y * factor, this.w * factor, this.h * factor);
+        const center = this.getCenter();
+        const lt = this.lt.multiplyScalar(factor);
+        const rt = this.rt.multiplyScalar(factor);
+        const rb = this.rb.multiplyScalar(factor);
+        const lb = this.lb.multiplyScalar(factor);
+
+        const rect = new Rectangle();
+        rect.setCorners(lt, rt, rb, lb);
+        return rect;
     }
 
     /**
@@ -213,7 +328,14 @@ export class Rectangle {
      * @returns {Rectangle} new rectangle
      */
     expandedInAllDirections(amount) {
-        return new Rectangle(this.x - amount, this.y - amount, this.w + 2 * amount, this.h + 2 * amount);
+        const lt = this.lt.add(this.lt.normalize().multiplyScalar(amount)).round();
+        const rt = this.rt.add(this.rt.normalize().multiplyScalar(amount)).round();
+        const rb = this.rb.add(this.rb.normalize().multiplyScalar(amount)).round();
+        const lb = this.lb.add(this.lb.normalize().multiplyScalar(amount)).round();
+
+        const rect = new Rectangle();
+        rect.setCorners(lt, rt, rb, lb);
+        return rect;
     }
 
     /**
@@ -222,11 +344,17 @@ export class Rectangle {
      * @returns {boolean}
      */
     containsRect(rect) {
+        // return (
+        //     this.top() <= rect.top() &&
+        //     this.bottom() >= rect.bottom() &&
+        //     this.left() <= rect.left() &&
+        //     this.right() >= rect.right()
+        // );
         return (
-            this.x <= rect.right() &&
-            rect.x <= this.right() &&
-            this.y <= rect.bottom() &&
-            rect.y <= this.bottom()
+            this.left() <= rect.right() &&
+            rect.left() <= this.right() &&
+            this.top() <= rect.bottom() &&
+            rect.top() <= this.bottom()
         );
     }
 
@@ -239,7 +367,7 @@ export class Rectangle {
      * @returns {boolean}
      */
     containsRect4Params(x, y, w, h) {
-        return this.x <= x + w && x <= this.right() && this.y <= y + h && y <= this.bottom();
+        return this.left() <= x + w && x <= this.right() && this.top() <= y + h && y <= this.bottom();
     }
 
     /**
@@ -251,9 +379,9 @@ export class Rectangle {
      */
     containsCircle(x, y, radius) {
         return (
-            this.x <= x + radius &&
+            this.left() <= x + radius &&
             x - radius <= this.right() &&
-            this.y <= y + radius &&
+            this.top() <= y + radius &&
             y - radius <= this.bottom()
         );
     }
@@ -265,7 +393,7 @@ export class Rectangle {
      * @returns {boolean}
      */
     containsPoint(x, y) {
-        return x >= this.x && x < this.right() && y >= this.y && y < this.bottom();
+        return x >= this.left() && x < this.right() && y >= this.top() && y < this.bottom();
     }
 
     /**
@@ -274,11 +402,11 @@ export class Rectangle {
      * @returns {Rectangle|null}
      */
     getIntersection(rect) {
-        const left = Math.max(this.x, rect.x);
-        const top = Math.max(this.y, rect.y);
+        const left = Math.max(this.left(), rect.left());
+        const top = Math.max(this.top(), rect.top());
 
-        const right = Math.min(this.x + this.w, rect.x + rect.w);
-        const bottom = Math.min(this.y + this.h, rect.y + rect.h);
+        const right = Math.min(this.right(), rect.right());
+        const bottom = Math.min(this.bottom(), rect.bottom());
 
         if (right <= left || bottom <= top) {
             return null;
@@ -302,8 +430,8 @@ export class Rectangle {
         }
 
         // Find contained area
-        const left = Math.min(this.x, rect.x);
-        const top = Math.min(this.y, rect.y);
+        const left = Math.min(this.left(), rect.left());
+        const top = Math.min(this.top(), rect.top());
         const right = Math.max(this.right(), rect.right());
         const bottom = Math.max(this.bottom(), rect.bottom());
 

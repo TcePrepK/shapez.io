@@ -9,6 +9,10 @@ import { Entity } from "./entity";
 import { COLOR_ITEM_SINGLETONS } from "./items/color_item";
 import { enumSubShape } from "./shape_definition";
 import { Rectangle } from "../core/rectangle";
+import { MetaDisplayBuilding } from "./buildings/display";
+import { gMetaBuildingRegistry } from "../core/global_registries";
+import { defaultBuildingVariant } from "./meta_building";
+import { ColoredItem, COLORED_ITEM_SINGLETONS } from "./items/colored_item";
 
 const logger = createLogger("map_chunk");
 
@@ -16,8 +20,10 @@ export class MapChunk {
     /**
      * @param {number} x
      * @param {number} y
+     * @param {boolean} limitWorldGen
+     * @param {number} maxChunkLimit
      */
-    constructor(x, y) {
+    constructor(x, y, limitWorldGen = false, maxChunkLimit = -1) {
         this.root = globalConfig.root;
         this.x = x;
         this.y = y;
@@ -26,7 +32,7 @@ export class MapChunk {
 
         /**
          * Stores the contents of the lower (= map resources) layer
-         *  @type {Array<Array<?BaseItem>>}
+         *  @type {Array<Array<BaseItem>>}
          */
         this.lowerLayer = make2DUndefinedArray(globalConfig.mapChunkSize, globalConfig.mapChunkSize);
 
@@ -44,6 +50,9 @@ export class MapChunk {
 
         /** @type {Array<Entity>} */
         this.containedEntities = [];
+
+        this.chunkCenter = new Vector(this.x, this.y).addScalar(0.5);
+        this.distanceToOriginInChunks = Math.round(this.chunkCenter.length());
 
         /**
          * World space rectangle, can be used for culling
@@ -80,7 +89,11 @@ export class MapChunk {
          */
         this.patches = [];
 
-        this.generateLowerLayer();
+        if (!limitWorldGen || this.distanceToOriginInChunks < maxChunkLimit) {
+            this.generateLowerLayer();
+        } else {
+            this.fillChunkWithVoid();
+        }
     }
 
     /**
@@ -268,8 +281,7 @@ export class MapChunk {
             return;
         }
 
-        const chunkCenter = new Vector(this.x, this.y).addScalar(0.5);
-        const distanceToOriginInChunks = Math.round(chunkCenter.length());
+        const distanceToOriginInChunks = this.distanceToOriginInChunks;
 
         // Determine how likely it is that there is a color patch
         const colorPatchChance = 0.9 - clamp(distanceToOriginInChunks / 25, 0, 1) * 0.5;
@@ -284,6 +296,18 @@ export class MapChunk {
         if (rng.next() < shapePatchChance / 4) {
             const shapePatchSize = Math.max(2, Math.round(1 + clamp(distanceToOriginInChunks / 8, 0, 4)));
             this.internalGenerateShapePatch(rng, shapePatchSize, distanceToOriginInChunks);
+        }
+    }
+
+    fillChunkWithVoid() {
+        const black = "#000000";
+        if (COLORED_ITEM_SINGLETONS[black] == undefined) {
+            COLORED_ITEM_SINGLETONS[black] = new ColoredItem(black);
+        }
+        for (let i = 0; i < globalConfig.mapChunkSize; i++) {
+            for (let j = 0; j < globalConfig.mapChunkSize; j++) {
+                this.lowerLayer[i][j] = COLORED_ITEM_SINGLETONS[black];
+            }
         }
     }
 

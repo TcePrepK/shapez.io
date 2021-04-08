@@ -453,9 +453,6 @@ export class Vector {
      * @returns {Vector} this vector
      */
     rotateInplaceFastMultipleOf90(angle) {
-        // const sin = Math.sin(angle);
-        // const cos = Math.cos(angle);
-        // let sin = 0, cos = 1;
         assert(angle >= 0 && angle <= 360, "Invalid angle, please clamp first: " + angle);
 
         switch (angle) {
@@ -492,7 +489,6 @@ export class Vector {
                 return this;
             }
         }
-        // return new Vector(this.x * cos - this.y * sin, this.x * sin + this.y * cos);
     }
 
     /**

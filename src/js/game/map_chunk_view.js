@@ -11,9 +11,11 @@ export class MapChunkView extends MapChunk {
     /**
      * @param {number} x
      * @param {number} y
+     * @param {boolean} limitWorldGen
+     * @param {number} maxChunkLimit
      */
-    constructor(x, y) {
-        super(x, y);
+    constructor(x, y, limitWorldGen = false, maxChunkLimit = -1) {
+        super(x, y, limitWorldGen, maxChunkLimit);
 
         /**
          * Whenever something changes, we increase this number - so we know we need to redraw

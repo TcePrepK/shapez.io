@@ -4,6 +4,7 @@ import { BooleanItem, BOOL_TRUE_SINGLETON, BOOL_FALSE_SINGLETON } from "./items/
 import { ShapeItem } from "./items/shape_item";
 import { ColorItem, COLOR_ITEM_SINGLETONS } from "./items/color_item";
 import { globalConfig } from "../core/config";
+import { ColoredItem, COLORED_ITEM_SINGLETONS } from "./items/colored_item";
 
 /**
  * Resolves items so we share instances
@@ -23,6 +24,13 @@ export function itemResolverSingleton(data) {
         }
         case ColorItem.getId(): {
             return COLOR_ITEM_SINGLETONS[itemData];
+        }
+        case ColoredItem.getId(): {
+            if (COLORED_ITEM_SINGLETONS[itemData] == undefined) {
+                COLORED_ITEM_SINGLETONS[itemData] = new ColoredItem(itemData);
+            }
+
+            return COLORED_ITEM_SINGLETONS[itemData];
         }
 
         default: {

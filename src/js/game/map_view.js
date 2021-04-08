@@ -4,13 +4,19 @@ import { freeCanvas, makeOffscreenBuffer } from "../core/buffer_utils";
 import { Entity } from "./entity";
 import { THEME } from "./theme";
 import { MapChunkView } from "./map_chunk_view";
+import { randomInt } from "../core/utils";
+import { Rectangle } from "../core/rectangle";
 
 /**
  * This is the view of the map, it extends the map which is the raw model and allows
  * to draw it
  */
 export class MapView extends BaseMap {
-    constructor() {
+    /**
+     * @param {boolean} limitWorldGen
+     * @param {number} maxChunkLimit
+     */
+    constructor(limitWorldGen = false, maxChunkLimit = -1) {
         super();
 
         /**
@@ -31,6 +37,11 @@ export class MapView extends BaseMap {
         this.root.signals.entityAdded.add(this.onEntityChanged, this);
         this.root.signals.entityDestroyed.add(this.onEntityChanged, this);
         this.root.signals.entityChanged.add(this.onEntityChanged, this);
+
+        this.seed = randomInt(0, 100000);
+
+        this.limitWorldGen = limitWorldGen;
+        this.maxChunkLimit = maxChunkLimit;
     }
 
     cleanup() {
@@ -190,15 +201,69 @@ export class MapView extends BaseMap {
                 this.cachedBackgroundCanvas,
                 "repeat"
             );
-            parameters.context.fillRect(
-                parameters.visibleRect.x * dpi,
-                parameters.visibleRect.y * dpi,
-                parameters.visibleRect.w * dpi,
-                parameters.visibleRect.h * dpi
-            );
+
+            const rect = parameters.visibleRect;
+            // parameters.context.moveTo(rect.lt.x * dpi, rect.lt.y * dpi);
+            // parameters.context.lineTo(rect.rt.x * dpi, rect.rt.y * dpi);
+            // parameters.context.lineTo(rect.rb.x * dpi, rect.rb.y * dpi);
+            // parameters.context.lineTo(rect.lb.x * dpi, rect.lb.y * dpi);
+            // parameters.context.closePath();
+            // parameters.context.fill();
+
+            // parameters.context.fillRect(
+            //     parameters.visibleRect.x * dpi,
+            //     parameters.visibleRect.y * dpi,
+            //     parameters.visibleRect.w * dpi,
+            //     parameters.visibleRect.h * dpi
+            // );
             parameters.context.scale(dpi, dpi);
         }
 
         this.drawVisibleChunks(MapChunkView.prototype.drawBackgroundLayer);
+
+        const rect = parameters.visibleRect;
+        parameters.context.strokeStyle = "green";
+        parameters.context.fillStyle = "blue";
+        parameters.context.beginPath();
+        parameters.context.moveTo(rect.lt.x, rect.lt.y);
+        parameters.context.lineTo(rect.rt.x, rect.rt.y);
+        parameters.context.lineTo(rect.rb.x, rect.rb.y);
+        parameters.context.lineTo(rect.lb.x, rect.lb.y);
+        parameters.context.closePath();
+        // parameters.context.fill();
+        parameters.context.stroke();
+
+        // console.log(rect);
+        // let rect = new Rectangle(-200, -160, 400, 200);
+        // parameters.context.translate(this.root.gameWidth / 2, this.root.gameHeight / 2);
+        // parameters.context.resetTransform();
+        // parameters.context.rotate(Math.PI / 2);
+        // let rect = parameters.visibleRect;
+        // rect = rect.rotate(-90);
+        // parameters.context.fillStyle = "blue";
+        // parameters.context.fillStyle = "blue";
+        // parameters.context.strokeStyle = "blue";
+        // parameters.context. = 8;
+        // parameters.context.beginPath();
+        // parameters.context.moveTo(rect.lt.x, rect.lt.y);
+        // parameters.context.lineTo(rect.rt.x, rect.rt.y);
+        // parameters.context.lineTo(rect.rb.x, rect.rb.y);
+        // parameters.context.lineTo(rect.lb.x, rect.lb.y);
+        // parameters.context.closePath();
+        // parameters.context.fill();
+        // parameters.context.stroke();
+        // parameters.context.rotate(-Math.PI / 2);
+        // this.root.camera.transform(parameters.context);
+        // parameters.context.translate(this.root.gameWidth / -2, this.root.gameHeight / -2);
+
+        // rect = rect.rotate(this.r++);
+        // console.log(rect);
+        // parameters.context.fillStyle = "green";
+        // parameters.context.beginPath();
+        // parameters.context.moveTo(rect.lt.x, rect.lt.y);
+        // parameters.context.lineTo(rect.rt.x, rect.rt.y);
+        // parameters.context.lineTo(rect.rb.x, rect.rb.y);
+        // parameters.context.lineTo(rect.lb.x, rect.lb.y);
+        // parameters.context.fill();
     }
 }

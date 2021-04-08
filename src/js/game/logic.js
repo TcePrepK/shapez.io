@@ -63,12 +63,15 @@ export class GameLogic {
             for (let y = rect.y; y < rect.y + rect.h; ++y) {
                 // Check if there is any direct collision
                 const otherEntity = this.root.map.getLayerContentXY(x, y, entity.layer);
+                const lowerContent = this.root.map.getLowerLayerContentXY(x, y);
                 if (otherEntity) {
                     const metaClass = otherEntity.components.StaticMapEntity.getMetaBuilding();
                     if (!metaClass.getIsReplaceable()) {
                         // This one is a direct blocker
                         return false;
                     }
+                } else if (lowerContent && !lowerContent.placeable) {
+                    return false;
                 }
             }
         }

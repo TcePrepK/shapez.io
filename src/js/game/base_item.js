@@ -2,7 +2,7 @@ import { globalConfig } from "../core/config";
 import { BasicSerializableObject } from "../savegame/serialization";
 
 /** @type {ItemType[]} **/
-export const itemTypes = ["shape", "color", "boolean"];
+export const itemTypes = ["shape", "color", "boolean", "colored"];
 
 /**
  * Class for items on belts etc. Not an entity for performance reasons
@@ -10,6 +10,12 @@ export const itemTypes = ["shape", "color", "boolean"];
 export class BaseItem extends BasicSerializableObject {
     constructor() {
         super();
+
+        /** @type {boolean} */
+        this.placeable = true;
+
+        /** @type {number} */
+        this.forceAlpha = null;
     }
 
     static getId() {

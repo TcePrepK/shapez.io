@@ -45,6 +45,8 @@ export class Camera extends BasicSerializableObject {
         /** @type {Vector} */
         this.center = new Vector(0, 0);
 
+        this.rotation = 0;
+
         // Input handling
         this.currentlyMoving = false;
         this.lastMovingPosition = null;
@@ -280,12 +282,13 @@ export class Camera extends BasicSerializableObject {
      * @returns {Rectangle}
      */
     getVisibleRect() {
-        return Rectangle.fromTRBL(
+        const rect = Rectangle.fromTRBL(
             Math.floor(this.getViewportTop()),
             Math.ceil(this.getViewportRight()),
             Math.ceil(this.getViewportBottom()),
             Math.floor(this.getViewportLeft())
         );
+        return rect;
     }
 
     getIsMapOverlayActive() {
@@ -341,10 +344,10 @@ export class Camera extends BasicSerializableObject {
      */
     bindKeys() {
         const mapper = this.root.keyMapper;
-        mapper.getBinding(KEYMAPPINGS.navigation.mapMoveUp).add(() => (this.keyboardForce.y = -1));
-        mapper.getBinding(KEYMAPPINGS.navigation.mapMoveDown).add(() => (this.keyboardForce.y = 1));
-        mapper.getBinding(KEYMAPPINGS.navigation.mapMoveRight).add(() => (this.keyboardForce.x = 1));
-        mapper.getBinding(KEYMAPPINGS.navigation.mapMoveLeft).add(() => (this.keyboardForce.x = -1));
+        // mapper.getBinding(KEYMAPPINGS.navigation.mapMoveUp).add(() => (this.keyboardForce.y = -1));
+        // mapper.getBinding(KEYMAPPINGS.navigation.mapMoveDown).add(() => (this.keyboardForce.y = 1));
+        // mapper.getBinding(KEYMAPPINGS.navigation.mapMoveRight).add(() => (this.keyboardForce.x = 1));
+        // mapper.getBinding(KEYMAPPINGS.navigation.mapMoveLeft).add(() => (this.keyboardForce.x = -1));
 
         mapper
             .getBinding(KEYMAPPINGS.navigation.mapZoomIn)
@@ -702,7 +705,7 @@ export class Camera extends BasicSerializableObject {
         }
 
         this.didMoveSinceTouchStart = this.didMoveSinceTouchStart || delta.length() > 0;
-        this.center = this.center.add(delta);
+        // this.center = this.center.add(delta);
 
         this.touchPostMoveVelocity = this.touchPostMoveVelocity
             .multiplyScalar(velocitySmoothing)
@@ -783,27 +786,75 @@ export class Camera extends BasicSerializableObject {
     /**
      * Prepares a context to transform it
      * @param {CanvasRenderingContext2D} context
+     * @param {number} rotation
      */
-    transform(context) {
+    transform(context, rotation) {
         if (G_IS_DEV && globalConfig.debug.testCulling) {
             context.transform(1, 0, 0, 1, 100, 100);
             return;
         }
 
+        const par = this.findTransformValues();
+        const translate = new Vector(par.x, par.y).rotated(Math.radians(0));
+
+        // context.rotate(rotation);
+        context.transform(
+            // Scale, skew, rotate
+            par.a,
+            par.b,
+            par.c,
+            par.d,
+
+            // Translate
+            translate.x,
+            translate.y
+        );
+    }
+
+    findTransformValues() {
         this.clampZoomLevel();
         const zoom = this.zoomLevel;
 
-        context.transform(
+        return {
             // Scale, skew, rotate
-            zoom,
-            0,
-            0,
-            zoom,
+            a: zoom,
+            b: 0,
+            c: 0,
+            d: zoom,
 
             // Translate
-            -zoom * this.getViewportLeft(),
-            -zoom * this.getViewportTop()
-        );
+            x: -zoom * this.getViewportLeft(),
+            y: -zoom * this.getViewportTop(),
+        };
+    }
+
+    /**
+     * Prepares a context to transform it
+     * @param {CanvasRenderingContext2D} context
+     * @param {number} angle
+     */
+    rotate(context, angle) {
+        // this.rotation = angle;
+        const parameters = globalConfig.parameters;
+        // console.log(parameters.visibleRect.getCenter());
+        const center = this.center;
+        const visibleRect = parameters.visibleRect;
+        // visibleRect.moveBy(-center.x, -center.y);
+        parameters.visibleRect = visibleRect.rotate(-angle);
+        // visibleRect.moveBy(center.x, center.y);
+        // parameters.visibleRect = parameters.visibleRect.allScaled(1 / 2);
+        // console.log(parameters.visibleRect.getCenter());
+        // console.log("-------------------------------");
+        // context.resetTransform();
+        context.rotate(Math.radians(angle));
+        // this.transform(context);
+        // globalConfig.parameters.visibleRect = globalConfig.parameters.visibleRect.rotate(angle);
+        // globalConfig.parameters.visibleRect.h *= 2;
+
+        // console.log("--------------------------------");
+        // console.log(this.center);
+        // console.log(globalConfig.parameters.visibleRect);
+        // console.log(this.getVisibleRect());
     }
 
     /**
@@ -1002,8 +1053,19 @@ export class Camera extends BasicSerializableObject {
                 this.root.app.settings.getMovementSpeed() *
                 (actionMapper.getBinding(KEYMAPPINGS.navigation.mapMoveFaster).pressed ? 4 : 1);
 
-            this.center.x += moveAmount * forceX * movementSpeed;
-            this.center.y += moveAmount * forceY * movementSpeed;
+            const angle = this.root.camera.rotation;
+            const moveVector = new Vector(
+                moveAmount * forceX * movementSpeed,
+                moveAmount * forceY * movementSpeed
+            );
+            // const moveVector = new Vector(
+            //     moveAmount * forceX * movementSpeed,
+            //     moveAmount * forceY * movementSpeed
+            // );
+
+            this.center.addInplace(moveVector);
+            // this.center.x += moveAmount * forceX * movementSpeed;
+            // this.center.y += moveAmount * forceY * movementSpeed;
         }
     }
 }

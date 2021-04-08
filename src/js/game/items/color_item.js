@@ -46,6 +46,7 @@ export class ColorItem extends BaseItem {
      */
     constructor(color) {
         super();
+
         this.color = color;
     }
 

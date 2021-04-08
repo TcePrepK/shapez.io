@@ -276,6 +276,7 @@ ingame:
         clearSelection: Clear selection
         pipette: Pipette
         switchLayers: Switch layers
+        switchMaps: Switch maps
 
     # Names of the colors, used for the color blind mode
     colors:
@@ -1101,6 +1102,7 @@ keybindings:
         toggleHud: Toggle HUD
         toggleFPSInfo: Toggle FPS and Debug Info
         switchLayers: Switch layers
+        switchMaps: Switch maps
         exportScreenshot: Export whole Base as Image
 
         # --- Do not translate the values in this section

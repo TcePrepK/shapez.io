@@ -26,6 +26,9 @@ export class BaseMap extends BasicSerializableObject {
          * Mapping of 'X|Y' to chunk
          * @type {Map<string, MapChunkView>} */
         this.chunksById = new Map();
+
+        this.limitWorldGen = null;
+        this.maxChunkLimit = null;
     }
 
     /**
@@ -42,7 +45,7 @@ export class BaseMap extends BasicSerializableObject {
         }
 
         if (createIfNotExistent) {
-            const instance = new MapChunkView(chunkX, chunkY);
+            const instance = new MapChunkView(chunkX, chunkY, this.limitWorldGen, this.maxChunkLimit);
             this.chunksById.set(chunkIdentifier, instance);
             return instance;
         }

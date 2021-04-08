@@ -44,6 +44,7 @@ import { HUDStandaloneAdvantages } from "./parts/standalone_advantages";
 import { HUDCatMemes } from "./parts/cat_memes";
 import { HUDTutorialVideoOffer } from "./parts/tutorial_video_offer";
 import { HUDConstantSignalEdit } from "./parts/constant_signal_edit";
+import { HUDSwitchMap } from "./parts/switch_map";
 
 export class GameHUD {
     constructor() {
@@ -95,6 +96,8 @@ export class GameHUD {
 
             minerHighlight: new HUDMinerHighlight(),
             tutorialVideoOffer: new HUDTutorialVideoOffer(),
+
+            switchMaps: new HUDSwitchMap(),
 
             // Typing hints
             /* typehints:start */

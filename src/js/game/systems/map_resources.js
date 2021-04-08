@@ -3,6 +3,7 @@ import { GameSystem } from "../game_system";
 import { MapChunkView } from "../map_chunk_view";
 import { THEME } from "../theme";
 import { drawSpriteClipped } from "../../core/draw_utils";
+import { BaseItem } from "../base_item";
 
 export class MapResourcesSystem extends GameSystem {
     /**
@@ -101,7 +102,12 @@ export class MapResourcesSystem extends GameSystem {
                 const item = row[y];
                 if (item) {
                     context.fillStyle = item.getBackgroundColorAsResource();
+                    let temp = context.globalAlpha;
+                    if (item.forceAlpha) {
+                        context.globalAlpha = item.forceAlpha;
+                    }
                     context.fillRect(x, y, 1, 1);
+                    context.globalAlpha = temp;
                 }
             }
         }

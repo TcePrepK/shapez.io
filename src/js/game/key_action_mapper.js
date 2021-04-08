@@ -1,6 +1,7 @@
 import { Signal, STOP_PROPAGATION } from "../core/signal";
 import { globalConfig, IS_MOBILE } from "../core/config";
 import { T } from "../translations";
+import { InputReceiver } from "../core/input_receiver";
 function key(str) {
     return str.toUpperCase().charCodeAt(0);
 }
@@ -22,10 +23,11 @@ export const KEYMAPPINGS = {
         menuClose: { keyCode: key("Q") },
 
         toggleHud: { keyCode: 113 }, // F2
-        exportScreenshot: { keyCode: 114 }, // F3PS
+        exportScreenshot: { keyCode: 114 }, // F3PS"
         toggleFPSInfo: { keyCode: 115 }, // F4
 
         switchLayers: { keyCode: key("E") },
+        switchMaps: { keyCode: key("N") },
     },
 
     navigation: {
