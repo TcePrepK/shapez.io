@@ -37,7 +37,6 @@ export class PistonComponent extends Component {
         this.type = "regular";
         this.status = enumStatusTypes.off;
 
-        this.maxHeadSpan = 1;
         this.headSpan = 0;
     }
 }

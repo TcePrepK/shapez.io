@@ -15,6 +15,9 @@ import { MetaStorageBuilding } from "../../buildings/storage";
 import { MetaPistonBuilding } from "../../buildings/piston";
 import { MetaStickyTileBuilding } from "../../buildings/sticky_tile";
 import { MetaButtonBuilding } from "../../buildings/button";
+import { MetaObserverBuilding } from "../../buildings/observer";
+import { MetaSignalBlockBuilding } from "../../buildings/signal_block";
+import { MetaExplosiveBuilding } from "../../buildings/explosive";
 
 export class HUDWiresToolbar extends HUDBaseToolbar {
     constructor() {
@@ -38,6 +41,9 @@ export class HUDWiresToolbar extends HUDBaseToolbar {
                 MetaPistonBuilding,
                 MetaStickyTileBuilding,
                 MetaButtonBuilding,
+                MetaObserverBuilding,
+                MetaSignalBlockBuilding,
+                MetaExplosiveBuilding,
             ],
             visibilityCondition: () =>
                 !this.root.camera.getIsMapOverlayActive() && this.root.currentLayer === "wires",

@@ -161,6 +161,15 @@ export class MetaBuilding {
     }
 
     /**
+     * Returns whether this building is pushable
+     * @param {string} variant
+     * @returns {boolean}
+     */
+    getIsMoveable(variant) {
+        return true;
+    }
+
+    /**
      * Returns whether this building is unlocked for the given game
      */
     getIsUnlocked() {

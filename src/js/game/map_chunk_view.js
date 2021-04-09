@@ -60,12 +60,14 @@ export class MapChunkView extends MapChunk {
         const systems = this.root.systemMgr.systems;
 
         systems.staticMapEntities.drawChunk(this);
-        systems.piston.drawChunk(this);
         systems.lever.drawChunk(this);
-        systems.button.drawChunk(this);
         systems.display.drawChunk(this);
         systems.storage.drawChunk(this);
         systems.itemProcessorOverlays.drawChunk(this);
+
+        systems.piston.drawChunk(this);
+        systems.button.drawChunk(this);
+        systems.explosive.drawChunk(this);
     }
 
     /**

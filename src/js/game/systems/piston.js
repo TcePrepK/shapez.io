@@ -6,7 +6,7 @@ import { enumPistonVariants } from "../buildings/piston";
 import { Entity } from "../entity";
 import { getBuildingDataFromCode } from "../building_codes";
 import { WiredPinsComponent } from "../components/wired_pins";
-import { fastArrayDeleteValue } from "../../core/utils";
+import { clamp, fastArrayDeleteValue } from "../../core/utils";
 import { MapChunkView } from "../map_chunk_view";
 import { globalConfig } from "../../core/config";
 import { Loader } from "../../core/loader";
@@ -20,13 +20,13 @@ export class PistonSystem extends GameSystemWithFilter {
         this.fixRequired = true;
         this.pistonSprites = {
             [enumPistonTypes.regular]: {
-                body: Loader.getSprite("sprites/buildings/piston_regular_body.png"),
+                body: Loader.getSprite("sprites/buildings/piston_body.png"),
                 head: Loader.getSprite("sprites/buildings/piston_regular_head.png"),
             },
 
             [enumPistonTypes.sticky]: {
-                body: Loader.getSprite("sprites/buildings/piston_regular_body.png"),
-                head: Loader.getSprite("sprites/buildings/piston_regular_head.png"),
+                body: Loader.getSprite("sprites/buildings/piston_body.png"),
+                head: Loader.getSprite("sprites/buildings/piston_sticky_head.png"),
             },
         };
     }
@@ -71,6 +71,17 @@ export class PistonSystem extends GameSystemWithFilter {
         const rotation = staticComp.rotation;
         const pushVector = new Vector(0, -1).rotateInplaceFastMultipleOf90(rotation);
         const pullVector = pushVector.multiplyScalar(-1);
+
+        const otherOrigin = staticComp.origin.add(pushVector);
+        const otherEntity = this.root.map.getLayerContentXY(otherOrigin.x, otherOrigin.y, entity.layer);
+
+        if (!otherEntity) {
+            return;
+        }
+
+        if (otherEntity !== entity) {
+            return;
+        }
 
         entity.components.StaticMapEntity.moveOrigin(pushVector);
         this.root.map.removeStaticEntity(entity);
@@ -157,26 +168,30 @@ export class PistonSystem extends GameSystemWithFilter {
                     const pistonComp = entity.components.Piston;
                     const pistonType = pistonComp.type;
 
-                    if (pistonComp.status == enumStatusTypes.on && pistonComp.headSpan < 0.8) {
-                        pistonComp.headSpan += 0.1;
-                    } else if (pistonComp.status == enumStatusTypes.off && pistonComp.headSpan > 0.1) {
-                        pistonComp.headSpan -= 0.1;
+                    // Calculating head span with in 0-10 instead of 0-1 because of floating points.
+                    if (pistonComp.status == enumStatusTypes.on && pistonComp.headSpan <= 8) {
+                        pistonComp.headSpan += 1;
+                    } else if (pistonComp.status == enumStatusTypes.off && pistonComp.headSpan >= 1) {
+                        pistonComp.headSpan -= 1;
                     }
+
+                    // To be safe
+                    clamp(pistonComp.headSpan, 0, 10);
+                    const headSpan = pistonComp.headSpan / 10;
 
                     const staticComp = entity.components.StaticMapEntity;
                     const rotation = staticComp.rotation;
-                    const pushVector = new Vector(0, -pistonComp.headSpan).rotateInplaceFastMultipleOf90(
-                        rotation
-                    );
+                    const pushVector = new Vector(0, -headSpan).rotateInplaceFastMultipleOf90(rotation);
 
                     const sprites = this.pistonSprites[pistonType];
 
-                    // if (pistonComp.headSpan >= 0) {
                     staticComp.drawSpriteOnBoundsClipped(
                         sprites.head,
                         0,
                         null,
-                        pushVector.multiplyScalar(globalConfig.tileSize)
+                        pushVector.multiplyScalar(globalConfig.tileSize),
+                        0,
+                        2 - 2 * headSpan
                     );
                     // }
                     staticComp.drawSpriteOnBoundsClipped(sprites.body);

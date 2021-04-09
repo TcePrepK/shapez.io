@@ -6,12 +6,6 @@ export class ButtonComponent extends Component {
         return "Button";
     }
 
-    static getSchema() {
-        return {
-            toggled: types.bool,
-        };
-    }
-
     /**
      * Copy the current state to another component
      * @param {ButtonComponent} otherComponent
@@ -31,6 +25,6 @@ export class ButtonComponent extends Component {
         const desiredFPS = this.root.app.settings.getDesiredFps();
         const oneAndHalfSecond = desiredFPS * 1.5;
         this.maxSpan = oneAndHalfSecond; // Minecraft button lives only 1.5 second :P
-        this.lifeSpan = this.maxSpan;
+        this.lifeSpan = 0;
     }
 }

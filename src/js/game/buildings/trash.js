@@ -34,23 +34,8 @@ export class MetaTrashBuilding extends MetaBuilding {
         return this.root.hubGoals.isRewardUnlocked(enumHubGoalRewards.reward_cutter_and_trash);
     }
 
-    addAchievementReceiver(entity) {
-        if (!entity.root) {
-            return;
-        }
-
-        const itemProcessor = entity.components.ItemProcessor;
-        const tryTakeItem = itemProcessor.tryTakeItem.bind(itemProcessor);
-
-        itemProcessor.tryTakeItem = () => {
-            const taken = tryTakeItem(...arguments);
-
-            if (taken) {
-                entity.root.signals.achievementCheck.dispatch(ACHIEVEMENTS.trash1000, 1);
-            }
-
-            return taken;
-        };
+    getIsMoveable() {
+        return false;
     }
 
     addAchievementReceiver(entity) {

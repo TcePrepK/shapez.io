@@ -22,6 +22,9 @@ import { ItemProducerComponent } from "./components/item_producer";
 import { PistonComponent } from "./components/piston";
 import { StickyComponent } from "./components/sticky";
 import { ButtonComponent } from "./components/button";
+import { ObserverComponent } from "./components/observer";
+import { SignalBlockComponent } from "./components/signal_block";
+import { ExplosiveComponent } from "./components/explosive";
 /* typehints:end */
 
 /**
@@ -100,6 +103,15 @@ export class EntityComponentStorage {
 
         /** @type {ButtonComponent} */
         this.Button;
+
+        /** @type {ObserverComponent} */
+        this.Observer;
+
+        /** @type {SignalBlockComponent} */
+        this.SignalBlock;
+
+        /** @type {ExplosiveComponent} */
+        this.Explosive;
 
         /* typehints:end */
     }

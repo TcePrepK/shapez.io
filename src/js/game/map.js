@@ -271,6 +271,13 @@ export class BaseMap extends BasicSerializableObject {
                         return moveList;
                     }
 
+                    const metaClass = entity.components.StaticMapEntity.getMetaBuilding();
+                    const variant = entity.components.StaticMapEntity.getVariant();
+                    if (!metaClass.getIsMoveable(variant)) {
+                        moveList.moveable = false;
+                        return moveList;
+                    }
+
                     // console.log("something");
                     if (moveList.list.indexOf(content) === -1) {
                         moveList.list.push(content);

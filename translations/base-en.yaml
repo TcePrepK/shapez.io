@@ -719,6 +719,21 @@ buildings:
             name: Button
             description: Minecraft button
 
+    observer:
+        default:
+            name: Observer
+            description: Minecraft observer
+
+    signal_block:
+        default:
+            name: Signal Block
+            description: Minecraft redstone block
+
+    explosive:
+        default:
+            name: Explosive
+            description: Minecraft tnt
+
 storyRewards:
     # Those are the rewards gained from completing the store
     reward_cutter_and_trash:
@@ -1148,9 +1163,13 @@ keybindings:
         analyzer: *analyzer
         comparator: *comparator
         item_producer: Item Producer (Sandbox)
+
         piston: Piston
         sticky_tile: Sticky Tile
         button: Button
+        observer: Observer
+        signal_block: Signal Block
+        explosive: Explosive
         # ---
 
         pipette: Pipette

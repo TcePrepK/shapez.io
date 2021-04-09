@@ -23,6 +23,9 @@ import { ItemProducerSystem } from "./systems/item_producer";
 import { PistonSystem } from "./systems/piston";
 import { globalConfig } from "../core/config";
 import { ButtonSystem } from "./systems/button";
+import { ObserverSystem } from "./systems/observer";
+import { SignalBlockSystem } from "./systems/signal_block";
+import { ExplosiveSystem } from "./systems/explosive";
 
 const logger = createLogger("game_system_manager");
 
@@ -101,6 +104,15 @@ export class GameSystemManager {
             /** @type {ButtonSystem} */
             button: null,
 
+            /** @type {ObserverSystem} */
+            observer: null,
+
+            /** @type {SignalBlockSystem} */
+            signalBlock: null,
+
+            /** @type {ExplosiveSystem} */
+            explosive: null,
+
             /* typehints:end */
         };
         this.systemUpdateOrder = [];
@@ -169,6 +181,12 @@ export class GameSystemManager {
         add("piston", PistonSystem);
 
         add("button", ButtonSystem);
+
+        add("observer", ObserverSystem);
+
+        add("signalBlock", SignalBlockSystem);
+
+        add("explosive", ExplosiveSystem);
 
         logger.log("📦 There are", this.systemUpdateOrder.length, "game systems");
     }

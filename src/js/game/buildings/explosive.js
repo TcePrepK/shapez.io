@@ -1,31 +1,20 @@
 import { enumDirection, Vector } from "../../core/vector";
+import { enumPinSlotType, WiredPinsComponent } from "../components/wired_pins";
 import { Entity } from "../entity";
-import { defaultBuildingVariant, MetaBuilding } from "../meta_building";
-import { WiredPinsComponent, enumPinSlotType } from "../components/wired_pins";
-import { PistonComponent } from "../components/piston";
+import { MetaBuilding } from "../meta_building";
+import { ExplosiveComponent } from "../components/explosive";
 
-/** @enum {string} */
-export const enumPistonVariants = { [defaultBuildingVariant]: "regular", sticky: "sticky" };
-
-export class MetaPistonBuilding extends MetaBuilding {
+export class MetaExplosiveBuilding extends MetaBuilding {
     constructor() {
-        super("piston");
+        super("explosive");
     }
 
     getSilhouetteColor() {
         return "#000000";
     }
 
-    getAvailableVariants() {
-        return [defaultBuildingVariant, enumPistonVariants.sticky];
-    }
-
     getIsUnlocked() {
         return true;
-    }
-
-    getSprite() {
-        return null;
     }
 
     getShowWiresLayerPreview() {
@@ -46,6 +35,11 @@ export class MetaPistonBuilding extends MetaBuilding {
                 slots: [
                     {
                         pos: new Vector(0, 0),
+                        direction: enumDirection.top,
+                        type: enumPinSlotType.logicalAcceptor,
+                    },
+                    {
+                        pos: new Vector(0, 0),
                         direction: enumDirection.right,
                         type: enumPinSlotType.logicalAcceptor,
                     },
@@ -59,24 +53,9 @@ export class MetaPistonBuilding extends MetaBuilding {
                         direction: enumDirection.left,
                         type: enumPinSlotType.logicalAcceptor,
                     },
-                    {
-                        pos: new Vector(0, 0),
-                        direction: enumDirection.top,
-                        type: enumPinSlotType.logicalAcceptor,
-                    },
                 ],
             })
         );
-
-        entity.addComponent(new PistonComponent());
-    }
-
-    /**
-     * @param {Entity} entity
-     * @param {number} rotationVariant
-     * @param {string} variant
-     */
-    updateVariants(entity, rotationVariant, variant) {
-        entity.components.Piston.type = enumPistonVariants[variant];
+        entity.addComponent(new ExplosiveComponent());
     }
 }

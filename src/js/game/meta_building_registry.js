@@ -16,13 +16,16 @@ import { MetaLeverBuilding } from "./buildings/lever";
 import { enumLogicGateVariants, MetaLogicGateBuilding } from "./buildings/logic_gate";
 import { enumMinerVariants, MetaMinerBuilding } from "./buildings/miner";
 import { MetaMixerBuilding } from "./buildings/mixer";
+import { MetaObserverBuilding } from "./buildings/observer";
 import { enumPainterVariants, MetaPainterBuilding } from "./buildings/painter";
 import { enumPistonVariants, MetaPistonBuilding } from "./buildings/piston";
 import { MetaReaderBuilding } from "./buildings/reader";
 import { enumRotaterVariants, MetaRotaterBuilding } from "./buildings/rotater";
+import { MetaSignalBlockBuilding } from "./buildings/signal_block";
 import { MetaStackerBuilding } from "./buildings/stacker";
 import { MetaStickyTileBuilding } from "./buildings/sticky_tile";
 import { MetaStorageBuilding } from "./buildings/storage";
+import { MetaExplosiveBuilding } from "./buildings/explosive";
 import { enumTransistorVariants, MetaTransistorBuilding } from "./buildings/transistor";
 import { MetaTrashBuilding } from "./buildings/trash";
 import { enumUndergroundBeltVariants, MetaUndergroundBeltBuilding } from "./buildings/underground_belt";
@@ -65,6 +68,9 @@ export function initMetaBuildingRegistry() {
     gMetaBuildingRegistry.register(MetaPistonBuilding);
     gMetaBuildingRegistry.register(MetaStickyTileBuilding);
     gMetaBuildingRegistry.register(MetaButtonBuilding);
+    gMetaBuildingRegistry.register(MetaObserverBuilding);
+    gMetaBuildingRegistry.register(MetaSignalBlockBuilding);
+    gMetaBuildingRegistry.register(MetaExplosiveBuilding);
 
     // Belt
     registerBuildingVariant(1, MetaBeltBuilding, defaultBuildingVariant, 0);
@@ -175,11 +181,20 @@ export function initMetaBuildingRegistry() {
     registerBuildingVariant(100, MetaPistonBuilding);
     registerBuildingVariant(101, MetaPistonBuilding, enumPistonVariants.sticky);
 
+    // Observer
+    registerBuildingVariant(102, MetaObserverBuilding);
+
     // Sticky Tile
     registerBuildingVariant(103, MetaStickyTileBuilding);
 
     // Button
     registerBuildingVariant(104, MetaButtonBuilding);
+
+    // Signal Block
+    registerBuildingVariant(105, MetaSignalBlockBuilding);
+
+    // Explosive
+    registerBuildingVariant(106, MetaExplosiveBuilding);
 
     // Propagate instances
     for (const key in gBuildingVariants) {
@@ -206,18 +221,20 @@ export function initMetaBuildingRegistry() {
             const id = metaBuilding.getId();
             if (!["hub"].includes(id)) {
                 if (!KEYMAPPINGS.buildings[id]) {
-                    assertAlways(
-                        false,
+                    logger.error(
                         "Building " + id + " has no keybinding assigned! Add it to key_action_mapper.js"
                     );
+                    KEYMAPPINGS.buildings[id] = { keyCode: ".".toUpperCase().charCodeAt(0), id };
                 }
 
                 if (!T.buildings[id]) {
-                    assertAlways(false, "Translation for building " + id + " missing!");
+                    logger.error("Translation for building " + id + " missing!");
+                    T.buildings[id] = {};
                 }
 
                 if (!T.buildings[id].default) {
-                    assertAlways(false, "Translation for building " + id + " missing (default variant)!");
+                    logger.error("Translation for building " + id + " missing (default variant)!");
+                    T.buildings[id] = { default: { name: id, description: "NaN" } };
                 }
             }
         });

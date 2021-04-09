@@ -2,9 +2,13 @@ import { Signal, STOP_PROPAGATION } from "../core/signal";
 import { globalConfig, IS_MOBILE } from "../core/config";
 import { T } from "../translations";
 import { InputReceiver } from "../core/input_receiver";
+import { createLogger } from "../core/logging";
+
 function key(str) {
     return str.toUpperCase().charCodeAt(0);
 }
+
+const logger = createLogger("key_action_mapper");
 
 const KEYCODE_UP_ARROW = 38;
 const KEYCODE_DOWN_ARROW = 40;
@@ -376,7 +380,8 @@ export class KeyActionMapper {
                 if (G_IS_DEV) {
                     // Sanity
                     if (!T.keybindings.mappings[key]) {
-                        assertAlways(false, "Keybinding " + key + " has no translation!");
+                        logger.error("Keybinding " + key + " has no translation!");
+                        T.keybindings.mappings[key] = key;
                     }
                 }
             }

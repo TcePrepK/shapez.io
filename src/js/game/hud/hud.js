@@ -45,6 +45,7 @@ import { HUDCatMemes } from "./parts/cat_memes";
 import { HUDTutorialVideoOffer } from "./parts/tutorial_video_offer";
 import { HUDConstantSignalEdit } from "./parts/constant_signal_edit";
 import { HUDButtonToggle } from "./parts/button_toggle";
+import { HUDSignalBlockEdit } from "./parts/signal_block_edit";
 
 export class GameHUD {
     constructor() {
@@ -82,6 +83,7 @@ export class GameHUD {
             leverToggle: new HUDLeverToggle(),
             buttonToggle: new HUDButtonToggle(),
             constantSignalEdit: new HUDConstantSignalEdit(),
+            signalBlockEdit: new HUDSignalBlockEdit(),
 
             // Must always exist
             pinnedShapes: new HUDPinnedShapes(),

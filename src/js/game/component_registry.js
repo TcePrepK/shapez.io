@@ -22,6 +22,9 @@ import { ItemProducerComponent } from "./components/item_producer";
 import { PistonComponent } from "./components/piston";
 import { StickyComponent } from "./components/sticky";
 import { ButtonComponent } from "./components/button";
+import { ObserverComponent } from "./components/observer";
+import { SignalBlockComponent } from "./components/signal_block";
+import { ExplosiveComponent } from "./components/explosive";
 
 export function initComponentRegistry() {
     gComponentRegistry.register(StaticMapEntityComponent);
@@ -44,9 +47,13 @@ export function initComponentRegistry() {
     gComponentRegistry.register(BeltReaderComponent);
     gComponentRegistry.register(FilterComponent);
     gComponentRegistry.register(ItemProducerComponent);
+
     gComponentRegistry.register(PistonComponent);
     gComponentRegistry.register(StickyComponent);
     gComponentRegistry.register(ButtonComponent);
+    gComponentRegistry.register(ObserverComponent);
+    gComponentRegistry.register(SignalBlockComponent);
+    gComponentRegistry.register(ExplosiveComponent);
 
     // IMPORTANT ^^^^^ UPDATE ENTITY COMPONENT STORAGE AFTERWARDS
 

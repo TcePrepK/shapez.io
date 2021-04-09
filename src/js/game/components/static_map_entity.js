@@ -250,7 +250,9 @@ export class StaticMapEntityComponent extends Component {
         sprite,
         extrudePixels = 0,
         overridePosition = null,
-        positionOffset = new Vector(0, 0)
+        positionOffset = new Vector(0, 0),
+        spriteLimitX = 0,
+        spriteLimitY = 0
     ) {
         const parameters = globalConfig.parameters;
         if (!this.shouldBeDrawn() && !overridePosition) {
@@ -270,8 +272,8 @@ export class StaticMapEntityComponent extends Component {
             sprite.drawCached(
                 worldX - extrudePixels * size.x,
                 worldY - extrudePixels * size.y,
-                globalConfig.tileSize * size.x + 2 * extrudePixels * size.x,
-                globalConfig.tileSize * size.y + 2 * extrudePixels * size.y
+                globalConfig.tileSize * size.x + 2 * extrudePixels * size.x - spriteLimitX,
+                globalConfig.tileSize * size.y + 2 * extrudePixels * size.y - spriteLimitY
             );
         } else {
             const rotationCenterX = worldX + globalConfig.halfTileSize;
@@ -282,8 +284,8 @@ export class StaticMapEntityComponent extends Component {
             sprite.drawCached(
                 -globalConfig.halfTileSize - extrudePixels * size.x,
                 -globalConfig.halfTileSize - extrudePixels * size.y,
-                globalConfig.tileSize * size.x + 2 * extrudePixels * size.x,
-                globalConfig.tileSize * size.y + 2 * extrudePixels * size.y,
+                globalConfig.tileSize * size.x + 2 * extrudePixels * size.x - spriteLimitX,
+                globalConfig.tileSize * size.y + 2 * extrudePixels * size.y - spriteLimitY,
                 false // no clipping possible here
             );
             parameters.context.rotate(-Math.radians(this.rotation));

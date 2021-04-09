@@ -42,6 +42,7 @@ export class MinerSystem extends GameSystemWithFilter {
             // Reset everything on recompute
             if (this.needsRecompute) {
                 minerComp.cachedChainedMiner = null;
+                minerComp.cachedMinedItem = null;
             }
 
             // Check if miner is above an actual tile
