@@ -74,7 +74,6 @@ export class ConstantSignalSystem extends GameSystemWithFilter {
         });
 
         const dialog = new DialogWithForm({
-            app: this.root.app,
             title: T.dialogs.editSignal.title,
             desc: T.dialogs.editSignal.descItems,
             formElements: [itemInput, signalValueInput],

@@ -1,4 +1,3 @@
-import { globalConfig } from "../core/config";
 const circularJson = require("circular-json");
 
 /*
@@ -227,8 +226,9 @@ function extractHandleContext(handle) {
 function logInternal(handle, consoleMethod, args) {
     const context = extractHandleContext(handle).padEnd(20, " ");
     const labelColor = handle && handle.LOG_LABEL_COLOR ? handle.LOG_LABEL_COLOR : "#aaa";
+    const debug = require("./config.local.template").default;
 
-    if (G_IS_DEV && globalConfig.debug.logTimestamps) {
+    if (G_IS_DEV && debug.logTimestamps) {
         const timestamp = "⏱ %c" + (Math.floor(performance.now()) + "").padEnd(6, " ") + "";
         consoleMethod.call(
             console,
@@ -238,10 +238,6 @@ function logInternal(handle, consoleMethod, args) {
             ...args
         );
     } else {
-        // if (G_IS_DEV && !globalConfig.debug.disableLoggingLogSources) {
         consoleMethod.call(console, "%c" + context, "color: " + labelColor, ...args);
-        // } else {
-        // consoleMethod.call(console, ...args);
-        // }
     }
 }
