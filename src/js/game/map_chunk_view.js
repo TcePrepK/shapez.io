@@ -4,6 +4,7 @@ import { Entity } from "./entity";
 import { MapChunk } from "./map_chunk";
 import { THEME } from "./theme";
 import { drawSpriteClipped } from "../core/draw_utils";
+import { Rectangle } from "../core/rectangle";
 
 export const CHUNK_OVERLAY_RES = 3;
 
@@ -68,8 +69,9 @@ export class MapChunkView extends MapChunk {
 
     /**
      * Overlay
+     * @param {Rectangle} visibleRect
      */
-    drawOverlay() {
+    drawOverlay(visibleRect) {
         const parameters = globalConfig.parameters;
         const overlaySize = globalConfig.mapChunkSize * CHUNK_OVERLAY_RES;
         const sprite = this.root.buffers.getForKey({
@@ -94,6 +96,7 @@ export class MapChunkView extends MapChunk {
             h: dims + 2 * extrude,
             originalW: overlaySize,
             originalH: overlaySize,
+            visibleRect: visibleRect,
         });
 
         parameters.context.imageSmoothingEnabled = true;

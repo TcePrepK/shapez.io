@@ -81,12 +81,17 @@ let warningsShown = 0;
  * @param {number} param0.h
  * @param {number} param0.originalW
  * @param {number} param0.originalH
+ * @param {Rectangle} param0.visibleRect
  */
-export function drawSpriteClipped({ sprite, x, y, w, h, originalW, originalH }) {
+export function drawSpriteClipped({ sprite, x, y, w, h, originalW, originalH, visibleRect }) {
     const parameters = globalConfig.parameters;
     const rect = new Rectangle(x, y, w, h);
-    const intersection = rect.getIntersection(parameters.visibleRect);
+    let intersection = rect.getIntersection(visibleRect ? visibleRect : parameters.visibleRect);
     if (!intersection) {
+        if (visibleRect) {
+            console.log(rect);
+            console.log(visibleRect);
+        }
         // Clipped
         if (++warningsShown % 200 === 1) {
             logger.warn(

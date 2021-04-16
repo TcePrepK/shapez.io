@@ -452,12 +452,31 @@ export class GameCore {
                 // Static map entities
                 root.map.drawWiresForegroundLayer();
             }
+
+            // Mini Map
+            const scale = 10;
+
+            const w = (root.gameWidth / scale) * 1.5;
+            const h = (root.gameHeight / scale) * 1.5;
+            const center = root.camera.center;
+            const transWidth = (root.gameWidth / 2 - w * 2) * scale;
+            const transHeight = (root.gameHeight / 2 - h * 2) * scale;
+
+            context.scale(1 / scale, 1 / scale);
+            context.translate(transWidth, transHeight);
+
+            root.map.drawOverlay(
+                new Rectangle((center.x - w / 2) * scale, (center.y - h / 2) * scale, w * scale, h * scale)
+            );
+
+            context.translate(-transWidth, -transHeight);
+            context.scale(scale, scale);
         }
 
         if (this.overlayAlpha > 0.01) {
             // Map overview
             context.globalAlpha = this.overlayAlpha;
-            root.map.drawOverlay();
+            root.map.drawOverlay(params.visibleRect);
             context.globalAlpha = 1;
         }
 

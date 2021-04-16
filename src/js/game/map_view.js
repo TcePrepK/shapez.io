@@ -4,6 +4,7 @@ import { freeCanvas, makeOffscreenBuffer } from "../core/buffer_utils";
 import { Entity } from "./entity";
 import { THEME } from "./theme";
 import { MapChunkView } from "./map_chunk_view";
+import { Rectangle } from "../core/rectangle";
 
 /**
  * This is the view of the map, it extends the map which is the raw model and allows
@@ -132,10 +133,13 @@ export class MapView extends BaseMap {
     /**
      * Calls a given method on all given chunks
      * @param {function} method
+     * @param {Rectangle} visibleRect
      */
-    drawVisibleChunks(method) {
+    drawVisibleChunks(method, visibleRect = null) {
         const parameters = globalConfig.parameters;
-        const cullRange = parameters.visibleRect.allScaled(1 / globalConfig.tileSize);
+        const rect = visibleRect ? visibleRect : parameters.visibleRect;
+        let cullRange = rect.allScaled(1 / globalConfig.tileSize);
+
         const top = cullRange.top();
         const right = cullRange.right();
         const bottom = cullRange.bottom();
@@ -157,7 +161,7 @@ export class MapView extends BaseMap {
         for (let chunkX = chunkStartX; chunkX <= chunkEndX; ++chunkX) {
             for (let chunkY = chunkStartY; chunkY <= chunkEndY; ++chunkY) {
                 const chunk = this.root.map.getChunk(chunkX, chunkY, true);
-                method.call(chunk);
+                method.call(chunk, visibleRect);
             }
         }
     }
@@ -171,9 +175,10 @@ export class MapView extends BaseMap {
 
     /**
      * Draws the map overlay
+     * @param {Rectangle} visibleRect
      */
-    drawOverlay(parameters) {
-        this.drawVisibleChunks(MapChunkView.prototype.drawOverlay);
+    drawOverlay(visibleRect) {
+        this.drawVisibleChunks(MapChunkView.prototype.drawOverlay, visibleRect);
     }
 
     /**

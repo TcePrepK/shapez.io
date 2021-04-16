@@ -793,6 +793,7 @@ export class Camera extends BasicSerializableObject {
         this.clampZoomLevel();
         const zoom = this.zoomLevel;
 
+        const trans = this.findTranslate();
         context.transform(
             // Scale, skew, rotate
             zoom,
@@ -801,9 +802,13 @@ export class Camera extends BasicSerializableObject {
             zoom,
 
             // Translate
-            -zoom * this.getViewportLeft(),
-            -zoom * this.getViewportTop()
+            -zoom * trans.x,
+            -zoom * trans.y
         );
+    }
+
+    findTranslate() {
+        return new Vector(this.getViewportLeft(), this.getViewportTop());
     }
 
     /**

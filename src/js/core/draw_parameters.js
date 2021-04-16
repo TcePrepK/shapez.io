@@ -6,17 +6,18 @@ import { globalConfig } from "./config";
  */
 
 export class DrawParameters {
+    /**
+     * @param {object} param0
+     * @param {CanvasRenderingContext2D} param0.context
+     * @param {Rectangle} param0.visibleRect
+     * @param {string} param0.desiredAtlasScale
+     * @param {number} param0.zoomLevel
+     */
     constructor({ context, visibleRect, desiredAtlasScale, zoomLevel }) {
-        /** @type {CanvasRenderingContext2D} */
         this.context = context;
-
-        /** @type {Rectangle} */
         this.visibleRect = visibleRect;
-
-        /** @type {string} */
+        this.minimapRect = visibleRect.allScaled(1 / 5);
         this.desiredAtlasScale = desiredAtlasScale;
-
-        /** @type {number} */
         this.zoomLevel = zoomLevel;
 
         /** @type {GameRoot} */
