@@ -166,9 +166,10 @@ export class GameCore {
         logger.log("Initializing new game");
         this.root.gameIsFresh = true;
 
+        const center = globalConfig.mapChunkCenter.copy().addScalar(-2);
         // Place the hub
         const hub = gMetaBuildingRegistry.findByClass(MetaHubBuilding).createEntity({
-            origin: new Vector(-2, -2),
+            origin: center,
             rotation: 0,
             originalRotation: 0,
             rotationVariant: 0,
@@ -414,9 +415,7 @@ export class GameCore {
             );
         }
 
-        const rotation = 90;
-        root.camera.transform(context, rotation);
-        root.camera.rotate(context, rotation);
+        root.camera.transform(context);
 
         assert(context.globalAlpha === 1.0, "Global alpha not 1 on frame start");
 

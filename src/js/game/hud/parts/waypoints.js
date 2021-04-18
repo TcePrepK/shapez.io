@@ -99,12 +99,12 @@ export class HUDWaypoints extends BaseHUDPart {
 
         this.directionIndicatorSprite = Loader.getSprite("sprites/misc/hub_direction_indicator.png");
 
-        /** @type {Array<Waypoint>}
-         */
+        const center = globalConfig.mapCenter;
+        /** @type {Array<Waypoint>} */
         this.waypoints = [
             {
                 label: null,
-                center: { x: 0, y: 0 },
+                center: center,
                 zoomLevel: 3,
                 layer: gMetaBuildingRegistry.findByClass(MetaHubBuilding).getLayer(),
             },
@@ -289,7 +289,6 @@ export class HUDWaypoints extends BaseHUDPart {
                 val.length > 0 && (val.length < MAX_LABEL_LENGTH || ShapeDefinition.isValidShortKey(val)),
         });
         const dialog = new DialogWithForm({
-            app: this.root.app,
             title: waypoint ? T.dialogs.createMarker.titleEdit : T.dialogs.createMarker.title,
             desc: fillInLinkIntoTranslation(T.dialogs.createMarker.desc, THIRDPARTY_URLS.shapeViewer),
             formElements: [markerNameInput],
@@ -532,7 +531,8 @@ export class HUDWaypoints extends BaseHUDPart {
         const context = this.compassBuffer.context;
         context.clearRect(0, 0, dims, dims);
 
-        const distanceToHub = cameraPos.length();
+        const center = globalConfig.mapCenter;
+        const distanceToHub = cameraPos.copy().sub(center).length();
         const compassVisible = distanceToHub > (10 * globalConfig.tileSize) / this.root.camera.zoomLevel;
         const targetCompassAlpha = compassVisible ? 1 : 0;
 

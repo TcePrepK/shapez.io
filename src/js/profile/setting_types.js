@@ -1,4 +1,3 @@
-import { Application } from "../application";
 import { globalConfig } from "../core/config";
 import { createLogger } from "../core/logging";
 import { T } from "../translations";

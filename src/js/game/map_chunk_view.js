@@ -22,6 +22,13 @@ export class MapChunkView extends MapChunk {
          */
         this.renderIteration = 0;
 
+        const chunkID = x + "|" + y;
+        const unlockedChunks = this.root.map.unlockedChunks;
+        this.unlocked = true;
+        if (unlockedChunks) {
+            this.unlocked = unlockedChunks.includes(chunkID);
+        }
+
         this.markDirty();
     }
 
@@ -114,6 +121,68 @@ export class MapChunkView extends MapChunk {
                 }
             }
         }
+    }
+
+    drawUnlockedChunks() {
+        if (this.root.app.settings.getAllSettings().disableTileGrid) {
+            return;
+        }
+
+        const parameters = globalConfig.parameters;
+        const dims = globalConfig.mapChunkWorldSize;
+        const extrude = 1;
+
+        const x = this.x * dims;
+        const y = this.y * dims;
+
+        const dpi = this.root.map.backgroundCacheDPI;
+        parameters.context.translate(x, y);
+        parameters.context.scale(1 / dpi, 1 / dpi);
+
+        parameters.context.fillStyle = parameters.context.createPattern(
+            this.root.map.cachedBackgroundCanvas,
+            "repeat"
+        );
+
+        parameters.context.fillRect(-extrude, -extrude, 2 * dims + extrude, 2 * dims + extrude);
+        parameters.context.scale(dpi, dpi);
+        parameters.context.translate(-x, -y);
+    }
+
+    drawLockedChunks() {
+        if (this.root.app.settings.getAllSettings().disableTileGrid) {
+            return;
+        }
+
+        const parameters = globalConfig.parameters;
+        const dims = globalConfig.mapChunkWorldSize;
+
+        const x = this.x * dims + dims / 2;
+        const y = this.y * dims + dims / 2;
+        // const centerX = x + dims;
+        // const centerY = y + dims;
+
+        const scale = 2;
+        const dpi = this.root.map.backgroundCacheDPI;
+        parameters.context.translate(x, y);
+
+        parameters.context.fillStyle = "gray";
+        parameters.context.strokeStyle = "black";
+        parameters.context.beginPath();
+        parameters.context.rect(-dims / 2 - 1, -dims / 2 - 1, dims, dims);
+        parameters.context.fill();
+        parameters.context.stroke();
+
+        parameters.context.scale(1 / dpi, 1 / dpi);
+        parameters.context.scale(scale, scale);
+
+        parameters.context.textAlign = "center";
+        parameters.context.fillStyle = "white";
+        parameters.context.fillText("Locked", 0, 0);
+
+        parameters.context.scale(1 / scale, 1 / scale);
+        parameters.context.scale(dpi, dpi);
+        parameters.context.translate(-x, -y);
     }
 
     /**

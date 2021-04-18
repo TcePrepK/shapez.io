@@ -89,11 +89,7 @@ export class MapChunk {
          */
         this.patches = [];
 
-        if (!limitWorldGen || this.distanceToOriginInChunks < maxChunkLimit) {
-            this.generateLowerLayer();
-        } else {
-            this.fillChunkWithVoid();
-        }
+        this.generateLowerLayer();
     }
 
     /**
@@ -299,18 +295,6 @@ export class MapChunk {
         }
     }
 
-    fillChunkWithVoid() {
-        const black = "#000000";
-        if (COLORED_ITEM_SINGLETONS[black] == undefined) {
-            COLORED_ITEM_SINGLETONS[black] = new ColoredItem(black);
-        }
-        for (let i = 0; i < globalConfig.mapChunkSize; i++) {
-            for (let j = 0; j < globalConfig.mapChunkSize; j++) {
-                this.lowerLayer[i][j] = COLORED_ITEM_SINGLETONS[black];
-            }
-        }
-    }
-
     /**
      * Checks if this chunk has predefined contents, and if so returns true and generates the
      * predefined contents
@@ -318,7 +302,7 @@ export class MapChunk {
      * @returns {boolean}
      */
     generatePredefined(rng) {
-        if (this.x === 0 && this.y === 0) {
+        if (this.x === 1 && this.y === 0) {
             this.internalGeneratePatch(rng, 2, COLOR_ITEM_SINGLETONS[enumColors.red], 7, 7);
             return true;
         }
@@ -332,15 +316,16 @@ export class MapChunk {
             this.internalGeneratePatch(rng, 2, item, 5, globalConfig.mapChunkSize - 7);
             return true;
         }
-
         if (this.x === -1 && this.y === -1) {
             this.internalGeneratePatch(rng, 2, COLOR_ITEM_SINGLETONS[enumColors.green]);
             return true;
         }
-
         if (this.x === 5 && this.y === -2) {
             const item = this.root.shapeDefinitionMgr.getShapeItemFromShortKey("SuSuSuSu");
             this.internalGeneratePatch(rng, 2, item, 5, globalConfig.mapChunkSize - 7);
+            return true;
+        }
+        if (this.x === 0 && this.y === 0) {
             return true;
         }
 

@@ -664,6 +664,10 @@ export class Vector {
     }
 }
 
+globalConfig.mapChunkCenter = new Vector(globalConfig.mapChunkSize / 2, globalConfig.mapChunkSize / 2);
+
+globalConfig.mapCenter = globalConfig.mapChunkCenter.copy().multiplyScalar(globalConfig.tileSize);
+
 /**
  * Interpolates two vectors, for a = 0, returns v1 and for a = 1 return v2, otherwise interpolate
  * @param {Vector} v1

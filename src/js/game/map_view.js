@@ -6,17 +6,14 @@ import { THEME } from "./theme";
 import { MapChunkView } from "./map_chunk_view";
 import { randomInt } from "../core/utils";
 import { Rectangle } from "../core/rectangle";
+import { Vector } from "../core/vector";
 
 /**
  * This is the view of the map, it extends the map which is the raw model and allows
  * to draw it
  */
 export class MapView extends BaseMap {
-    /**
-     * @param {boolean} limitWorldGen
-     * @param {number} maxChunkLimit
-     */
-    constructor(limitWorldGen = false, maxChunkLimit = -1) {
+    constructor() {
         super();
 
         /**
@@ -40,8 +37,10 @@ export class MapView extends BaseMap {
 
         this.seed = randomInt(0, 100000);
 
-        this.limitWorldGen = limitWorldGen;
-        this.maxChunkLimit = maxChunkLimit;
+        // this.unlockedChunks = ["-1|-1", "1|1"];
+        // this.unlockedChunks = null;
+        this.unlockedChunks = ["0|0", "0|1", "1|0", "1|1", "-1|0", "0|-1", "-1|-1"];
+        // this.maxChunkLimit = maxChunkLimit;
     }
 
     cleanup() {
@@ -136,15 +135,16 @@ export class MapView extends BaseMap {
      * Draws the maps foreground
      */
     drawForeground() {
-        this.drawVisibleChunks(MapChunkView.prototype.drawForegroundDynamicLayer);
-        this.drawVisibleChunks(MapChunkView.prototype.drawForegroundStaticLayer);
+        this.drawVisibleChunks(MapChunkView.prototype.drawForegroundDynamicLayer, true);
+        this.drawVisibleChunks(MapChunkView.prototype.drawForegroundStaticLayer, true);
     }
 
     /**
      * Calls a given method on all given chunks
      * @param {function} method
+     * @param {boolean} limited
      */
-    drawVisibleChunks(method) {
+    drawVisibleChunks(method, limited = null) {
         const parameters = globalConfig.parameters;
         const cullRange = parameters.visibleRect.allScaled(1 / globalConfig.tileSize);
         const top = cullRange.top();
@@ -167,6 +167,20 @@ export class MapView extends BaseMap {
         // Render y from top down for proper blending
         for (let chunkX = chunkStartX; chunkX <= chunkEndX; ++chunkX) {
             for (let chunkY = chunkStartY; chunkY <= chunkEndY; ++chunkY) {
+                const chunkID = chunkX + "|" + chunkY;
+                // console.log(limited);
+                if (limited == true && this.unlockedChunks && !this.unlockedChunks.includes(chunkID)) {
+                    continue;
+                }
+
+                if (limited == false && (!this.unlockedChunks || this.unlockedChunks.includes(chunkID))) {
+                    continue;
+                }
+
+                // if (new Vector(chunkX, chunkY).length() > this.limit) {
+                //     continue;
+                // }
+
                 const chunk = this.root.map.getChunk(chunkX, chunkY, true);
                 method.call(chunk);
             }
@@ -177,93 +191,22 @@ export class MapView extends BaseMap {
      * Draws the wires foreground
      */
     drawWiresForegroundLayer() {
-        this.drawVisibleChunks(MapChunkView.prototype.drawWiresForegroundLayer);
+        this.drawVisibleChunks(MapChunkView.prototype.drawWiresForegroundLayer, true);
     }
 
     /**
      * Draws the map overlay
      */
-    drawOverlay(parameters) {
-        this.drawVisibleChunks(MapChunkView.prototype.drawOverlay);
+    drawOverlay() {
+        this.drawVisibleChunks(MapChunkView.prototype.drawOverlay, true);
     }
 
     /**
      * Draws the map background
      */
     drawBackground() {
-        const parameters = globalConfig.parameters;
-        // Render tile grid
-        if (!this.root.app.settings.getAllSettings().disableTileGrid) {
-            const dpi = this.backgroundCacheDPI;
-            parameters.context.scale(1 / dpi, 1 / dpi);
-
-            parameters.context.fillStyle = parameters.context.createPattern(
-                this.cachedBackgroundCanvas,
-                "repeat"
-            );
-
-            const rect = parameters.visibleRect;
-            // parameters.context.moveTo(rect.lt.x * dpi, rect.lt.y * dpi);
-            // parameters.context.lineTo(rect.rt.x * dpi, rect.rt.y * dpi);
-            // parameters.context.lineTo(rect.rb.x * dpi, rect.rb.y * dpi);
-            // parameters.context.lineTo(rect.lb.x * dpi, rect.lb.y * dpi);
-            // parameters.context.closePath();
-            // parameters.context.fill();
-
-            // parameters.context.fillRect(
-            //     parameters.visibleRect.x * dpi,
-            //     parameters.visibleRect.y * dpi,
-            //     parameters.visibleRect.w * dpi,
-            //     parameters.visibleRect.h * dpi
-            // );
-            parameters.context.scale(dpi, dpi);
-        }
-
-        this.drawVisibleChunks(MapChunkView.prototype.drawBackgroundLayer);
-
-        const rect = parameters.visibleRect;
-        parameters.context.strokeStyle = "green";
-        parameters.context.fillStyle = "blue";
-        parameters.context.beginPath();
-        parameters.context.moveTo(rect.lt.x, rect.lt.y);
-        parameters.context.lineTo(rect.rt.x, rect.rt.y);
-        parameters.context.lineTo(rect.rb.x, rect.rb.y);
-        parameters.context.lineTo(rect.lb.x, rect.lb.y);
-        parameters.context.closePath();
-        // parameters.context.fill();
-        parameters.context.stroke();
-
-        // console.log(rect);
-        // let rect = new Rectangle(-200, -160, 400, 200);
-        // parameters.context.translate(this.root.gameWidth / 2, this.root.gameHeight / 2);
-        // parameters.context.resetTransform();
-        // parameters.context.rotate(Math.PI / 2);
-        // let rect = parameters.visibleRect;
-        // rect = rect.rotate(-90);
-        // parameters.context.fillStyle = "blue";
-        // parameters.context.fillStyle = "blue";
-        // parameters.context.strokeStyle = "blue";
-        // parameters.context. = 8;
-        // parameters.context.beginPath();
-        // parameters.context.moveTo(rect.lt.x, rect.lt.y);
-        // parameters.context.lineTo(rect.rt.x, rect.rt.y);
-        // parameters.context.lineTo(rect.rb.x, rect.rb.y);
-        // parameters.context.lineTo(rect.lb.x, rect.lb.y);
-        // parameters.context.closePath();
-        // parameters.context.fill();
-        // parameters.context.stroke();
-        // parameters.context.rotate(-Math.PI / 2);
-        // this.root.camera.transform(parameters.context);
-        // parameters.context.translate(this.root.gameWidth / -2, this.root.gameHeight / -2);
-
-        // rect = rect.rotate(this.r++);
-        // console.log(rect);
-        // parameters.context.fillStyle = "green";
-        // parameters.context.beginPath();
-        // parameters.context.moveTo(rect.lt.x, rect.lt.y);
-        // parameters.context.lineTo(rect.rt.x, rect.rt.y);
-        // parameters.context.lineTo(rect.rb.x, rect.rb.y);
-        // parameters.context.lineTo(rect.lb.x, rect.lb.y);
-        // parameters.context.fill();
+        this.drawVisibleChunks(MapChunkView.prototype.drawUnlockedChunks, true);
+        this.drawVisibleChunks(MapChunkView.prototype.drawLockedChunks, false);
+        this.drawVisibleChunks(MapChunkView.prototype.drawBackgroundLayer, true);
     }
 }

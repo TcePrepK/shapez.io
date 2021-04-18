@@ -57,6 +57,8 @@ export const globalConfig = {
     mapChunkSize: 16,
     mapChunkOverviewMinZoom: 0.9,
     mapChunkWorldSize: null, // COMPUTED
+    mapChunkCenter: null, // COMPUTED
+    mapCenter: null, // COMPUTED
 
     // Belt speeds
     // NOTICE: Update webpack.production.config too!
@@ -131,7 +133,6 @@ export const IS_MOBILE = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
 // Automatic calculations
 globalConfig.minerSpeedItemsPerSecond = globalConfig.beltSpeedItemsPerSecond / 5;
-
 globalConfig.mapChunkWorldSize = globalConfig.mapChunkSize * globalConfig.tileSize;
 
 // Dynamic calculations
