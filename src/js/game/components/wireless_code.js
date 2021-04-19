@@ -15,8 +15,16 @@ export class WirelessCodeComponent extends Component {
     }
 
     /**
+     * Copy the current state to another component
+     * @param {WirelessCodeComponent} otherComponent
+     */
+    copyAdditionalStateTo(otherComponent) {
+        otherComponent.wireless_code = this.wireless_code;
+    }
+
+    /**
      *
-     * @param {string} wireless_code 
+     * @param {string} wireless_code
      */
     constructor(wireless_code = "") {
         super();

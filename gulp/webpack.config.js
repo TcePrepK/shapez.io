@@ -6,7 +6,7 @@ const { getRevision, getVersion, getAllResourceImages } = require("./buildutils"
 const lzString = require("lz-string");
 const CircularDependencyPlugin = require("circular-dependency-plugin");
 
-module.exports = ({ watch = false, standalone = false }) => {
+module.exports = ({ watch = false, standalone = false, chineseVersion = false }) => {
     return {
         mode: "development",
         devtool: "cheap-source-map",
@@ -113,7 +113,7 @@ module.exports = ({ watch = false, standalone = false }) => {
             filename: "bundle.js",
             path: path.resolve(__dirname, "..", "build"),
             libraryTarget: "var",
-            library: "testing"
+            library: "testing",
         },
     };
 };

@@ -307,8 +307,6 @@ export function getApplicationSettingById(id) {
     return allApplicationSettings.find(setting => setting.id === id);
 }
 
-const enumModSettings = [];
-
 class SettingsStorage {
     constructor() {
         this.uiScale = "regular";

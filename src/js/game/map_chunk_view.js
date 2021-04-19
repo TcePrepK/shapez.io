@@ -330,18 +330,4 @@ export class MapChunkView extends MapChunk {
             systems.logicGate.drawWiresChunk(parameters, this);
         }
     }
-
-    /**
-     * Draws the signal layer
-     * @param {DrawParameters} parameters
-     */
-    drawSignalForegroundLayer(parameters) {
-        const systems = this.root.systemMgr.systems;
-
-        // @ts-ignore
-        if (this.root.app.settings.getAllSettings().wirelessBuildingsMod) {
-            systems.wirelessSignal.drawSignalChunk(parameters, this);
-            systems.wirelessDisplay.drawSignalChunk(parameters, this);
-        }
-    }
 }

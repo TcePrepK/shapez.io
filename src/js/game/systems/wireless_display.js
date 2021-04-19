@@ -1,7 +1,7 @@
 import { globalConfig } from "../../core/config";
 import { Loader } from "../../core/loader";
 import { BaseItem } from "../base_item";
-import { enumColors } from "../colors";
+import { enumColorMixingResults, enumColors, enumColorsToHexCode } from "../colors";
 import { WirelessDisplayComponent } from "../components/wireless_display";
 import { GameSystemWithFilter } from "../game_system_with_filter";
 import { BOOL_FALSE_SINGLETON, isTrueItem } from "../items/boolean_item";
@@ -9,12 +9,11 @@ import { ColorItem, COLOR_ITEM_SINGLETONS } from "../items/color_item";
 import { MapChunkView } from "../map_chunk_view";
 import { THIRDPARTY_URLS } from "../../core/config";
 import { DialogWithForm } from "../../core/modal_dialog_elements";
-import { FormElementInput, FormElementItemChooser } from "../../core/modal_dialog_forms";
+import { FormElementInput } from "../../core/modal_dialog_forms";
 import { fillInLinkIntoTranslation } from "../../core/utils";
 import { T } from "../../translations";
 import { Entity } from "../entity";
 import { THEME } from "../theme";
-import { drawRotatedSprite } from "../../core/draw_utils";
 import { enumDirectionToAngle, Vector } from "../../core/vector";
 
 /** @type {Object<ItemType, number>} */
@@ -30,32 +29,37 @@ export class WirelessDisplaySystem extends GameSystemWithFilter {
 
         this.root.signals.entityManuallyPlaced.add(this.channelSignalValue, this);
 
-        /** @type {Object<string, import("../../core/draw_utils").AtlasSprite>} */
-        this.displaySprites = {};
+        this.root.signals.entityQueuedForDestroy.add(this.refreshWirelessMachineList, this);
+        this.root.signals.entityAdded.add(this.refreshWirelessMachineList, this);
+        this.root.signals.entityDestroyed.add(this.refreshWirelessMachineList, this);
 
-        for (const colorId in enumColors) {
-            if (colorId === enumColors.uncolored) {
-                continue;
-            }
-            this.displaySprites[colorId] = Loader.getSprite("sprites/wires/display/" + colorId + ".png");
-        }
+        // /** @type {Object<string, import("../../core/draw_utils").AtlasSprite>} */
+        // this.displaySprites = {};
 
+        // for (const colorId in enumColors) {
+        //     if (colorId === enumColors.uncolored) {
+        //         continue;
+        //     }
+        //     this.displaySprites[colorId] = Loader.getSprite("sprites/wires/display/" + colorId + ".png");
+        // }
+
+        /** @type {Object<string, Array<Entity>>} */
         this.wirelessMachineList = {};
     }
 
-    update() {
+    refreshWirelessMachineList() {
         this.wirelessMachineList = {};
         for (let i = 0; i < this.allEntities.length; i++) {
             const entity = this.allEntities[i];
             if (entity.components.WiredPins) {
-                this.wirelessMachineList[entity.components.WirelessCode.wireless_code] = entity;
+                const code = entity.components.WirelessCode.wireless_code;
+                if (!this.wirelessMachineList[code]) {
+                    this.wirelessMachineList[code] = [];
+                }
+
+                this.wirelessMachineList[code].push(entity);
             }
         }
-    }
-
-    testVal(val, entity) {
-        console.log(entity.components);
-        return true;
     }
 
     /**
@@ -63,84 +67,79 @@ export class WirelessDisplaySystem extends GameSystemWithFilter {
      * @param {Entity} entity
      */
     channelSignalValue(entity) {
-        if (entity.components.WirelessDisplay) {
-            // Ok, query, but also save the uid because it could get stale
-            const uid = entity.uid;
-
-            const signalValueInput = new FormElementInput({
-                id: "channelValue",
-                label: fillInLinkIntoTranslation(
-                    T.dialogs.editChannel.descShortKey,
-                    THIRDPARTY_URLS.shapeViewer
-                ),
-                placeholder: "",
-                defaultValue: "",
-                validator: val => val,
-            });
-
-            const channeldialog = new DialogWithForm({
-                app: this.root.app,
-                title: T.dialogs.editChannel.title,
-                desc: T.dialogs.editChannel.descItems,
-                formElements: [signalValueInput],
-                buttons: ["cancel:bad:escape", "ok:good:enter"],
-                closeButton: false,
-            });
-            this.root.hud.parts.dialogs.internalShowDialog(channeldialog);
-
-            // When confirmed, set the signal
-            const closeHandler = () => {
-                if (!this.root || !this.root.entityMgr) {
-                    // Game got stopped
-                    return;
-                }
-
-                const entityRef = this.root.entityMgr.findByUid(uid, false);
-                if (!entityRef) {
-                    // outdated
-                    return;
-                }
-
-                const constantComp = entityRef.components.WirelessCode;
-                if (!constantComp) {
-                    // no longer interesting
-                    return;
-                }
-
-                if (signalValueInput.getValue()) {
-                    entity.components.WirelessCode.wireless_code = signalValueInput.getValue();
-                }
-
-                if (signalValueInput.getValue() && entity.components.WiredPins) {
-                    this.wirelessMachineList[entity.components.WirelessCode.wireless_code] = entity;
-                }
-            };
-
-            channeldialog.buttonSignals.ok.add(closeHandler);
-            channeldialog.valueChosen.add(closeHandler);
-
-            // When cancelled, destroy the entity again
-            channeldialog.buttonSignals.cancel.add(() => {
-                if (!this.root || !this.root.entityMgr) {
-                    // Game got stopped
-                    return;
-                }
-
-                const entityRef = this.root.entityMgr.findByUid(uid, false);
-                if (!entityRef) {
-                    // outdated
-                    return;
-                }
-
-                const constantComp = entityRef.components.WirelessCode;
-                if (!constantComp) {
-                    // no longer interesting
-                    return;
-                }
-
-                this.root.logic.tryDeleteBuilding(entityRef);
-            });
+        if (!entity.components.WirelessDisplay) {
+            return;
         }
+
+        // Ok, query, but also save the uid because it could get stale
+        const uid = entity.uid;
+
+        const signalValueInput = new FormElementInput({
+            id: "channelValue",
+            label: fillInLinkIntoTranslation(T.dialogs.editChannel.descShortKey, THIRDPARTY_URLS.shapeViewer),
+            placeholder: "",
+            defaultValue: "",
+            validator: val => val,
+        });
+
+        const channeldialog = new DialogWithForm({
+            app: this.root.app,
+            title: T.dialogs.editChannel.title,
+            desc: T.dialogs.editChannel.descItems,
+            formElements: [signalValueInput],
+            buttons: ["cancel:bad:escape", "ok:good:enter"],
+            closeButton: false,
+        });
+        this.root.hud.parts.dialogs.internalShowDialog(channeldialog);
+
+        // When confirmed, set the signal
+        const closeHandler = () => {
+            if (!this.root || !this.root.entityMgr) {
+                // Game got stopped
+                return;
+            }
+
+            const entityRef = this.root.entityMgr.findByUid(uid, false);
+            if (!entityRef) {
+                // outdated
+                return;
+            }
+
+            const constantComp = entityRef.components.WirelessCode;
+            if (!constantComp) {
+                // no longer interesting
+                return;
+            }
+
+            if (signalValueInput.getValue()) {
+                entity.components.WirelessCode.wireless_code = signalValueInput.getValue();
+            }
+        };
+
+        channeldialog.buttonSignals.ok.add(closeHandler);
+        channeldialog.valueChosen.add(closeHandler);
+
+        // When cancelled, destroy the entity again
+        channeldialog.buttonSignals.cancel.add(() => {
+            if (!this.root || !this.root.entityMgr) {
+                // Game got stopped
+                return;
+            }
+
+            const entityRef = this.root.entityMgr.findByUid(uid, false);
+            if (!entityRef) {
+                // outdated
+                return;
+            }
+
+            const constantComp = entityRef.components.WirelessCode;
+            if (!constantComp) {
+                // no longer interesting
+                return;
+            }
+
+            this.root.logic.tryDeleteBuilding(entityRef);
+        });
     }
 
     /**
@@ -215,132 +214,161 @@ export class WirelessDisplaySystem extends GameSystemWithFilter {
      * @param {import("../../core/draw_utils").DrawParameters} parameters
      */
     drawBasedOnSender(receiver, parameters) {
-        const sender = this.wirelessMachineList[receiver.components.WirelessCode.wireless_code];
+        const code = receiver.components.WirelessCode.wireless_code;
+        const senders = this.wirelessMachineList[code];
 
-        if (sender) {
-            if (!this.allEntities.includes(sender)) {
-                delete this.wirelessMachineList.entity_b;
-                return;
-            }
-            const origin = receiver.components.StaticMapEntity.origin;
+        if (!senders) {
+            return;
+        }
+
+        // /** @type {Array<Entity>} */
+        // const singlePins = [];
+        // /** @type {Array<Entity>} */
+        // const quadPins = [];
+        // for (const sender of senders) {
+        //     const pinsComp = sender.components.WiredPins;
+        //     if (pinsComp.slots.length == 1) {
+        //         singlePins.push(sender);
+        //     } else {
+        //         quadPins.push(sender);
+        //     }
+        // }
+
+        /** @type {Array<Array<BaseItem>, Array<BaseItem>, Array<BaseItem>, Array<BaseItem>>} */
+        const corners = [[], [], [], []];
+        for (const sender of senders) {
             const pinsComp = sender.components.WiredPins;
-
-            if (pinsComp.slots.length == 1) {
-                const network = pinsComp.slots[0].linkedNetwork;
+            const slots = pinsComp.slots;
+            for (let i = 0; i < slots.length; i++) {
+                const network = slots[i].linkedNetwork;
 
                 if (!network) {
-                    return;
+                    continue;
                 }
 
                 const value = this.getDisplayItem(network.currentValue);
 
+                if (value) {
+                    corners[i].push(value);
+                    if (slots.length === 1) {
+                        corners[1].push(value);
+                        corners[2].push(value);
+                        corners[3].push(value);
+                    }
+                }
+            }
+        }
+
+        const possibleItems = [];
+        for (const corner of corners) {
+            let shape = null;
+            let color = null;
+            for (const value of corner) {
                 if (!value) {
-                    return;
+                    continue;
                 }
 
-                if (value.getItemType()) {
-                    if (value.getItemType() === "color") {
-                        this.displaySprites[/** @type {ColorItem} */ (value).color].drawCachedCentered(
-                            parameters,
-                            (origin.x + 0.5) * globalConfig.tileSize,
-                            (origin.y + 0.5) * globalConfig.tileSize,
-                            globalConfig.tileSize
-                        );
-                    } else if (value.getItemType() === "shape") {
-                        let radius = 30;
-                        // @ts-ignore
-                        if (parameters.root.app.settings.getAllSettings().visibleDisplayMod) {
-                            radius += 11;
-                        }
-                        value.drawItemCenteredClipped(
-                            (origin.x + 0.5) * globalConfig.tileSize,
-                            (origin.y + 0.5) * globalConfig.tileSize,
-                            parameters,
-                            radius
-                        );
-                    }
-                }
-            } else if (pinsComp.slots.length == 4) {
-                const possibleItems = [];
-                for (let slot = 0; slot < pinsComp.slots.length; ++slot) {
-                    const network = pinsComp.slots[slot].linkedNetwork;
-
-                    if (!network) {
-                        possibleItems.push("dead");
+                if (value.getItemType() === "color") {
+                    if (!color) {
+                        color = value.getAsCopyableKey();
                         continue;
                     }
 
-                    if (network.currentValue == null) {
-                        possibleItems.push("dead");
-                        continue;
-                    }
+                    color = enumColorMixingResults[color][value.getAsCopyableKey()];
+                } else if (value.getItemType() === "shape") {
+                    shape = value.getAsCopyableKey();
+                }
+            }
 
-                    if (network.currentValue == BOOL_FALSE_SINGLETON) {
-                        possibleItems.push("dead");
-                        continue;
-                    }
+            if (shape) {
+                shape = this.root.shapeDefinitionMgr.getShapeItemFromShortKey(shape);
+                possibleItems.push(shape);
+            } else if (color) {
+                possibleItems.push(COLOR_ITEM_SINGLETONS[color]);
+            } else {
+                possibleItems.push(null);
+            }
+        }
 
-                    const value = this.getDisplayItem(network.currentValue);
+        const ctx = parameters.context;
+        const origin = receiver.components.StaticMapEntity.origin;
+        // if (singlePins.length == senders.length) {
+        //     if (shape) {
+        //         shape = this.root.shapeDefinitionMgr.getShapeItemFromShortKey(shape);
+        //         let radius = 30;
+        //         // @ts-ignore
+        //         if (parameters.root.app.settings.getAllSettings().visibleDisplayMod) {
+        //             radius += 11;
+        //         }
+        //         shape.drawItemCenteredClipped(
+        //             (origin.x + 0.5) * globalConfig.tileSize,
+        //             (origin.y + 0.5) * globalConfig.tileSize,
+        //             parameters,
+        //             radius
+        //         );
+        //     } else if (color) {
+        //         ctx.fillStyle = enumColorsToHexCode[color];
+        //         ctx.fillRect(
+        //             (origin.x + 0.5) * globalConfig.tileSize - globalConfig.tileSize / 2 + 1,
+        //             (origin.y + 0.5) * globalConfig.tileSize - globalConfig.tileSize / 2 + 1,
+        //             globalConfig.tileSize - 2,
+        //             globalConfig.tileSize - 2
+        //         );
+        //     }
+        // } else if (quadPins.length == senders.length) {
+        ctx.fillStyle = "black";
+        ctx.fillRect(
+            (origin.x + 0.5) * globalConfig.tileSize - 16,
+            (origin.y + 0.5) * globalConfig.tileSize - 15.5,
+            32.25,
+            32.25
+        );
 
-                    if (value) {
-                        possibleItems.push(value);
-                    }
+        // console.log(possibleItems);
+        for (let index = 0; index < possibleItems.length; ++index) {
+            const value = possibleItems[index];
+
+            const dims = globalConfig.tileSize;
+            let currentX = origin.x * dims;
+            let currentY = origin.y * dims;
+
+            if (value) {
+                switch (index) {
+                    case 0:
+                        // currentX += 0.25;
+                        // currentY += 0.5;
+                        break;
+                    case 1:
+                        currentX += dims / 2;
+                        currentY += 0.2;
+                        // currentX += dims / 2 - 0.25;
+                        // currentY += 0.5;
+                        break;
+                    case 2:
+                        currentX += dims / 2;
+                        currentY += dims / 2 + 0.1;
+                        // currentX += dims / 2 + 0.25;
+                        // currentY += dims / 2 + 0.5;
+                        break;
+                    case 3:
+                        currentY += dims / 2 + 0.25;
+                        // currentX += 0.25;
+                        // currentY += dims / 2 + 0.5;
+                        break;
+                    default:
+                        break;
                 }
 
-                if (possibleItems.length > 0) {
-                    const D_context = parameters.context;
-                    D_context.fillStyle = "black";
-                    D_context.fillRect(
-                        (origin.x + 0.5) * globalConfig.tileSize - 16,
-                        (origin.y + 0.5) * globalConfig.tileSize - 15.5,
-                        32.25,
-                        32.25
+                if (value.getItemType() === "color") {
+                    ctx.fillStyle = enumColorsToHexCode[value.getAsCopyableKey()];
+                    ctx.fillRect(currentX, currentY, dims / 2, dims / 2);
+                } else if (value.getItemType() === "shape") {
+                    value.drawItemCenteredClipped(
+                        currentX + dims / 4 + 0.25,
+                        currentY + dims / 4 + 0.25,
+                        parameters,
+                        20
                     );
-                }
-
-                for (let index = 0; index < possibleItems.length; ++index) {
-                    const value = possibleItems[index];
-
-                    let currentX = (origin.x + 0.5) * globalConfig.tileSize;
-                    let currentY = (origin.y + 0.5) * globalConfig.tileSize;
-                    let drawSize = globalConfig.tileSize / 2 + 1;
-
-                    if (value) {
-                        switch (index) {
-                            case 0:
-                                currentX -= globalConfig.tileSize / 4 - 0.25;
-                                currentY -= globalConfig.tileSize / 4 - 0.5;
-                                break;
-                            case 1:
-                                currentX -= globalConfig.tileSize / 4 - globalConfig.tileSize / 2 - 0.25;
-                                currentY -= globalConfig.tileSize / 4 - 0.5;
-                                break;
-                            case 2:
-                                currentX -= globalConfig.tileSize / 4 - globalConfig.tileSize / 2 - 0.25;
-                                currentY -= globalConfig.tileSize / 4 - globalConfig.tileSize / 2 - 0.5;
-                                break;
-                            case 3:
-                                currentX -= globalConfig.tileSize / 4 - 0.25;
-                                currentY -= globalConfig.tileSize / 4 - globalConfig.tileSize / 2 - 0.5;
-                                break;
-                            default:
-                                break;
-                        }
-
-                        if (typeof value == "string") {
-                            continue;
-                        } else if (value.getItemType() === "color") {
-                            this.displaySprites[/** @type {ColorItem} */ (value).color].drawCachedCentered(
-                                parameters,
-                                currentX,
-                                currentY,
-                                drawSize
-                            );
-                        } else if (value.getItemType() === "shape") {
-                            let radius = 20;
-                            value.drawItemCenteredClipped(currentX, currentY, parameters, radius);
-                        }
-                    }
                 }
             }
         }
@@ -488,41 +516,6 @@ export class WirelessDisplaySystem extends GameSystemWithFilter {
                 parameters.context.beginPath();
                 parameters.context.rect(tile.x, tile.y, globalConfig.tileSize, globalConfig.tileSize);
                 parameters.context.stroke();
-            }
-        }
-    }
-
-    /**
-     * Draws a given chunk
-     * @param {import("../../core/draw_utils").DrawParameters} parameters
-     * @param {MapChunkView} chunk
-     */
-    drawSignalChunk(parameters, chunk) {
-        const contents = chunk.containedEntitiesByLayer.regular;
-        for (let i = 0; i < contents.length; ++i) {
-            const entity = contents[i];
-            if (entity.components.WirelessCode) {
-                const sender = this.wirelessMachineList[entity.components.WirelessCode.wireless_code];
-
-                if (sender) {
-                    const origin = entity.components.StaticMapEntity.origin;
-                    const senderOrigin = sender.components.StaticMapEntity.origin;
-
-                    const tileSize = globalConfig.tileSize;
-
-                    const ctx = parameters.context;
-
-                    ctx.beginPath();
-                    ctx.strokeStyle = "blue";
-                    ctx.lineWidth = 1;
-                    ctx.miterLimit = 2;
-                    ctx.moveTo(origin.x * tileSize + tileSize / 2, origin.y * tileSize + tileSize / 2);
-                    ctx.lineTo(
-                        senderOrigin.x * tileSize + tileSize / 2,
-                        senderOrigin.y * tileSize + tileSize / 2
-                    );
-                    ctx.stroke();
-                }
             }
         }
     }

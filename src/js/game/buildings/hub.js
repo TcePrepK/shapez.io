@@ -5,6 +5,7 @@ import { enumItemProcessorTypes, ItemProcessorComponent } from "../components/it
 import { Entity } from "../entity";
 import { MetaBuilding } from "../meta_building";
 import { WiredPinsComponent, enumPinSlotType } from "../components/wired_pins";
+// @ts-ignore
 import { Loader } from "../../core/loader";
 import { GameRoot } from "../root";
 
@@ -25,20 +26,13 @@ export class MetaHubBuilding extends MetaBuilding {
         return false;
     }
 
-    getBlueprintSprite() {
-        return Loader.getSprite("sprites/blueprints/hub.png");
-    }
-
-    getSprite() {
-        // We render it ourself
-        return Loader.getSprite("sprites/buildings/hub.png");
-    }
-
     /**
      * @param {GameRoot} root
      */
     getIsUnlocked(root) {
+        // @ts-ignore
         this.survivalMod = root.app.settings.getAllSettings().survivalMod;
+        // @ts-ignore
         this.sandboxMod = root.app.settings.getAllSettings().sandboxMod;
         if (this.survivalMod || this.sandboxMod) {
             return true;
@@ -46,7 +40,7 @@ export class MetaHubBuilding extends MetaBuilding {
         return null;
     }
 
-    getIsRemovable(root) {
+    getIsRemovable() {
         if (this.survivalMod || this.sandboxMod) {
             return true;
         }

@@ -1,5 +1,13 @@
 export const CHANGELOG = [
     {
+        version: "Mod Browser v1.1 !",
+        date: "18.04.2021",
+        entries: [
+            "Updated browser version to 1.3.1",
+            "From now on if more than 1 wireless senders try to send signal to same receiver, value will be mixed (only works if signal is color)",
+        ],
+    },
+    {
         version: "Mod Browser v1.0 !",
         date: "19.01.2021",
         entries: [
@@ -43,11 +51,23 @@ export const CHANGELOG = [
         ],
     },
     {
-        version: "1.2.3",
-        date: "unreleased",
+        version: "1.3.1",
+        date: "beta",
         entries: [
+            "Fixed savegames getting corrupt in rare conditions",
+            "Fixed game crashing sometimes since the achievements update",
+        ],
+    },
+    {
+        version: "1.3.0",
+        date: "12.03.2020",
+        skin: "achievements",
+        entries: [
+            "There are now <strong>45 Steam Achievements!</strong>",
             "Fixed constant signals being editable from the regular layer",
             "Fixed items still overlapping sometimes between buildings and belts",
+            "The game is now available in finnish, italian, romanian and ukrainian! (Thanks to all contributors!)",
+            "Updated translations (Thanks to all contributors!)",
         ],
     },
     {

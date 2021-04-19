@@ -3,7 +3,6 @@ import { cachebust } from "../core/cachebust";
 import { globalConfig } from "../core/config";
 import { GameState } from "../core/game_state";
 import { createLogger } from "../core/logging";
-import { findNiceValue } from "../core/utils";
 import { getRandomHint } from "../game/hints";
 import { HUDModalDialogs } from "../game/hud/parts/modal_dialogs";
 import { PlatformWrapperImplBrowser } from "../platform/browser/wrapper";
@@ -20,7 +19,7 @@ export class PreloadState extends GameState {
         return `
             <div class="loadingImage"></div>
             <div class="loadingStatus">
-                <span class="desc">Booting</span>
+                <span class="desc">"Booting"</span>
                 </div>
             </div>
             <span class="prefab_GameHint"></span>
@@ -192,7 +191,9 @@ export class PreloadState extends GameState {
                         for (let i = 0; i < changelogEntries.length; ++i) {
                             const entry = changelogEntries[i];
                             dialogHtml += `
-                            <div class="changelogDialogEntry">
+                            <div class="changelogDialogEntry" data-changelog-skin="${
+                                entry.skin || "default"
+                            }">
                                 <span class="version">${entry.version}</span>
                                 <span class="date">${entry.date}</span>
                                 <ul class="changes">

@@ -42,7 +42,8 @@ export class MainMenuState extends GameState {
 
         return `
             <div class="topButtons">
-                <button class="languageChoose" data-languageicon="${this.app.settings.getLanguage()}"></button>
+                ${`<button class="languageChoose" data-languageicon="${this.app.settings.getLanguage()}"></button>`}
+
                 <button class="settingsButton"></button>
             ${
                 G_IS_STANDALONE || G_IS_DEV
@@ -78,10 +79,12 @@ export class MainMenuState extends GameState {
             </div>
 
             <div class="footer">
+
+                ${`
                 <a class="githubLink boxLink" target="_blank">
                     ${T.mainMenu.openSourceHint}
                     <span class="thirdpartyLogo githubLogo"></span>
-                </a>
+                </a>`}
 
                 <a class="discordLink boxLink" target="_blank">
                     ${T.mainMenu.discordLink}
@@ -89,12 +92,13 @@ export class MainMenuState extends GameState {
                 </a>
 
                 <div class="sidelinks">
-                    <a class="redditLink">${T.mainMenu.subreddit}</a>
+                    ${`<a class="redditLink">${T.mainMenu.subreddit}</a>`}
 
-                    <a class="changelog">${T.changelog.title}</a>
+                    ${`<a class="changelog">${T.changelog.title}</a>`}
 
-                    <a class="helpTranslate">${T.mainMenu.helpTranslate}</a>
+                    ${`<a class="helpTranslate">${T.mainMenu.helpTranslate}</a>`}
                 </div>
+
 
                 <div class="author">${T.mainMenu.madeBy.replace(
                     "<author-link>",
@@ -208,10 +212,6 @@ export class MainMenuState extends GameState {
         });
 
         this.trackClicks(qs(".settingsButton"), this.onSettingsButtonClicked);
-        this.trackClicks(qs(".changelog"), this.onChangelogClicked);
-        this.trackClicks(qs(".redditLink"), this.onRedditClicked);
-        this.trackClicks(qs(".languageChoose"), this.onLanguageChooseClicked);
-        this.trackClicks(qs(".helpTranslate"), this.onTranslationHelpLinkClicked);
 
         if (G_IS_STANDALONE) {
             this.trackClicks(qs(".exitAppButton"), this.onExitAppButtonClicked);
@@ -228,23 +228,29 @@ export class MainMenuState extends GameState {
         const discordLink = this.htmlElement.querySelector(".discordLink");
         this.trackClicks(
             discordLink,
-            () => this.app.platformWrapper.openExternalLink(THIRDPARTY_URLS.discord),
+            () => {
+                this.app.analytics.trackUiClick("main_menu_link_discord");
+                this.app.platformWrapper.openExternalLink(THIRDPARTY_URLS.discord);
+            },
             { preventClick: true }
         );
 
         const githubLink = this.htmlElement.querySelector(".githubLink");
-        this.trackClicks(
-            githubLink,
-            () => this.app.platformWrapper.openExternalLink(THIRDPARTY_URLS.github),
-            { preventClick: true }
-        );
+        if (githubLink) {
+            this.trackClicks(
+                githubLink,
+                () => {
+                    this.app.analytics.trackUiClick("main_menu_link_github");
+                    this.app.platformWrapper.openExternalLink(THIRDPARTY_URLS.github);
+                },
+                { preventClick: true }
+            );
+        }
 
         const producerLink = this.htmlElement.querySelector(".producerLink");
-        this.trackClicks(
-            producerLink,
-            () => this.app.platformWrapper.openExternalLink("https://tobspr.com"),
-            { preventClick: true }
-        );
+        this.trackClicks(producerLink, () => this.app.platformWrapper.openExternalLink("https://tobspr.io"), {
+            preventClick: true,
+        });
     }
 
     renderMainMenu() {

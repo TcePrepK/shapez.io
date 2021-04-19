@@ -13,6 +13,14 @@ export class ProgrammableBalancerComponent extends Component {
     }
 
     /**
+     * Copy the current state to another component
+     * @param {ProgrammableBalancerComponent} otherComponent
+     */
+    copyAdditionalStateTo(otherComponent) {
+        otherComponent.word = this.word;
+    }
+
+    /**
      * @param {string} word
      */
     constructor(word = "out/in/out/out") {

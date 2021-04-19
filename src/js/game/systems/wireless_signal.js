@@ -152,7 +152,10 @@ export class WirelessSignalSystem extends GameSystemWithFilter {
             const signalValueInput = new FormElementInput({
                 id: "channelValue",
                 // eslint-disable-next-line prettier/prettier
-                label: fillInLinkIntoTranslation(T.dialogs.editChannelForWS.descShortKey, THIRDPARTY_URLS.shapeViewer),
+                label: fillInLinkIntoTranslation(
+                    T.dialogs.editChannelForWS.descShortKey,
+                    THIRDPARTY_URLS.shapeViewer
+                ),
                 placeholder: "",
                 defaultValue: "",
                 validator: val => this.testVal(val),
@@ -306,59 +309,6 @@ export class WirelessSignalSystem extends GameSystemWithFilter {
                     parameters.context.beginPath();
                     parameters.context.rect(tile.x, tile.y, globalConfig.tileSize, globalConfig.tileSize);
                     parameters.context.stroke();
-                }
-            }
-        }
-    }
-
-    /**
-     * Draws a given chunk
-     * @param {import("../../core/draw_utils").DrawParameters} parameters
-     * @param {MapChunkView} chunk
-     */
-    drawSignalChunk(parameters, chunk) {
-        const contents = chunk.containedEntitiesByLayer.regular;
-        for (let i = 0; i < contents.length; ++i) {
-            const entity = contents[i];
-
-            for (const code in this.wirelessInputList) {
-                const senderEntities = this.wirelessInputList[code];
-
-                for (let i = 0; i < senderEntities.length; ++i) {
-                    const senderEntity = senderEntities[i];
-
-                    const pinsComp = senderEntity.components.WiredPins;
-                    const input_network = pinsComp.slots[1].linkedNetwork;
-                    const outputCode = senderEntity.components.WirelessCode.wireless_code.split("/")[0];
-                    const receiverEntities = this.wirelessOutputList[outputCode];
-
-                    if (!input_network) {
-                        continue;
-                    }
-
-                    if (!receiverEntities) {
-                        continue;
-                    }
-
-                    for (let j = 0; j < receiverEntities.length; ++j) {
-                        const receiverEntity = receiverEntities[j];
-                        const receiverOrigin = receiverEntity.components.StaticMapEntity.origin;
-                        const origin = entity.components.StaticMapEntity.origin;
-
-                        const ctx = parameters.context;
-
-                        ctx.beginPath();
-                        ctx.strokeStyle = "yellow";
-                        ctx.shadowColor = "black";
-                        ctx.shadowBlur = 6;
-                        ctx.shadowOffsetX = 6;
-                        ctx.shadowOffsetY = 6;
-                        ctx.moveTo(origin.x, origin.y);
-                        ctx.lineTo(receiverOrigin.x, receiverOrigin.y);
-                        ctx.stroke();
-
-                        // Set Outputs
-                    }
                 }
             }
         }

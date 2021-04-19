@@ -35,6 +35,7 @@ import { RegularGameMode } from "./modes/regular";
 import { ProductionAnalytics } from "./production_analytics";
 import { GameRoot } from "./root";
 import { ShapeDefinitionManager } from "./shape_definition_manager";
+import { AchievementProxy } from "./achievement_proxy";
 import { SoundProxy } from "./sound_proxy";
 import { GameTime } from "./time/game_time";
 
@@ -110,6 +111,7 @@ export class GameCore {
         root.logic = new GameLogic(root);
         root.hud = new GameHUD(root);
         root.time = new GameTime(root);
+        root.achievementProxy = new AchievementProxy(root);
         root.automaticSave = new AutomaticSave(root);
         root.soundProxy = new SoundProxy(root);
 
@@ -148,6 +150,9 @@ export class GameCore {
 
                     // Update analytics
                     root.productionAnalytics.update();
+
+                    // Check achievements
+                    root.achievementProxy.update();
                 }
             });
         }
@@ -273,6 +278,9 @@ export class GameCore {
 
             // Update analytics
             root.productionAnalytics.update();
+
+            // Check achievements
+            root.achievementProxy.update();
         }
 
         // Update automatic save after everything finished
