@@ -56,7 +56,14 @@ export const globalConfig = {
     // Map
     mapChunkSize: 16,
     mapChunkOverviewMinZoom: 0.9,
+    /** @type {number} */
     mapChunkWorldSize: null, // COMPUTED
+
+    // Minimap
+    minimapOffsetX: 0,
+    minimapOffsetY: 0,
+    minimapScale: 10,
+    movingMinimap: false,
 
     // Belt speeds
     // NOTICE: Update webpack.production.config too!

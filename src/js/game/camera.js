@@ -691,6 +691,10 @@ export class Camera extends BasicSerializableObject {
             return;
         }
 
+        if (globalConfig.movingMinimap) {
+            return;
+        }
+
         if (!this.currentlyMoving) {
             return false;
         }

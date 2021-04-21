@@ -88,10 +88,6 @@ export function drawSpriteClipped({ sprite, x, y, w, h, originalW, originalH, vi
     const rect = new Rectangle(x, y, w, h);
     let intersection = rect.getIntersection(visibleRect ? visibleRect : parameters.visibleRect);
     if (!intersection) {
-        if (visibleRect) {
-            console.log(rect);
-            console.log(visibleRect);
-        }
         // Clipped
         if (++warningsShown % 200 === 1) {
             logger.warn(

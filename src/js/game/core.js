@@ -9,10 +9,10 @@ import { globalConfig } from "../core/config";
 import { getDeviceDPI, resizeHighDPICanvas } from "../core/dpi_manager";
 import { DrawParameters } from "../core/draw_parameters";
 import { gMetaBuildingRegistry } from "../core/global_registries";
-import { createLogger } from "../core/logging";
+import { createLogger, globalLog } from "../core/logging";
 import { Rectangle } from "../core/rectangle";
 import { ORIGINAL_SPRITE_SCALE } from "../core/sprites";
-import { lerp, randomInt, round2Digits } from "../core/utils";
+import { clamp, lerp, randomInt, round2Digits } from "../core/utils";
 import { Vector } from "../core/vector";
 import { Savegame } from "../savegame/savegame";
 import { SavegameSerializer } from "../savegame/savegame_serializer";
@@ -35,6 +35,7 @@ import { ShapeDefinitionManager } from "./shape_definition_manager";
 import { AchievementProxy } from "./achievement_proxy";
 import { SoundProxy } from "./sound_proxy";
 import { GameTime } from "./time/game_time";
+import { createMetaProperty } from "typescript";
 
 const logger = createLogger("ingame/core");
 
@@ -454,23 +455,27 @@ export class GameCore {
             }
 
             // Mini Map
-            const scale = 10;
-
-            const w = (root.gameWidth / scale) * 1.5;
-            const h = (root.gameHeight / scale) * 1.5;
+            const scale = globalConfig.minimapScale;
             const center = root.camera.center;
-            const transWidth = (root.gameWidth / 2 - w * 2) * scale;
-            const transHeight = (root.gameHeight / 2 - h * 2) * scale;
+            const zoomLevel = root.camera.zoomLevel;
+            const width = root.gameWidth;
+            const height = root.gameHeight;
+            const offsetX = globalConfig.minimapOffsetX;
+            const offsetY = globalConfig.minimapOffsetY;
+            const rectWidth = (width * 2) / scale;
+            const rectHeight = (height * 2) / scale;
 
-            context.scale(1 / scale, 1 / scale);
+            const transWidth =
+                center.x * zoomLevel * scale - center.x + (offsetX - width / 2 + rectWidth / 2) * scale;
+            const transHeight =
+                center.y * zoomLevel * scale - center.y + (offsetY - height / 2 + rectHeight / 2) * scale;
+
+            context.scale(1 / (zoomLevel * scale), 1 / (zoomLevel * scale));
             context.translate(transWidth, transHeight);
-
-            root.map.drawOverlay(
-                new Rectangle((center.x - w / 2) * scale, (center.y - h / 2) * scale, w * scale, h * scale)
-            );
-
+            const minimap = new Rectangle(center.x - width, center.y - height, width * 2, height * 2);
+            root.map.drawOverlay(minimap);
             context.translate(-transWidth, -transHeight);
-            context.scale(scale, scale);
+            context.scale(zoomLevel * scale, zoomLevel * scale);
         }
 
         if (this.overlayAlpha > 0.01) {
