@@ -3,6 +3,7 @@ import { enumDirection, Vector } from "../../core/vector";
 import { ACHIEVEMENTS } from "../../platform/achievement_provider";
 import { ItemAcceptorComponent } from "../components/item_acceptor";
 import { enumItemProcessorTypes, ItemProcessorComponent } from "../components/item_processor";
+import { TrashComponent } from "../components/trash";
 import { Entity } from "../entity";
 import { MetaBuilding } from "../meta_building";
 import { enumHubGoalRewards } from "../tutorial_goals";
@@ -34,44 +35,6 @@ export class MetaTrashBuilding extends MetaBuilding {
         return this.root.hubGoals.isRewardUnlocked(enumHubGoalRewards.reward_cutter_and_trash);
     }
 
-    addAchievementReceiver(entity) {
-        if (!entity.root) {
-            return;
-        }
-
-        const itemProcessor = entity.components.ItemProcessor;
-        const tryTakeItem = itemProcessor.tryTakeItem.bind(itemProcessor);
-
-        itemProcessor.tryTakeItem = () => {
-            const taken = tryTakeItem(...arguments);
-
-            if (taken) {
-                entity.root.signals.achievementCheck.dispatch(ACHIEVEMENTS.trash1000, 1);
-            }
-
-            return taken;
-        };
-    }
-
-    addAchievementReceiver(entity) {
-        if (!entity.root) {
-            return;
-        }
-
-        const itemProcessor = entity.components.ItemProcessor;
-        const tryTakeItem = itemProcessor.tryTakeItem.bind(itemProcessor);
-
-        itemProcessor.tryTakeItem = () => {
-            const taken = tryTakeItem(...arguments);
-
-            if (taken) {
-                entity.root.signals.achievementCheck.dispatch(ACHIEVEMENTS.trash1000, 1);
-            }
-
-            return taken;
-        };
-    }
-
     /**
      * Creates the entity at the given location
      * @param {Entity} entity
@@ -100,6 +63,6 @@ export class MetaTrashBuilding extends MetaBuilding {
             })
         );
 
-        this.addAchievementReceiver(entity);
+        entity.addComponent(new TrashComponent());
     }
 }

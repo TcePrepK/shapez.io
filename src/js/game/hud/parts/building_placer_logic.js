@@ -680,7 +680,7 @@ export class HUDBuildingPlacerLogic extends BaseHUDPart {
         const metaBuilding = this.currentMetaBuilding.get();
 
         // Placement
-        if (button === enumMouseButton.left && metaBuilding) {
+        if (!this.root.map.trashMap && button === enumMouseButton.left && metaBuilding) {
             this.currentlyDragging = true;
             this.currentlyDeleting = false;
             this.lastDragTile = this.root.camera.screenToWorld(pos).toTileSpace();
@@ -696,6 +696,7 @@ export class HUDBuildingPlacerLogic extends BaseHUDPart {
 
         // Deletion
         if (
+            !this.root.map.trashMap &&
             button === enumMouseButton.right &&
             (!metaBuilding || !this.root.app.settings.getAllSettings().clearCursorOnDeleteWhilePlacing)
         ) {
@@ -710,6 +711,10 @@ export class HUDBuildingPlacerLogic extends BaseHUDPart {
         // Cancel placement
         if (button === enumMouseButton.right && metaBuilding) {
             this.currentMetaBuilding.set(null);
+        }
+
+        if (this.root.map.trashMap) {
+            return STOP_PROPAGATION;
         }
     }
 

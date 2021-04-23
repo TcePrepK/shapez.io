@@ -3,26 +3,48 @@ import { GameSystem } from "../game_system";
 import { MapChunkView } from "../map_chunk_view";
 import { THEME } from "../theme";
 import { drawSpriteClipped } from "../../core/draw_utils";
+import { makeOffscreenBuffer } from "../../core/buffer_utils";
 
 export class MapResourcesSystem extends GameSystem {
+    constructor() {
+        super();
+
+        const [canvas, context] = makeOffscreenBuffer(globalConfig.mapChunkSize, globalConfig.mapChunkSize, {
+            label: "buffer-mapresourcebg",
+            smooth: true,
+        });
+
+        this.backgroundCanvas = canvas;
+        this.backgroundContext = context;
+    }
+
     /**
      * Draws the map resources
      * @param {MapChunkView} chunk
      */
     drawChunk(chunk) {
         const parameters = globalConfig.parameters;
-        const basicChunkBackground = this.root.buffers.getForKey({
-            key: "mapresourcebg",
-            subKey: chunk.renderKey,
-            w: globalConfig.mapChunkSize,
-            h: globalConfig.mapChunkSize,
-            dpi: 1,
-            redrawMethod: this.generateChunkBackground.bind(this, chunk),
-        });
+        // const basicChunkBackground = this.root.buffers.getForKey({
+        //     key: "mapresourcebg",
+        //     subKey: chunk.renderKey,
+        //     w: globalConfig.mapChunkSize,
+        //     h: globalConfig.mapChunkSize,
+        //     dpi: 1,
+        //     redrawMethod: this.generateChunkBackground.bind(this, chunk),
+        // });
+
+        this.generateChunkBackground(
+            chunk,
+            this.backgroundCanvas,
+            this.backgroundContext,
+            globalConfig.mapChunkSize,
+            globalConfig.mapChunkSize,
+            null
+        );
 
         parameters.context.imageSmoothingEnabled = false;
         drawSpriteClipped({
-            sprite: basicChunkBackground,
+            sprite: this.backgroundCanvas,
             x: chunk.tileX * globalConfig.tileSize,
             y: chunk.tileY * globalConfig.tileSize,
             w: globalConfig.mapChunkWorldSize,
@@ -54,19 +76,15 @@ export class MapResourcesSystem extends GameSystem {
                 const worldX = (chunk.tileX + x) * globalConfig.tileSize;
                 for (let y = 0; y < globalConfig.mapChunkSize; ++y) {
                     const lowerItem = row[y];
-
                     const entity = rowEntities[y];
                     if (entity) {
                         // Don't draw if there is an entity above
                         continue;
                     }
-
                     if (lowerItem) {
                         const worldY = (chunk.tileY + y) * globalConfig.tileSize;
-
                         const destX = worldX + globalConfig.halfTileSize;
                         const destY = worldY + globalConfig.halfTileSize;
-
                         lowerItem.drawItemCenteredClipped(destX, destY, globalConfig.defaultItemDiameter);
                     }
                 }

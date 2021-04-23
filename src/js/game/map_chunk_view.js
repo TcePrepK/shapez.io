@@ -12,8 +12,8 @@ export class MapChunkView extends MapChunk {
      * @param {number} x
      * @param {number} y
      */
-    constructor(x, y) {
-        super(x, y);
+    constructor(x, y, trashMap) {
+        super(x, y, trashMap);
 
         /**
          * Whenever something changes, we increase this number - so we know we need to redraw
@@ -64,6 +64,15 @@ export class MapChunkView extends MapChunk {
         systems.display.drawChunk(this);
         systems.storage.drawChunk(this);
         systems.itemProcessorOverlays.drawChunk(this);
+    }
+
+    /**
+     * Draws the static foreground layer
+     */
+    drawTrashLayer() {
+        const systems = this.root.systemMgr.systems;
+
+        systems.trash.drawChunk(this);
     }
 
     /**

@@ -2,7 +2,7 @@ import { globalConfig } from "../core/config";
 import { BasicSerializableObject } from "../savegame/serialization";
 
 /** @type {ItemType[]} **/
-export const itemTypes = ["shape", "color", "boolean"];
+export const itemTypes = ["shape", "color", "boolean", "trash"];
 
 /**
  * Class for items on belts etc. Not an entity for performance reasons

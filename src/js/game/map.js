@@ -16,11 +16,13 @@ export class BaseMap extends BasicSerializableObject {
         };
     }
 
-    constructor() {
+    constructor(trashMap) {
         super();
         this.root = globalConfig.root;
 
         this.seed = 0;
+
+        this.trashMap = trashMap;
 
         /**
          * Mapping of 'X|Y' to chunk
@@ -42,7 +44,7 @@ export class BaseMap extends BasicSerializableObject {
         }
 
         if (createIfNotExistent) {
-            const instance = new MapChunkView(chunkX, chunkY);
+            const instance = new MapChunkView(chunkX, chunkY, this.trashMap);
             this.chunksById.set(chunkIdentifier, instance);
             return instance;
         }

@@ -4,14 +4,17 @@ import { freeCanvas, makeOffscreenBuffer } from "../core/buffer_utils";
 import { Entity } from "./entity";
 import { THEME } from "./theme";
 import { MapChunkView } from "./map_chunk_view";
+import { TrashItem } from "./items/trash_item";
 
 /**
  * This is the view of the map, it extends the map which is the raw model and allows
  * to draw it
  */
 export class MapView extends BaseMap {
-    constructor() {
-        super();
+    constructor(trashMap = false) {
+        super(trashMap);
+
+        this.trashMap = trashMap;
 
         /**
          * DPI of the background cache images, required in some places
@@ -130,6 +133,13 @@ export class MapView extends BaseMap {
     }
 
     /**
+     * Draws the maps foreground
+     */
+    drawTrashMap() {
+        this.drawVisibleChunks(MapChunkView.prototype.drawTrashLayer);
+    }
+
+    /**
      * Calls a given method on all given chunks
      * @param {function} method
      */
@@ -197,6 +207,10 @@ export class MapView extends BaseMap {
                 parameters.visibleRect.h * dpi
             );
             parameters.context.scale(dpi, dpi);
+        }
+
+        if (this.root.map.trashMap) {
+            return;
         }
 
         this.drawVisibleChunks(MapChunkView.prototype.drawBackgroundLayer);

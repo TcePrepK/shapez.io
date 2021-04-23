@@ -17,7 +17,7 @@ export class MapChunk {
      * @param {number} x
      * @param {number} y
      */
-    constructor(x, y) {
+    constructor(x, y, trashMap) {
         this.root = globalConfig.root;
         this.x = x;
         this.y = y;
@@ -80,7 +80,9 @@ export class MapChunk {
          */
         this.patches = [];
 
-        this.generateLowerLayer();
+        if (!trashMap) {
+            this.generateLowerLayer();
+        }
     }
 
     /**

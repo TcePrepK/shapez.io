@@ -424,33 +424,41 @@ export class GameCore {
         // Main rendering order
         // -----
 
-        const desiredOverlayAlpha = this.root.camera.getIsMapOverlayActive() ? 1 : 0;
+        const desiredOverlayAlpha = root.camera.getIsMapOverlayActive() ? 1 : 0;
         this.overlayAlpha = lerp(this.overlayAlpha, desiredOverlayAlpha, 0.25);
 
         // On low performance, skip the fade
-        if (this.root.entityMgr.entities.length > 5000 || this.root.dynamicTickrate.averageFps < 50) {
+        if (root.entityMgr.entities.length > 5000 || root.dynamicTickrate.averageFps < 50) {
             this.overlayAlpha = desiredOverlayAlpha;
         }
 
         if (this.overlayAlpha < 0.99) {
-            // Background (grid, resources, etc)
-            root.map.drawBackground();
+            if (!root.map.trashMap) {
+                // Background (grid, resources, etc)
+                root.map.drawBackground();
 
-            // Belt items
-            systems.belt.drawBeltItems();
+                // Belt items
+                systems.belt.drawBeltItems();
 
-            // Miner & Static map entities etc.
-            root.map.drawForeground();
+                // Miner & Static map entities etc.
+                root.map.drawForeground();
 
-            // HUB Overlay
-            systems.hub.draw();
+                // HUB Overlay
+                systems.hub.draw();
 
-            // Green wires overlay
-            root.hud.parts.wiresOverlay.draw();
+                // Green wires overlay
+                root.hud.parts.wiresOverlay.draw();
 
-            if (this.root.currentLayer === "wires") {
-                // Static map entities
-                root.map.drawWiresForegroundLayer();
+                if (this.root.currentLayer === "wires") {
+                    // Static map entities
+                    root.map.drawWiresForegroundLayer();
+                }
+            } else {
+                // Background (grid, resources, etc)
+                root.map.drawBackground();
+
+                // Trash Map
+                root.map.drawTrashMap();
             }
         }
 

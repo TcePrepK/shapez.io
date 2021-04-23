@@ -1,6 +1,7 @@
 import { Signal, STOP_PROPAGATION } from "../core/signal";
 import { globalConfig, IS_MOBILE } from "../core/config";
 import { T } from "../translations";
+import { InputReceiver } from "../core/input_receiver";
 function key(str) {
     return str.toUpperCase().charCodeAt(0);
 }

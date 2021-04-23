@@ -21,6 +21,7 @@ import { BeltReaderSystem } from "./systems/belt_reader";
 import { FilterSystem } from "./systems/filter";
 import { ItemProducerSystem } from "./systems/item_producer";
 import { globalConfig } from "../core/config";
+import { TrashSystem } from "./systems/trash";
 
 const logger = createLogger("game_system_manager");
 
@@ -92,6 +93,10 @@ export class GameSystemManager {
 
             /** @type {ItemProducerSystem} */
             itemProducer: null,
+
+            /** @type {TrashSystem} */
+            trash: null,
+
             /* typehints:end */
         };
         this.systemUpdateOrder = [];
@@ -156,6 +161,8 @@ export class GameSystemManager {
         add("display", DisplaySystem);
 
         add("itemProcessorOverlays", ItemProcessorOverlaysSystem);
+
+        add("trash", TrashSystem);
 
         logger.log("📦 There are", this.systemUpdateOrder.length, "game systems");
     }
