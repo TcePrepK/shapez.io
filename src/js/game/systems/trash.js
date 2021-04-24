@@ -8,20 +8,35 @@ export class TrashSystem extends GameSystemWithFilter {
         super([TrashComponent]);
     }
 
+    update() {
+        for (const entity of this.allEntities) {
+            const trashComp = entity.components.Trash;
+            const fallingList = trashComp.fallingList;
+
+            for (const trash of fallingList) {
+                trash.updateFalling();
+                if (trash.falling >= 0) {
+                    fallingList.splice(fallingList.indexOf(trash), 1);
+                }
+            }
+        }
+    }
+
     /**
      * Draws a given chunk
      * @param {MapChunkView} chunk
      */
     drawChunk(chunk) {
         const contents = chunk.containedEntitiesByLayer.regular;
-        for (let i = 0; i < contents.length; ++i) {
-            const entity = contents[i];
-            if (entity && entity.components.Trash) {
-                const trashList = entity.components.Trash.trashList;
-                const origin = entity.components.StaticMapEntity.origin.multiplyScalar(globalConfig.tileSize);
-                for (const item of trashList) {
-                    item.drawItemCenteredImpl(origin.x, origin.y, globalConfig.defaultItemDiameter);
-                }
+        for (const entity of contents) {
+            if (!entity.components.Trash) {
+                continue;
+            }
+
+            const trashList = entity.components.Trash.trashList;
+            const origin = entity.components.StaticMapEntity.origin.multiplyScalar(globalConfig.tileSize);
+            for (const trash of trashList) {
+                trash.drawItemCenteredImpl(origin.x, origin.y, globalConfig.defaultItemDiameter);
             }
         }
     }

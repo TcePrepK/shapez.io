@@ -7,10 +7,12 @@ import {
 } from "../components/item_processor";
 import { Entity } from "../entity";
 import { GameSystemWithFilter } from "../game_system_with_filter";
-import { isTruthyItem } from "../items/boolean_item";
+import { BooleanItem, isTruthyItem } from "../items/boolean_item";
 import { ColorItem, COLOR_ITEM_SINGLETONS } from "../items/color_item";
 import { ShapeItem } from "../items/shape_item";
-import { TrashItem } from "../items/trash_item";
+import { TrashBooleanItem } from "../items/trash_boolean";
+import { TrashColorItem } from "../items/trash_color";
+import { TrashShapeItem } from "../items/trash_shape";
 
 /**
  * We need to allow queuing charges, otherwise the throughput will stall
@@ -440,10 +442,18 @@ export class ItemProcessorSystem extends GameSystemWithFilter {
 
         for (const items of payload.items) {
             const item = items.item;
-            // @ts-ignore
-            const trashItem = new TrashItem(item);
+
+            let trashItem;
+            if (item instanceof ShapeItem) {
+                trashItem = new TrashShapeItem(item);
+            } else if (item instanceof ColorItem) {
+                trashItem = new TrashColorItem(item);
+            } else if (item instanceof BooleanItem) {
+                trashItem = new TrashBooleanItem(item);
+            }
 
             trashComp.trashList.push(trashItem);
+            trashComp.fallingList.push(trashItem);
         }
     }
 

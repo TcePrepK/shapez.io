@@ -1,5 +1,7 @@
 import { Component } from "../component";
-import { TrashItem } from "../items/trash_item";
+import { TrashBooleanItem } from "../items/trash_boolean";
+import { TrashColorItem } from "../items/trash_color";
+import { TrashShapeItem } from "../items/trash_shape";
 
 export class TrashComponent extends Component {
     static getId() {
@@ -9,7 +11,10 @@ export class TrashComponent extends Component {
     constructor() {
         super();
 
-        /** @type {Array<TrashItem>} */
+        /** @type {Array<TrashColorItem|TrashShapeItem|TrashBooleanItem>} */
         this.trashList = [];
+
+        /** @type {Array<TrashColorItem|TrashShapeItem|TrashBooleanItem>} */
+        this.fallingList = [];
     }
 }

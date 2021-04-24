@@ -1,29 +1,10 @@
-import { types } from "../../savegame/serialization";
 import { BaseItem } from "../base_item";
-import { THEME } from "../theme";
 import { globalConfig } from "../../core/config";
 import { ShapeItem } from "./shape_item";
 
-export class TrashItem extends BaseItem {
+export class TrashShapeItem extends BaseItem {
     static getId() {
-        return "trash";
-    }
-
-    static getSchema() {
-        return types.string;
-    }
-
-    serialize() {
-        return this.item.definition;
-    }
-
-    deserialize(data) {
-        this.item = this.root.shapeDefinitionMgr.getShapeItemFromShortKey(data);
-    }
-
-    /** @returns {"trash"} **/
-    getItemType() {
-        return "trash";
+        return "trash_shape";
     }
 
     /**
@@ -40,19 +21,6 @@ export class TrashItem extends BaseItem {
         this.falling = -1000;
     }
 
-    getBackgroundColorAsResource() {
-        return THEME.map.resources.shape;
-    }
-
-    /**
-     * Draws the item to a canvas
-     * @param {CanvasRenderingContext2D} context
-     * @param {number} size
-     */
-    drawFullSizeOnCanvas(context, size) {
-        this.item.definition.drawFullSizeOnCanvas(context, size);
-    }
-
     /**
      * @param {number} x
      * @param {number} y
@@ -66,7 +34,9 @@ export class TrashItem extends BaseItem {
         this.item.definition.drawCentered(0, 0, diameter);
         ctx.rotate(-alpha);
         ctx.translate(-this.offX - x, -this.offY - this.falling - y);
+    }
 
+    updateFalling() {
         if (this.falling < 0) {
             this.falling += 8;
         }

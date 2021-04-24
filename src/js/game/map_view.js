@@ -4,7 +4,6 @@ import { freeCanvas, makeOffscreenBuffer } from "../core/buffer_utils";
 import { Entity } from "./entity";
 import { THEME } from "./theme";
 import { MapChunkView } from "./map_chunk_view";
-import { TrashItem } from "./items/trash_item";
 
 /**
  * This is the view of the map, it extends the map which is the raw model and allows
