@@ -294,7 +294,10 @@ export class HUDBuildingPlacer extends HUDBuildingPlacerLogic {
 
         const metaBuilding = this.currentMetaBuilding.get();
 
-        const worldPos = this.root.camera.screenToWorld(mousePosition);
+        let worldPos = this.root.camera.screenToWorld(mousePosition);
+        const cameraCenter = this.root.camera.center;
+        const cameraRotation = this.root.camera.rotation;
+        worldPos = worldPos.sub(cameraCenter).rotated(cameraRotation).add(cameraCenter);
         const mouseTile = worldPos.toTileSpace();
 
         // Compute best rotation variant
@@ -402,7 +405,13 @@ export class HUDBuildingPlacer extends HUDBuildingPlacerLogic {
             return;
         }
 
-        const mouseWorld = this.root.camera.screenToWorld(mousePosition);
+        const cameraCenter = this.root.camera.center;
+        const cameraRotation = this.root.camera.rotation;
+        const mouseWorld = this.root.camera
+            .screenToWorld(mousePosition)
+            .sub(cameraCenter)
+            .rotated(cameraRotation)
+            .add(cameraCenter);
         const mouseTile = mouseWorld.toTileSpace();
         parameters.context.fillStyle = THEME.map.directionLock[this.root.currentLayer].color;
         parameters.context.strokeStyle = THEME.map.directionLock[this.root.currentLayer].background;

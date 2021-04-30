@@ -215,8 +215,15 @@ export class HUDBuildingPlacerLogic extends BaseHUDPart {
             return null;
         }
 
+        const cameraCenter = this.root.camera.center;
+        const cameraRotation = this.root.camera.rotation;
+
         // Figure which points the line visits
-        const worldPos = this.root.camera.screenToWorld(mousePosition);
+        const worldPos = this.root.camera
+            .screenToWorld(mousePosition)
+            .sub(cameraCenter)
+            .rotated(cameraRotation)
+            .add(cameraCenter);
         const mouseTile = worldPos.toTileSpace();
 
         // Figure initial direction
@@ -564,8 +571,15 @@ export class HUDBuildingPlacerLogic extends BaseHUDPart {
 
         let result = [];
 
+        const cameraCenter = this.root.camera.center;
+        const cameraRotation = this.root.camera.rotation;
+
         // Figure which points the line visits
-        const worldPos = this.root.camera.screenToWorld(mousePosition);
+        const worldPos = this.root.camera
+            .screenToWorld(mousePosition)
+            .sub(cameraCenter)
+            .rotated(cameraRotation)
+            .add(cameraCenter);
         let endTile = worldPos.toTileSpace();
         let startTile = this.lastDragTile;
 
@@ -679,12 +693,19 @@ export class HUDBuildingPlacerLogic extends BaseHUDPart {
         }
 
         const metaBuilding = this.currentMetaBuilding.get();
+        const cameraCenter = this.root.camera.center;
+        const cameraRotation = this.root.camera.rotation;
+        const lastDragTile = this.root.camera
+            .screenToWorld(pos)
+            .sub(cameraCenter)
+            .rotated(cameraRotation)
+            .add(cameraCenter);
 
         // Placement
         if (button === enumMouseButton.left && metaBuilding) {
             this.currentlyDragging = true;
             this.currentlyDeleting = false;
-            this.lastDragTile = this.root.camera.screenToWorld(pos).toTileSpace();
+            this.lastDragTile = lastDragTile.toTileSpace();
 
             // Place initial building, but only if direction lock is not active
             if (!this.isDirectionLockActive) {
@@ -702,7 +723,7 @@ export class HUDBuildingPlacerLogic extends BaseHUDPart {
         ) {
             this.currentlyDragging = true;
             this.currentlyDeleting = true;
-            this.lastDragTile = this.root.camera.screenToWorld(pos).toTileSpace();
+            this.lastDragTile = lastDragTile.toTileSpace();
             if (this.deleteBelowCursor()) {
                 return STOP_PROPAGATION;
             }
@@ -731,7 +752,15 @@ export class HUDBuildingPlacerLogic extends BaseHUDPart {
         const metaBuilding = this.currentMetaBuilding.get();
         if ((metaBuilding || this.currentlyDeleting) && this.lastDragTile) {
             const oldPos = this.lastDragTile;
-            let newPos = this.root.camera.screenToWorld(pos).toTileSpace();
+            const cameraCenter = this.root.camera.center;
+            const cameraRotation = this.root.camera.rotation;
+
+            let newPos = this.root.camera
+                .screenToWorld(pos)
+                .sub(cameraCenter)
+                .rotated(cameraRotation)
+                .add(cameraCenter)
+                .toTileSpace();
 
             // Check if camera is moving, since then we do nothing
             if (this.root.camera.desiredCenter) {
