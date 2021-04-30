@@ -336,9 +336,12 @@ export class HUDWaypoints extends BaseHUDPart {
      * @param {Vector} position
      */
     addWaypoint(label, position) {
+        const cameraCenter = this.root.camera.center;
+        const cameraRotation = this.root.camera.rotation;
+        const rotatedPosition = position.sub(cameraCenter).rotated(cameraRotation).add(cameraCenter);
         this.waypoints.push({
             label,
-            center: { x: position.x, y: position.y },
+            center: { x: rotatedPosition.x, y: rotatedPosition.y },
             zoomLevel: this.root.camera.zoomLevel,
             layer: this.root.currentLayer,
         });
