@@ -1,5 +1,7 @@
 import { clickDetectorGlobals } from "../core/click_detector";
 import { globalConfig, SUPPORT_TOUCH } from "../core/config";
+import { DrawParameters } from "../core/draw_parameters";
+import { Loader } from "../core/loader";
 import { createLogger } from "../core/logging";
 import { Rectangle } from "../core/rectangle";
 import { Signal, STOP_PROPAGATION } from "../core/signal";
@@ -36,6 +38,8 @@ export class Camera extends BasicSerializableObject {
 
         /** @type {GameRoot} */
         this.root = root;
+
+        this.cursorSprite = Loader.getSprite("sprites/misc/cursor.png");
 
         // Zoom level, 2 means double size
 
@@ -820,6 +824,34 @@ export class Camera extends BasicSerializableObject {
             this.internalUpdateKeyboardForce(now, physicsStepSizeMs);
         }
         this.clampZoomLevel();
+    }
+
+    /**
+     * @param {DrawParameters} parameter
+     */
+    drawCursor(parameter) {
+        let temp = this.rotation;
+        if (!this.root.app.settings.getAllSettings().rotateCursor) {
+            this.rotation = 0;
+        }
+
+        const mouse = this.root.app.mousePosition;
+
+        parameter.context.resetTransform();
+        parameter.context.translate(mouse.x, mouse.y);
+
+        parameter.context.scale(1 / 10, 1 / 10);
+        parameter.context.rotate(-this.rotation);
+
+        this.cursorSprite.draw(parameter.context, 0, 0, 120, 190);
+
+        parameter.context.rotate(this.rotation);
+        parameter.context.scale(10, 10);
+
+        parameter.context.translate(-mouse.x, -mouse.y);
+        this.root.camera.transform(parameter.context);
+
+        this.rotation = temp;
     }
 
     /**

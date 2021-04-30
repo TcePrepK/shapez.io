@@ -494,6 +494,8 @@ export class GameCore {
             systems.belt.drawBeltPathDebug(params);
         }
 
+        root.camera.drawCursor(params);
+
         // END OF GAME CONTENT
         // -----
 

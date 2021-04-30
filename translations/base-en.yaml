@@ -999,6 +999,11 @@ settings:
             description: >-
                 Whether to offer hints and tutorials while playing. Also hides certain UI elements up to a given level to make it easier to get into the game.
 
+        rotateCursor:
+            title: Cursor Rotation
+            description: >-
+                Cursor rotates by camera rotation.
+
         enableTunnelSmartplace:
             title: Smart Tunnels
             description: >-

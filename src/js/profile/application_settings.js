@@ -228,6 +228,7 @@ export const allApplicationSettings = [
     ),
 
     new BoolSetting("offerHints", enumCategories.userInterface, (app, value) => {}),
+    new BoolSetting("rotateCursor", enumCategories.userInterface, (app, value) => {}),
 
     new EnumSetting("theme", {
         options: Object.keys(THEMES),
@@ -345,6 +346,7 @@ class SettingsStorage {
 
         this.alwaysMultiplace = false;
         this.offerHints = true;
+        this.rotateCursor = true;
         this.enableTunnelSmartplace = true;
         this.vignette = true;
         this.compactBuildingInfo = false;
@@ -584,7 +586,7 @@ export class ApplicationSettings extends ReadWriteProxy {
     }
 
     getCurrentVersion() {
-        return 31;
+        return 32;
     }
 
     /** @param {{settings: SettingsStorage, version: number}} data */
@@ -734,6 +736,11 @@ export class ApplicationSettings extends ReadWriteProxy {
         if (data.version < 31) {
             data.settings.rotationSpeed = "regular";
             data.version = 31;
+        }
+
+        if (data.version < 32) {
+            data.settings.rotateCursor = true;
+            data.version = 32;
         }
 
         return ExplainedResult.good();
