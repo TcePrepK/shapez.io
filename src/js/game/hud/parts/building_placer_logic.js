@@ -335,7 +335,14 @@ export class HUDBuildingPlacerLogic extends BaseHUDPart {
             return false;
         }
 
-        const worldPos = this.root.camera.screenToWorld(mousePosition);
+        const cameraCenter = this.root.camera.center;
+        const cameraRotation = this.root.camera.rotation;
+        const worldPos = this.root.camera
+            .screenToWorld(mousePosition)
+            .sub(cameraCenter)
+            .rotated(cameraRotation)
+            .add(cameraCenter);
+
         const tile = worldPos.toTileSpace();
         const contents = this.root.map.getTileContent(tile, this.root.currentLayer);
         if (contents) {
