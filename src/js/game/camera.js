@@ -101,13 +101,13 @@ export class Camera extends BasicSerializableObject {
         this.internalInitEvents();
         this.clampZoomLevel();
         this.bindKeys();
-        if (G_IS_DEV) {
-            window.addEventListener("keydown", ev => {
-                if (ev.key === "i") {
-                    this.zoomLevel = 3;
-                }
-            });
-        }
+        window.addEventListener("keydown", ev => {
+            if (ev.key === "i") {
+                this.setDesiredCenter(new Vector(0, 0));
+                this.setDesiredZoom(3);
+                this.setDesiredRotation(0);
+            }
+        });
     }
 
     // Serialization
@@ -156,6 +156,14 @@ export class Camera extends BasicSerializableObject {
      */
     setDesiredZoom(zoom) {
         this.desiredZoom = zoom;
+    }
+
+    /**
+     * Sets a desired rotation
+     * @param {number} angle
+     */
+    setDesiredRotation(angle) {
+        this.desiredRotation = angle;
     }
 
     /**
@@ -728,7 +736,7 @@ export class Camera extends BasicSerializableObject {
             return false;
         }
 
-        let delta = this.lastMovingPosition.sub(pos).divideScalar(this.zoomLevel);
+        let delta = this.lastMovingPosition.sub(pos).divideScalar(this.zoomLevel).rotated(this.rotation);
         if (G_IS_DEV && globalConfig.debug.testCulling) {
             // When testing culling, we see everything from the same distance
             delta = delta.multiplyScalar(this.zoomLevel * -2);
