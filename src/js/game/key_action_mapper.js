@@ -46,6 +46,10 @@ export const KEYMAPPINGS = {
         mapZoomOut: { keyCode: 189, repeated: true }, // "-"
 
         createMarker: { keyCode: key("M") },
+
+        cameraRotationLock: { keyCode: 16 }, //shift
+        cameraRotateCW: { keyCode: key("E"), repeated: true },
+        cameraRotateCCW: { keyCode: key("Q"), repeated: true },
     },
 
     buildings: {

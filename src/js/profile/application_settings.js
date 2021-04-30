@@ -95,6 +95,33 @@ export const movementSpeeds = [
     },
 ];
 
+export const rotationSpeeds = [
+    {
+        id: "super_slow",
+        speed: 0.5,
+    },
+    {
+        id: "slow",
+        speed: 1,
+    },
+    {
+        id: "regular",
+        speed: 2,
+    },
+    {
+        id: "fast",
+        speed: 4,
+    },
+    {
+        id: "super_fast",
+        speed: 8,
+    },
+    {
+        id: "extremely_fast",
+        speed: 16,
+    },
+];
+
 export const autosaveIntervals = [
     {
         id: "one_minute",
@@ -256,6 +283,15 @@ export const allApplicationSettings = [
         changeCb: (app, id) => {},
     }),
 
+    new EnumSetting("rotationSpeed", {
+        options: rotationSpeeds.sort((a, b) => a.speed - b.speed),
+        valueGetter: speed => speed.id,
+        textGetter: speed => T.settings.labels.rotationSpeed.speeds[speed.id],
+        category: enumCategories.advanced,
+        restartRequired: false,
+        changeCb: (app, id) => {},
+    }),
+
     new BoolSetting("enableMousePan", enumCategories.advanced, (app, value) => {}),
     new BoolSetting("alwaysMultiplace", enumCategories.advanced, (app, value) => {}),
     new BoolSetting("zoomToCursor", enumCategories.advanced, (app, value) => {}),
@@ -303,6 +339,7 @@ class SettingsStorage {
         this.refreshRate = "60";
         this.scrollWheelSensitivity = "regular";
         this.movementSpeed = "regular";
+        this.rotationSpeed = "regular";
         this.language = "auto-detect";
         this.autosaveInterval = "two_minutes";
 
@@ -417,6 +454,17 @@ export class ApplicationSettings extends ReadWriteProxy {
             }
         }
         logger.error("Unknown movement speed id:", id);
+        return 1;
+    }
+
+    getRotationSpeed() {
+        const id = this.getAllSettings().rotationSpeed;
+        for (let i = 0; i < rotationSpeeds.length; ++i) {
+            if (rotationSpeeds[i].id === id) {
+                return rotationSpeeds[i].speed;
+            }
+        }
+        logger.error("Unknown rotation speed id:", id);
         return 1;
     }
 
@@ -536,7 +584,7 @@ export class ApplicationSettings extends ReadWriteProxy {
     }
 
     getCurrentVersion() {
-        return 30;
+        return 31;
     }
 
     /** @param {{settings: SettingsStorage, version: number}} data */
@@ -681,6 +729,11 @@ export class ApplicationSettings extends ReadWriteProxy {
             data.settings.offerHints = true;
 
             data.version = 30;
+        }
+
+        if (data.version < 31) {
+            data.settings.rotationSpeed = "regular";
+            data.version = 31;
         }
 
         return ExplainedResult.good();

@@ -356,6 +356,11 @@ export class HUDBuildingPlacerLogic extends BaseHUDPart {
             return;
         }
 
+        // Disable in rotation
+        if (this.root.keyMapper.getBinding(KEYMAPPINGS.navigation.cameraRotationLock).pressed) {
+            return;
+        }
+
         const mousePosition = this.root.app.mousePosition;
         if (!mousePosition) {
             // Not on screen

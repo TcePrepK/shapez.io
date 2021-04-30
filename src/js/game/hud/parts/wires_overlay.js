@@ -28,6 +28,11 @@ export class HUDWiresOverlay extends BaseHUDPart {
      * Switches between layers
      */
     switchLayers() {
+        // Disable in rotation
+        if (this.root.keyMapper.getBinding(KEYMAPPINGS.navigation.cameraRotationLock).pressed) {
+            return;
+        }
+
         if (this.root.currentLayer === "regular") {
             if (
                 this.root.hubGoals.isRewardUnlocked(enumHubGoalRewards.reward_wires_painter_and_levers) ||

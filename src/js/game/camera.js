@@ -86,6 +86,12 @@ export class Camera extends BasicSerializableObject {
         /** @type {number} */
         this.rotation = 0;
 
+        /** @type {number} */
+        this.desiredRotation = null;
+
+        /** @type {number} */
+        this.rotationSpeed = (Math.PI / 180) * 2;
+
         // Handlers
         this.downPreHandler = /** @type {TypedSignal<[Vector, enumMouseButton]>} */ (new Signal());
         this.movePreHandler = /** @type {TypedSignal<[Vector]>} */ (new Signal());
@@ -99,10 +105,6 @@ export class Camera extends BasicSerializableObject {
             window.addEventListener("keydown", ev => {
                 if (ev.key === "i") {
                     this.zoomLevel = 3;
-                } else if (ev.key === "q") {
-                    this.rotation -= (Math.PI / 180) * 2;
-                } else if (ev.key === "e") {
-                    this.rotation += (Math.PI / 180) * 2;
                 }
             });
         }
@@ -203,6 +205,7 @@ export class Camera extends BasicSerializableObject {
         this.lastMovingPosition = null;
         this.didMoveSinceTouchStart = false;
         this.desiredZoom = null;
+        this.desiredRotation = null;
     }
 
     /**
@@ -228,7 +231,12 @@ export class Camera extends BasicSerializableObject {
      * @returns {boolean} true if it willchange
      */
     viewportWillChange() {
-        return this.desiredCenter !== null || this.desiredZoom !== null || this.isCurrentlyInteracting();
+        return (
+            this.desiredCenter !== null ||
+            this.desiredZoom !== null ||
+            this.desiredRotation !== null ||
+            this.isCurrentlyInteracting()
+        );
     }
 
     /**
@@ -240,6 +248,7 @@ export class Camera extends BasicSerializableObject {
         this.currentlyMoving = false;
         this.currentlyPinching = false;
         this.desiredZoom = null;
+        this.desiredRotation = null;
     }
 
     /**
@@ -363,6 +372,21 @@ export class Camera extends BasicSerializableObject {
             .add(() => (this.desiredZoom = this.zoomLevel / 1.2));
 
         mapper.getBinding(KEYMAPPINGS.navigation.centerMap).add(() => this.centerOnMap());
+
+        // Camera rotation
+        mapper.getBinding(KEYMAPPINGS.navigation.cameraRotateCW).add(() => {
+            if (mapper.getBinding(KEYMAPPINGS.navigation.cameraRotationLock).pressed) {
+                this.desiredRotation =
+                    this.rotation + Math.radians(this.root.app.settings.getRotationSpeed());
+            }
+        });
+
+        mapper.getBinding(KEYMAPPINGS.navigation.cameraRotateCCW).add(() => {
+            if (mapper.getBinding(KEYMAPPINGS.navigation.cameraRotationLock).pressed) {
+                this.desiredRotation =
+                    this.rotation - Math.radians(this.root.app.settings.getRotationSpeed());
+            }
+        });
     }
 
     centerOnMap() {
@@ -782,6 +806,7 @@ export class Camera extends BasicSerializableObject {
             this.internalUpdatePanning(now, physicsStepSizeMs);
             this.internalUpdateMousePanning(now, physicsStepSizeMs);
             this.internalUpdateZooming(now, physicsStepSizeMs);
+            this.internalUpdateRotating(now, physicsStepSizeMs);
             this.internalUpdateCentering(now, physicsStepSizeMs);
             this.internalUpdateShake(now, physicsStepSizeMs);
             this.internalUpdateKeyboardForce(now, physicsStepSizeMs);
@@ -891,7 +916,13 @@ export class Camera extends BasicSerializableObject {
             return;
         }
 
-        if (this.desiredCenter || this.desiredZoom || this.currentlyMoving || this.currentlyPinching) {
+        if (
+            this.desiredCenter ||
+            this.desiredZoom ||
+            this.desiredRotation ||
+            this.currentlyMoving ||
+            this.currentlyPinching
+        ) {
             // Performing another method of movement right now
             return;
         }
@@ -1013,6 +1044,35 @@ export class Camera extends BasicSerializableObject {
 
             this.center.x += moveAmount * forceX * movementSpeed;
             this.center.y += moveAmount * forceY * movementSpeed;
+        }
+    }
+
+    /**
+     * Updates the non user interaction rotating
+     * @param {number} now Time now in seconds
+     * @param {number} dt Delta time
+     */
+    internalUpdateRotating(now, dt) {
+        if (!this.currentlyPinching && this.desiredRotation !== null) {
+            const diff = this.rotation - this.desiredRotation;
+            if (Math.abs(diff) > 0.0001) {
+                let fade = 0.94;
+                if (diff > 0) {
+                    // Zoom out faster than in
+                    fade = 0.9;
+                }
+
+                assert(
+                    Number.isFinite(this.desiredRotation),
+                    "Desired rotation is NaN: " + this.desiredRotation
+                );
+                assert(Number.isFinite(fade), "Rotation fade is NaN: " + fade);
+                this.rotation = this.rotation * fade + this.desiredRotation * (1 - fade);
+                assert(Number.isFinite(this.rotation), "Rotation is NaN after fade: " + this.rotation);
+            } else {
+                this.rotation = this.desiredRotation;
+                this.desiredRotation = null;
+            }
         }
     }
 }

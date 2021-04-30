@@ -928,6 +928,18 @@ settings:
                 super_fast: Super Fast
                 extremely_fast: Extremely Fast
 
+        rotationSpeed:
+            title: Rotation speed
+            description: >-
+                Changes how fast the view rotates.
+            speeds:
+                super_slow: Super slow
+                slow: Slow
+                regular: Regular
+                fast: Fast
+                super_fast: Super Fast
+                extremely_fast: Extremely Fast
+
         language:
             title: Language
             description: >-
@@ -1093,6 +1105,10 @@ keybindings:
         mapZoomIn: Zoom in
         mapZoomOut: Zoom out
         createMarker: Create Marker
+
+        cameraRotationLock: Camera Rotation Lock,
+        cameraRotateCW: Rotate Camera Clock Wise,
+        cameraRotateCCW: Rotate Camera Counter Clock Wise,
 
         menuOpenShop: Upgrades
         menuOpenStats: Statistics
