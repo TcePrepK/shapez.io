@@ -5,6 +5,7 @@ import { freeCanvas, makeOffscreenBuffer } from "../core/buffer_utils";
 import { Entity } from "./entity";
 import { THEME } from "./theme";
 import { MapChunkView } from "./map_chunk_view";
+import { Rectangle } from "../core/rectangle";
 
 /**
  * This is the view of the map, it extends the map which is the raw model and allows
@@ -137,7 +138,8 @@ export class MapView extends BaseMap {
      * @param {function} method
      */
     drawVisibleChunks(parameters, method) {
-        const cullRange = parameters.visibleRect.allScaled(1 / globalConfig.tileSize);
+        const rect = parameters.visibleRect;
+        const cullRange = rect.allScaled(1 / globalConfig.tileSize);
         const top = cullRange.top();
         const right = cullRange.right();
         const bottom = cullRange.bottom();

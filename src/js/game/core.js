@@ -394,10 +394,28 @@ export class GameCore {
             desiredAtlasScale = "0.5";
         }
 
+        const center = root.camera.center;
+        const width = this.root.gameWidth / zoomLevel;
+        const height = this.root.gameHeight / zoomLevel;
+
+        const rotatedRectangle = new Rectangle(
+            center.x - width / 2,
+            center.y - height / 2,
+            width / 2,
+            height / 2
+        ).rotateRectangle(root.camera.rotation);
+
+        const visibleRect = new Rectangle(
+            center.x - rotatedRectangle.w,
+            center.y - rotatedRectangle.h,
+            rotatedRectangle.w * 2,
+            rotatedRectangle.h * 2
+        );
+
         // Construct parameters required for drawing
         const params = new DrawParameters({
             context: context,
-            visibleRect: root.camera.getVisibleRect(),
+            visibleRect,
             desiredAtlasScale,
             zoomLevel,
             root: root,
@@ -432,6 +450,12 @@ export class GameCore {
         if (this.root.entityMgr.entities.length > 5000 || this.root.dynamicTickrate.averageFps < 50) {
             this.overlayAlpha = desiredOverlayAlpha;
         }
+
+        context.resetTransform();
+        context.translate(root.gameWidth / 2, root.gameHeight / 2);
+        context.rotate(-root.camera.rotation);
+        context.translate(-root.gameWidth / 2, -root.gameHeight / 2);
+        root.camera.transform(context);
 
         if (this.overlayAlpha < 0.99) {
             // Background (grid, resources, etc)

@@ -8,6 +8,8 @@ export class Rectangle {
         this.y = y;
         this.w = w;
         this.h = h;
+
+        this.rotation = 0;
     }
 
     /**
@@ -67,6 +69,62 @@ export class Rectangle {
      */
     isEmpty() {
         return epsilonCompare(this.w * this.h, 0);
+    }
+
+    /**
+     * @param {number} angle
+     * @returns {Rectangle}
+     */
+    rotateRectangle(angle) {
+        const lt = new Vector(this.left(), this.top());
+        const rt = new Vector(this.right(), this.top());
+        const rb = new Vector(this.right(), this.bottom());
+        const lb = new Vector(this.left(), this.bottom());
+
+        const Rlt = lt.rotated(angle);
+        const Rrt = rt.rotated(angle);
+        const Rrb = rb.rotated(angle);
+        const Rlb = lb.rotated(angle);
+
+        const corners = [Rlt, Rrt, Rrb, Rlb];
+
+        // Sort by X
+        corners.sort((a, b) => {
+            if (a.x > b.x) return 1;
+            if (a.x < b.x) return -1;
+            return 0;
+        });
+
+        const leftMostCorner = corners[0];
+        const rightMostCorner = corners[3];
+
+        // Sory by Y
+        corners.sort((a, b) => {
+            if (a.y > b.y) return 1;
+            if (a.y < b.y) return -1;
+            return 0;
+        });
+
+        const topMostCorner = corners[0];
+        const bottomMostCorner = corners[3];
+
+        const newX = leftMostCorner.x;
+        const newY = topMostCorner.y;
+        const newWidth = rightMostCorner.x - newX;
+        const newHeight = bottomMostCorner.y - newY;
+
+        // console.table({
+        //     leftMostCorner: leftMostCorner.x,
+        //     rightMostCorner: rightMostCorner.x,
+        //     topMostCorner: topMostCorner.y,
+        //     bottomMostCorner: bottomMostCorner.y,
+        //     newX: newX,
+        //     newY: newY,
+        //     newWidth: newWidth,
+        //     newHeight: newHeight,
+        // });
+
+        return new Rectangle(newX, newY, newWidth, newHeight);
     }
 
     /**

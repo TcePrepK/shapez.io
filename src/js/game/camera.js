@@ -83,6 +83,9 @@ export class Camera extends BasicSerializableObject {
         /** @type {Vector} */
         this.touchPostMoveVelocity = new Vector(0, 0);
 
+        /** @type {number} */
+        this.rotation = 0;
+
         // Handlers
         this.downPreHandler = /** @type {TypedSignal<[Vector, enumMouseButton]>} */ (new Signal());
         this.movePreHandler = /** @type {TypedSignal<[Vector]>} */ (new Signal());
@@ -96,6 +99,10 @@ export class Camera extends BasicSerializableObject {
             window.addEventListener("keydown", ev => {
                 if (ev.key === "i") {
                     this.zoomLevel = 3;
+                } else if (ev.key === "q") {
+                    this.rotation -= (Math.PI / 180) * 2;
+                } else if (ev.key === "e") {
+                    this.rotation += (Math.PI / 180) * 2;
                 }
             });
         }
