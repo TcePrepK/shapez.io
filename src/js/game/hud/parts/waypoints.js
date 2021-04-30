@@ -440,7 +440,13 @@ export class HUDWaypoints extends BaseHUDPart {
 
         // Find parameters
         const scale = this.getWaypointUiScale();
-        const screenPos = this.root.camera.worldToScreen(new Vector(waypoint.center.x, waypoint.center.y));
+
+        const rotation = this.root.camera.rotation;
+        const cameraCenter = this.root.camera.center;
+        const waypointCenter = new Vector(waypoint.center.x, waypoint.center.y);
+        const rotatedScreenPos = this.root.camera.worldToScreen(
+            waypointCenter.sub(cameraCenter).rotated(-rotation).add(cameraCenter)
+        );
 
         // Distinguish between text and item waypoints -> Figure out parameters
         const originalLabel = this.getWaypointLabel(waypoint);
@@ -458,8 +464,8 @@ export class HUDWaypoints extends BaseHUDPart {
 
         return {
             screenBounds: new Rectangle(
-                screenPos.x - 7 * scale,
-                screenPos.y - 12 * scale,
+                rotatedScreenPos.x - 7 * scale,
+                rotatedScreenPos.y - 12 * scale,
                 15 * scale + textWidth,
                 15 * scale
             ),
