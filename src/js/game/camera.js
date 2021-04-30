@@ -1046,12 +1046,16 @@ export class Camera extends BasicSerializableObject {
                 forceX += 1;
             }
 
-            let movementSpeed =
+            const movementSpeed =
                 this.root.app.settings.getMovementSpeed() *
                 (actionMapper.getBinding(KEYMAPPINGS.navigation.mapMoveFaster).pressed ? 4 : 1);
 
-            this.center.x += moveAmount * forceX * movementSpeed;
-            this.center.y += moveAmount * forceY * movementSpeed;
+            const movementVector = new Vector(
+                moveAmount * forceX * movementSpeed,
+                moveAmount * forceY * movementSpeed
+            );
+            const rotatedMovementVector = movementVector.rotated(this.rotation);
+            this.center = this.center.add(rotatedMovementVector);
         }
     }
 
