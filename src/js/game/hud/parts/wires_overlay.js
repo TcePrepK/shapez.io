@@ -16,7 +16,7 @@ export class HUDWiresOverlay extends BaseHUDPart {
 
     initialize() {
         // Probably not the best location, but the one which makes most sense
-        this.root.keyMapper.getBinding(KEYMAPPINGS.ingame.switchLayers).add(this.switchLayers, this);
+        // this.root.keyMapper.getBinding(KEYMAPPINGS.ingame.switchLayers).add(this.switchLayers, this);
         this.root.keyMapper.getBinding(KEYMAPPINGS.placement.copyWireValue).add(this.copyWireValue, this);
 
         this.generateTilePattern();
@@ -24,22 +24,22 @@ export class HUDWiresOverlay extends BaseHUDPart {
         this.currentAlpha = 0.0;
     }
 
-    /**
-     * Switches between layers
-     */
-    switchLayers() {
-        if (this.root.currentLayer === "regular") {
-            if (
-                this.root.hubGoals.isRewardUnlocked(enumHubGoalRewards.reward_wires_painter_and_levers) ||
-                (G_IS_DEV && globalConfig.debug.allBuildingsUnlocked)
-            ) {
-                this.root.currentLayer = "wires";
-            }
-        } else {
-            this.root.currentLayer = "regular";
-        }
-        this.root.signals.editModeChanged.dispatch(this.root.currentLayer);
-    }
+    // /**
+    //  * Switches between layers
+    //  */
+    // switchLayers() {
+    //     if (this.root.currentLayer === "regular") {
+    //         if (
+    //             this.root.hubGoals.isRewardUnlocked(enumHubGoalRewards.reward_wires_painter_and_levers) ||
+    //             (G_IS_DEV && globalConfig.debug.allBuildingsUnlocked)
+    //         ) {
+    //             this.root.currentLayer = "wires";
+    //         }
+    //     } else {
+    //         this.root.currentLayer = "regular";
+    //     }
+    //     this.root.signals.editModeChanged.dispatch(this.root.currentLayer);
+    // }
 
     /**
      * Generates the background pattern for the wires overlay

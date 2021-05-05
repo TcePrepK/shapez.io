@@ -168,17 +168,17 @@ export class GameCore {
         this.root.gameIsFresh = true;
         this.root.map.seed = randomInt(0, 100000);
 
-        // Place the hub
-        const hub = gMetaBuildingRegistry.findByClass(MetaHubBuilding).createEntity({
-            root: this.root,
-            origin: new Vector(-2, -2),
-            rotation: 0,
-            originalRotation: 0,
-            rotationVariant: 0,
-            variant: defaultBuildingVariant,
-        });
-        this.root.map.placeStaticEntity(hub);
-        this.root.entityMgr.registerEntity(hub);
+        // // Place the hub
+        // const hub = gMetaBuildingRegistry.findByClass(MetaHubBuilding).createEntity({
+        //     root: this.root,
+        //     origin: new Vector(-2, -2),
+        //     rotation: 0,
+        //     originalRotation: 0,
+        //     rotationVariant: 0,
+        //     variant: defaultBuildingVariant,
+        // });
+        // this.root.map.placeStaticEntity(hub);
+        // this.root.entityMgr.registerEntity(hub);
     }
 
     /**
@@ -276,12 +276,6 @@ export class GameCore {
         if (!(G_IS_DEV && globalConfig.debug.manualTickOnly)) {
             // Perform logic ticks
             this.root.time.performTicks(deltaMs, this.boundInternalTick);
-
-            // Update analytics
-            root.productionAnalytics.update();
-
-            // Check achievements
-            root.achievementProxy.update();
         }
 
         // Update automatic save after everything finished
@@ -318,9 +312,6 @@ export class GameCore {
 
         this.duringLogicUpdate = true;
 
-        // Update entities, this removes destroyed entities
-        root.entityMgr.update();
-
         // IMPORTANT: At this point, the game might be game over. Stop if this is the case
         if (!this.root) {
             logger.log("Root destructed, returning false");
@@ -328,9 +319,6 @@ export class GameCore {
 
             return false;
         }
-
-        root.systemMgr.update();
-        // root.particleMgr.update();
 
         this.duringLogicUpdate = false;
         root.dynamicTickrate.endTick();
@@ -359,7 +347,6 @@ export class GameCore {
 
     draw() {
         const root = this.root;
-        const systems = root.systemMgr.systems;
 
         this.root.dynamicTickrate.onFrameRendered();
 
@@ -395,9 +382,11 @@ export class GameCore {
         }
 
         // Construct parameters required for drawing
+        const widthOfChunk = globalConfig.mapChunkWorldSize;
+        const visibleRect = root.camera.getVisibleRect().expandedInAllDirections(widthOfChunk);
         const params = new DrawParameters({
             context: context,
-            visibleRect: root.camera.getVisibleRect(),
+            visibleRect,
             desiredAtlasScale,
             zoomLevel,
             root: root,
@@ -428,46 +417,9 @@ export class GameCore {
         const desiredOverlayAlpha = this.root.camera.getIsMapOverlayActive() ? 1 : 0;
         this.overlayAlpha = lerp(this.overlayAlpha, desiredOverlayAlpha, 0.25);
 
-        // On low performance, skip the fade
-        if (this.root.entityMgr.entities.length > 5000 || this.root.dynamicTickrate.averageFps < 50) {
-            this.overlayAlpha = desiredOverlayAlpha;
-        }
-
         if (this.overlayAlpha < 0.99) {
             // Background (grid, resources, etc)
             root.map.drawBackground(params);
-
-            // Belt items
-            systems.belt.drawBeltItems(params);
-
-            // Miner & Static map entities etc.
-            root.map.drawForeground(params);
-
-            // HUB Overlay
-            systems.hub.draw(params);
-
-            // Green wires overlay
-            root.hud.parts.wiresOverlay.draw(params);
-
-            if (this.root.currentLayer === "wires") {
-                // Static map entities
-                root.map.drawWiresForegroundLayer(params);
-            }
-        }
-
-        if (this.overlayAlpha > 0.01) {
-            // Map overview
-            context.globalAlpha = this.overlayAlpha;
-            root.map.drawOverlay(params);
-            context.globalAlpha = 1;
-        }
-
-        if (G_IS_DEV) {
-            root.map.drawStaticEntityDebugOverlays(params);
-        }
-
-        if (G_IS_DEV && globalConfig.debug.renderBeltPaths) {
-            systems.belt.drawBeltPathDebug(params);
         }
 
         // END OF GAME CONTENT

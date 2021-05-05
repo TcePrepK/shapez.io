@@ -23,6 +23,9 @@ export function itemResolverSingleton(root, data) {
         case ColorItem.getId(): {
             return COLOR_ITEM_SINGLETONS[itemData];
         }
+        case NumberItem.getId(): {
+            return new NumberItem(itemData);
+        }
 
         default: {
             assertAlways(false, "Unknown item type: " + itemType);

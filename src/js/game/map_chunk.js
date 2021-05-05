@@ -1,15 +1,13 @@
 import { globalConfig } from "../core/config";
 import { createLogger } from "../core/logging";
 import { RandomNumberGenerator } from "../core/rng";
-import { clamp, fastArrayDeleteValueIfContained, make2DUndefinedArray } from "../core/utils";
+import { fastArrayDeleteValueIfContained, make2DUndefinedArray } from "../core/utils";
 import { Vector } from "../core/vector";
 import { BaseItem } from "./base_item";
-import { enumColors } from "./colors";
 import { Entity } from "./entity";
-import { COLOR_ITEM_SINGLETONS } from "./items/color_item";
 import { GameRoot } from "./root";
-import { enumSubShape } from "./shape_definition";
 import { Rectangle } from "../core/rectangle";
+import { NumberItem, isBombItem } from "./items/number_item";
 
 const logger = createLogger("map_chunk");
 
@@ -77,253 +75,130 @@ export class MapChunk {
             wires: [],
         };
 
-        /**
-         * Store which patches we have so we can render them in the overview
-         * @type {Array<{pos: Vector, item: BaseItem, size: number }>}
-         */
-        this.patches = [];
+        this.generateBombs();
 
-        this.generateLowerLayer();
-    }
-
-    /**
-     * Generates a patch filled with the given item
-     * @param {RandomNumberGenerator} rng
-     * @param {number} patchSize
-     * @param {BaseItem} item
-     * @param {number=} overrideX Override the X position of the patch
-     * @param {number=} overrideY Override the Y position of the patch
-     */
-    internalGeneratePatch(rng, patchSize, item, overrideX = null, overrideY = null) {
-        const border = Math.ceil(patchSize / 2 + 3);
-
-        // Find a position within the chunk which is not blocked
-        let patchX = rng.nextIntRange(border, globalConfig.mapChunkSize - border - 1);
-        let patchY = rng.nextIntRange(border, globalConfig.mapChunkSize - border - 1);
-
-        if (overrideX !== null) {
-            patchX = overrideX;
-        }
-
-        if (overrideY !== null) {
-            patchY = overrideY;
-        }
-
-        const avgPos = new Vector(0, 0);
-        let patchesDrawn = 0;
-
-        // Each patch consists of multiple circles
-        const numCircles = patchSize;
-
-        for (let i = 0; i <= numCircles; ++i) {
-            // Determine circle parameters
-            const circleRadius = Math.min(1 + i, patchSize);
-            const circleRadiusSquare = circleRadius * circleRadius;
-            const circleOffsetRadius = (numCircles - i) / 2 + 2;
-
-            // We draw an elipsis actually
-            const circleScaleX = rng.nextRange(0.9, 1.1);
-            const circleScaleY = rng.nextRange(0.9, 1.1);
-
-            const circleX = patchX + rng.nextIntRange(-circleOffsetRadius, circleOffsetRadius);
-            const circleY = patchY + rng.nextIntRange(-circleOffsetRadius, circleOffsetRadius);
-
-            for (let dx = -circleRadius * circleScaleX - 2; dx <= circleRadius * circleScaleX + 2; ++dx) {
-                for (let dy = -circleRadius * circleScaleY - 2; dy <= circleRadius * circleScaleY + 2; ++dy) {
-                    const x = Math.round(circleX + dx);
-                    const y = Math.round(circleY + dy);
-                    if (x >= 0 && x < globalConfig.mapChunkSize && y >= 0 && y <= globalConfig.mapChunkSize) {
-                        const originalDx = dx / circleScaleX;
-                        const originalDy = dy / circleScaleY;
-                        if (originalDx * originalDx + originalDy * originalDy <= circleRadiusSquare) {
-                            if (!this.lowerLayer[x][y]) {
-                                this.lowerLayer[x][y] = item;
-                                ++patchesDrawn;
-                                avgPos.x += x;
-                                avgPos.y += y;
-                            }
-                        }
-                    } else {
-                        // logger.warn("Tried to spawn resource out of chunk");
-                    }
-                }
-            }
-        }
-
-        this.patches.push({
-            pos: avgPos.divideScalar(patchesDrawn),
-            item,
-            size: patchSize,
-        });
-    }
-
-    /**
-     * Generates a color patch
-     * @param {RandomNumberGenerator} rng
-     * @param {number} colorPatchSize
-     * @param {number} distanceToOriginInChunks
-     */
-    internalGenerateColorPatch(rng, colorPatchSize, distanceToOriginInChunks) {
-        // First, determine available colors
-        let availableColors = [enumColors.red, enumColors.green];
-        if (distanceToOriginInChunks > 2) {
-            availableColors.push(enumColors.blue);
-        }
-        this.internalGeneratePatch(rng, colorPatchSize, COLOR_ITEM_SINGLETONS[rng.choice(availableColors)]);
-    }
-
-    /**
-     * Generates a shape patch
-     * @param {RandomNumberGenerator} rng
-     * @param {number} shapePatchSize
-     * @param {number} distanceToOriginInChunks
-     */
-    internalGenerateShapePatch(rng, shapePatchSize, distanceToOriginInChunks) {
-        /** @type {[enumSubShape, enumSubShape, enumSubShape, enumSubShape]} */
-        let subShapes = null;
-
-        let weights = {};
-
-        // Later there is a mix of everything
-        weights = {
-            [enumSubShape.rect]: 100,
-            [enumSubShape.circle]: Math.round(50 + clamp(distanceToOriginInChunks * 2, 0, 50)),
-            [enumSubShape.star]: Math.round(20 + clamp(distanceToOriginInChunks, 0, 30)),
-            [enumSubShape.windmill]: Math.round(6 + clamp(distanceToOriginInChunks / 2, 0, 20)),
+        this.neighborLowerLayers = {
+            0: null,
+            45: null,
+            90: null,
+            135: null,
+            180: null,
+            225: null,
+            270: null,
+            315: null,
         };
 
-        if (distanceToOriginInChunks < 7) {
-            // Initial chunks can not spawn the good stuff
-            weights[enumSubShape.star] = 0;
-            weights[enumSubShape.windmill] = 0;
-        }
+        const baseDir = new Vector(0, -1);
+        const baseOrigin = new Vector(this.x, this.y);
 
-        if (distanceToOriginInChunks < 10) {
-            // Initial chunk patches always have the same shape
-            const subShape = this.internalGenerateRandomSubShape(rng, weights);
-            subShapes = [subShape, subShape, subShape, subShape];
-        } else if (distanceToOriginInChunks < 15) {
-            // Later patches can also have mixed ones
-            const subShapeA = this.internalGenerateRandomSubShape(rng, weights);
-            const subShapeB = this.internalGenerateRandomSubShape(rng, weights);
-            subShapes = [subShapeA, subShapeA, subShapeB, subShapeB];
-        } else {
-            // Finally there is a mix of everything
-            subShapes = [
-                this.internalGenerateRandomSubShape(rng, weights),
-                this.internalGenerateRandomSubShape(rng, weights),
-                this.internalGenerateRandomSubShape(rng, weights),
-                this.internalGenerateRandomSubShape(rng, weights),
-            ];
-        }
+        for (let angle = 0; angle < 360; angle += 45) {
+            const dir = baseDir.rotated(Math.radians(angle)).round();
+            const origin = baseOrigin.add(dir);
+            const chunk = this.root.map.getChunk(origin.x, origin.y);
 
-        // Makes sure windmills never spawn as whole
-        let windmillCount = 0;
-        for (let i = 0; i < subShapes.length; ++i) {
-            if (subShapes[i] === enumSubShape.windmill) {
-                ++windmillCount;
+            if (chunk) {
+                chunk.addLowerLayerToList(this, angle);
             }
         }
-        if (windmillCount > 1) {
-            subShapes[0] = enumSubShape.rect;
-            subShapes[1] = enumSubShape.rect;
-        }
-
-        const definition = this.root.shapeDefinitionMgr.getDefinitionFromSimpleShapes(subShapes);
-        this.internalGeneratePatch(
-            rng,
-            shapePatchSize,
-            this.root.shapeDefinitionMgr.getShapeItemFromDefinition(definition)
-        );
     }
 
-    /**
-     * Chooses a random shape with the given weights
-     * @param {RandomNumberGenerator} rng
-     * @param {Object.<enumSubShape, number>} weights
-     * @returns {enumSubShape}
-     */
-    internalGenerateRandomSubShape(rng, weights) {
-        // @ts-ignore
-        const sum = Object.values(weights).reduce((a, b) => a + b, 0);
-
-        const chosenNumber = rng.nextIntRange(0, sum - 1);
-        let accumulated = 0;
-        for (const key in weights) {
-            const weight = weights[key];
-            if (accumulated + weight > chosenNumber) {
-                return key;
-            }
-            accumulated += weight;
+    addLowerLayerToList(chunk, dir) {
+        if (this.listFull) {
+            return;
         }
 
-        logger.error("Failed to find matching shape in chunk generation");
-        return enumSubShape.circle;
+        if (this.neighborLowerLayers[dir]) {
+            return;
+        }
+
+        this.neighborLowerLayers[dir] = chunk.lowerLayer;
+        chunk.addLowerLayerToList(this, (dir + 180) % 360);
+        // console.log(this.neighborLowerLayers);
+
+        for (const [dir, lowerLayer] of Object.entries(this.neighborLowerLayers)) {
+            if (lowerLayer === null) {
+                this.listFull = false;
+                return;
+            }
+        }
+
+        this.generateNumbers();
+        this.listFull = true;
     }
 
     /**
      * Generates the lower layer "terrain"
      */
-    generateLowerLayer() {
+    generateBombs() {
         const rng = new RandomNumberGenerator(this.x + "|" + this.y + "|" + this.root.map.seed);
 
-        if (this.generatePredefined(rng)) {
-            return;
-        }
+        const bombAmount = 40;
+        for (let i = 0; i < bombAmount; i++) {
+            const x = rng.nextIntRange(0, globalConfig.mapChunkSize);
+            const y = rng.nextIntRange(0, globalConfig.mapChunkSize);
 
-        const chunkCenter = new Vector(this.x, this.y).addScalar(0.5);
-        const distanceToOriginInChunks = Math.round(chunkCenter.length());
-
-        // Determine how likely it is that there is a color patch
-        const colorPatchChance = 0.9 - clamp(distanceToOriginInChunks / 25, 0, 1) * 0.5;
-
-        if (rng.next() < colorPatchChance / 4) {
-            const colorPatchSize = Math.max(2, Math.round(1 + clamp(distanceToOriginInChunks / 8, 0, 4)));
-            this.internalGenerateColorPatch(rng, colorPatchSize, distanceToOriginInChunks);
-        }
-
-        // Determine how likely it is that there is a shape patch
-        const shapePatchChance = 0.9 - clamp(distanceToOriginInChunks / 25, 0, 1) * 0.5;
-        if (rng.next() < shapePatchChance / 4) {
-            const shapePatchSize = Math.max(2, Math.round(1 + clamp(distanceToOriginInChunks / 8, 0, 4)));
-            this.internalGenerateShapePatch(rng, shapePatchSize, distanceToOriginInChunks);
+            this.lowerLayer[x][y] = new NumberItem(-1);
         }
     }
 
-    /**
-     * Checks if this chunk has predefined contents, and if so returns true and generates the
-     * predefined contents
-     * @param {RandomNumberGenerator} rng
-     * @returns {boolean}
-     */
-    generatePredefined(rng) {
-        if (this.x === 0 && this.y === 0) {
-            this.internalGeneratePatch(rng, 2, COLOR_ITEM_SINGLETONS[enumColors.red], 7, 7);
-            return true;
-        }
-        if (this.x === -1 && this.y === 0) {
-            const item = this.root.shapeDefinitionMgr.getShapeItemFromShortKey("CuCuCuCu");
-            this.internalGeneratePatch(rng, 2, item, globalConfig.mapChunkSize - 9, 7);
-            return true;
-        }
-        if (this.x === 0 && this.y === -1) {
-            const item = this.root.shapeDefinitionMgr.getShapeItemFromShortKey("RuRuRuRu");
-            this.internalGeneratePatch(rng, 2, item, 5, globalConfig.mapChunkSize - 7);
-            return true;
-        }
+    generateNumbers() {
+        for (let x = 0; x < globalConfig.mapChunkSize; x++) {
+            for (let y = 0; y < globalConfig.mapChunkSize; y++) {
+                let tile = this.lowerLayer[x][y];
 
-        if (this.x === -1 && this.y === -1) {
-            this.internalGeneratePatch(rng, 2, COLOR_ITEM_SINGLETONS[enumColors.green]);
-            return true;
-        }
+                if (!tile) {
+                    const item = new NumberItem(0);
+                    this.lowerLayer[x][y] = item;
+                    tile = item;
+                }
 
-        if (this.x === 5 && this.y === -2) {
-            const item = this.root.shapeDefinitionMgr.getShapeItemFromShortKey("SuSuSuSu");
-            this.internalGeneratePatch(rng, 2, item, 5, globalConfig.mapChunkSize - 7);
-            return true;
-        }
+                if (!(tile instanceof NumberItem)) {
+                    continue;
+                }
 
-        return false;
+                if (isBombItem(tile)) {
+                    continue;
+                }
+
+                for (let offX = -1; offX < 2; offX++) {
+                    for (let offY = -1; offY < 2; offY++) {
+                        const movX = x + offX;
+                        const movY = y + offY;
+
+                        if (
+                            movX >= 0 &&
+                            movX < globalConfig.mapChunkSize &&
+                            movY >= 0 &&
+                            movY < globalConfig.mapChunkSize
+                        ) {
+                            // Tile is inside chunk
+                            let item = this.lowerLayer[movX][movY];
+                            if (!(item instanceof NumberItem)) {
+                                continue;
+                            }
+
+                            if (isBombItem(item)) {
+                                tile.value++;
+                            }
+                        } else {
+                            // Tile is out of chunk
+                            const w = globalConfig.mapChunkSize;
+
+                            const worldX = this.x * w + movX;
+                            const worldY = this.y * w + movY;
+                            const item = this.root.map.getLowerLayerContentXY(worldX, worldY);
+                            if (!(item instanceof NumberItem)) {
+                                continue;
+                            }
+
+                            if (isBombItem(item)) {
+                                tile.value++;
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 
     /**
@@ -427,6 +302,7 @@ export class MapChunk {
      * @param {Entity=} contents
      * @param {Layer} layer
      */
+    // @ts-ignore
     setLayerContentFromWorldCords(tileX, tileY, contents, layer) {
         const localX = tileX - this.tileX;
         const localY = tileY - this.tileY;

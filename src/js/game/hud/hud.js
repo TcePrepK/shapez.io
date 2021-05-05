@@ -49,6 +49,7 @@ import { HUDStandaloneAdvantages } from "./parts/standalone_advantages";
 import { HUDCatMemes } from "./parts/cat_memes";
 import { HUDTutorialVideoOffer } from "./parts/tutorial_video_offer";
 import { HUDConstantSignalEdit } from "./parts/constant_signal_edit";
+import { HUDTileToggle } from "./parts/tile_toggle";
 
 export class GameHUD {
     /**
@@ -88,6 +89,8 @@ export class GameHUD {
             wireInfo: new HUDWireInfo(this.root),
             leverToggle: new HUDLeverToggle(this.root),
             constantSignalEdit: new HUDConstantSignalEdit(this.root),
+
+            tileToggle: new HUDTileToggle(this.root),
 
             // Must always exist
             pinnedShapes: new HUDPinnedShapes(this.root),

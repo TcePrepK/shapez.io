@@ -84,6 +84,8 @@ export class GameRoot {
         /** @type {Camera} */
         this.camera = null;
 
+        this.gameOver = false;
+
         /** @type {HTMLCanvasElement} */
         this.canvas = null;
 
