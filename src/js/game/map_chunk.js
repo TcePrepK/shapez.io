@@ -8,6 +8,8 @@ import { Entity } from "./entity";
 import { GameRoot } from "./root";
 import { Rectangle } from "../core/rectangle";
 import { NumberItem, isBombItem } from "./items/number_item";
+import { enumMouseButton } from "./camera";
+import { STOP_PROPAGATION } from "../core/signal";
 
 const logger = createLogger("map_chunk");
 
@@ -27,7 +29,7 @@ export class MapChunk {
 
         /**
          * Stores the contents of the lower (= map resources) layer
-         *  @type {Array<Array<?BaseItem>>}
+         *  @type {Array<Array<?NumberItem>>}
          */
         this.lowerLayer = make2DUndefinedArray(globalConfig.mapChunkSize, globalConfig.mapChunkSize);
 
@@ -75,61 +77,36 @@ export class MapChunk {
             wires: [],
         };
 
-        this.generateBombs();
+        this.generateChunk();
 
-        this.neighborLowerLayers = {
-            0: null,
-            45: null,
-            90: null,
-            135: null,
-            180: null,
-            225: null,
-            270: null,
-            315: null,
-        };
-
-        const baseDir = new Vector(0, -1);
-        const baseOrigin = new Vector(this.x, this.y);
-
-        for (let angle = 0; angle < 360; angle += 45) {
-            const dir = baseDir.rotated(Math.radians(angle)).round();
-            const origin = baseOrigin.add(dir);
-            const chunk = this.root.map.getChunk(origin.x, origin.y);
-
-            if (chunk) {
-                chunk.addLowerLayerToList(this, angle);
-            }
-        }
+        // this.root.camera.downPreHandler.add(this.onMouseDown, this);
     }
 
-    addLowerLayerToList(chunk, dir) {
-        if (this.listFull) {
+    onMouseDown(pos, button) {
+        if (button !== enumMouseButton.left || !this.root.camera.getIsMapOverlayActive()) {
             return;
         }
 
-        if (this.neighborLowerLayers[dir]) {
-            return;
+        const tile = this.root.camera.screenToWorld(pos).toTileSpace();
+        const chunk = this.root.map.getChunkAtTileOrNull(tile.x, tile.y);
+
+        if (chunk) {
+            console.log(chunk);
         }
 
-        this.neighborLowerLayers[dir] = chunk.lowerLayer;
-        chunk.addLowerLayerToList(this, (dir + 180) % 360);
-        // console.log(this.neighborLowerLayers);
-
-        for (const [dir, lowerLayer] of Object.entries(this.neighborLowerLayers)) {
-            if (lowerLayer === null) {
-                this.listFull = false;
-                return;
-            }
-        }
-
-        this.generateNumbers();
-        this.listFull = true;
+        return STOP_PROPAGATION;
     }
 
     /**
      * Generates the lower layer "terrain"
      */
-    generateBombs() {
+    generateChunk() {
+        for (let x = 0; x < globalConfig.mapChunkSize; x++) {
+            for (let y = 0; y < globalConfig.mapChunkSize; y++) {
+                this.lowerLayer[x][y] = new NumberItem(0);
+            }
+        }
+
         const rng = new RandomNumberGenerator(this.x + "|" + this.y + "|" + this.root.map.seed);
 
         const bombAmount = 40;
@@ -137,67 +114,7 @@ export class MapChunk {
             const x = rng.nextIntRange(0, globalConfig.mapChunkSize);
             const y = rng.nextIntRange(0, globalConfig.mapChunkSize);
 
-            this.lowerLayer[x][y] = new NumberItem(-1);
-        }
-    }
-
-    generateNumbers() {
-        for (let x = 0; x < globalConfig.mapChunkSize; x++) {
-            for (let y = 0; y < globalConfig.mapChunkSize; y++) {
-                let tile = this.lowerLayer[x][y];
-
-                if (!tile) {
-                    const item = new NumberItem(0);
-                    this.lowerLayer[x][y] = item;
-                    tile = item;
-                }
-
-                if (!(tile instanceof NumberItem)) {
-                    continue;
-                }
-
-                if (isBombItem(tile)) {
-                    continue;
-                }
-
-                for (let offX = -1; offX < 2; offX++) {
-                    for (let offY = -1; offY < 2; offY++) {
-                        const movX = x + offX;
-                        const movY = y + offY;
-
-                        if (
-                            movX >= 0 &&
-                            movX < globalConfig.mapChunkSize &&
-                            movY >= 0 &&
-                            movY < globalConfig.mapChunkSize
-                        ) {
-                            // Tile is inside chunk
-                            let item = this.lowerLayer[movX][movY];
-                            if (!(item instanceof NumberItem)) {
-                                continue;
-                            }
-
-                            if (isBombItem(item)) {
-                                tile.value++;
-                            }
-                        } else {
-                            // Tile is out of chunk
-                            const w = globalConfig.mapChunkSize;
-
-                            const worldX = this.x * w + movX;
-                            const worldY = this.y * w + movY;
-                            const item = this.root.map.getLowerLayerContentXY(worldX, worldY);
-                            if (!(item instanceof NumberItem)) {
-                                continue;
-                            }
-
-                            if (isBombItem(item)) {
-                                tile.value++;
-                            }
-                        }
-                    }
-                }
-            }
+            this.lowerLayer[x][y].value = -1;
         }
     }
 
@@ -205,7 +122,7 @@ export class MapChunk {
      *
      * @param {number} worldX
      * @param {number} worldY
-     * @returns {BaseItem=}
+     * @returns {NumberItem=}
      */
     getLowerLayerFromWorldCoords(worldX, worldY) {
         const localX = worldX - this.tileX;

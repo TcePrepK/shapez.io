@@ -2,41 +2,29 @@ import { globalConfig } from "../../core/config";
 import { DrawParameters } from "../../core/draw_parameters";
 import { GameSystem } from "../game_system";
 import { MapChunkView } from "../map_chunk_view";
+import { THEME } from "../theme";
 import { drawSpriteClipped } from "../../core/draw_utils";
-import { makeOffscreenBuffer } from "../../core/buffer_utils";
 
 export class MapResourcesSystem extends GameSystem {
-    constructor(root) {
-        super(root);
-
-        const [canvas, context] = makeOffscreenBuffer(globalConfig.mapChunkSize, globalConfig.mapChunkSize, {
-            label: "buffer-mapresourcebg",
-            smooth: true,
-        });
-
-        this.backgroundCanvas = canvas;
-        this.backgroundContext = context;
-    }
-
     /**
      * Draws the map resources
      * @param {DrawParameters} parameters
      * @param {MapChunkView} chunk
      */
     drawChunk(parameters, chunk) {
-        this.generateChunkBackground(
-            chunk,
-            this.backgroundCanvas,
-            this.backgroundContext,
-            globalConfig.mapChunkSize,
-            globalConfig.mapChunkSize,
-            null
-        );
+        const basicChunkBackground = this.root.buffers.getForKey({
+            key: "mapresourcebg",
+            subKey: chunk.renderKey,
+            w: globalConfig.mapChunkSize,
+            h: globalConfig.mapChunkSize,
+            dpi: 1,
+            redrawMethod: this.generateChunkBackground.bind(this, chunk),
+        });
 
         parameters.context.imageSmoothingEnabled = false;
         drawSpriteClipped({
             parameters,
-            sprite: this.backgroundCanvas,
+            sprite: basicChunkBackground,
             x: chunk.tileX * globalConfig.tileSize,
             y: chunk.tileY * globalConfig.tileSize,
             w: globalConfig.mapChunkWorldSize,

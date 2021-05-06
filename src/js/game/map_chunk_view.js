@@ -6,7 +6,6 @@ import { MapChunk } from "./map_chunk";
 import { GameRoot } from "./root";
 import { THEME } from "./theme";
 import { drawSpriteClipped } from "../core/draw_utils";
-import { makeOffscreenBuffer } from "../core/buffer_utils";
 
 export const CHUNK_OVERLAY_RES = 3;
 
@@ -26,15 +25,6 @@ export class MapChunkView extends MapChunk {
         this.renderIteration = 0;
 
         this.markDirty();
-
-        const overlaySize = globalConfig.mapChunkSize * CHUNK_OVERLAY_RES;
-        const [canvas, context] = makeOffscreenBuffer(overlaySize, overlaySize, {
-            label: "buffer-chunk@" + this.root.currentLayer + "/" + this.renderKey,
-            smooth: true,
-        });
-
-        this.backgroundCanvas = canvas;
-        this.backgroundContext = context;
     }
 
     /**
@@ -88,31 +78,23 @@ export class MapChunkView extends MapChunk {
      */
     drawOverlay(parameters) {
         const overlaySize = globalConfig.mapChunkSize * CHUNK_OVERLAY_RES;
-        // const sprite = this.root.buffers.getForKey({
-        //     key: "chunk@" + this.root.currentLayer,
-        //     subKey: this.renderKey,
-        //     w: overlaySize,
-        //     h: overlaySize,
-        //     dpi: 1,
-        //     redrawMethod: this.generateOverlayBuffer.bind(this),
-        // });
+        const sprite = this.root.buffers.getForKey({
+            key: "chunk@" + this.root.currentLayer,
+            subKey: this.renderKey,
+            w: overlaySize,
+            h: overlaySize,
+            dpi: 1,
+            redrawMethod: this.generateOverlayBuffer.bind(this),
+        });
 
         const dims = globalConfig.mapChunkWorldSize;
         const extrude = 0.05;
-
-        this.generateOverlayBuffer(
-            this.backgroundCanvas,
-            this.backgroundContext,
-            overlaySize,
-            overlaySize,
-            1
-        );
 
         // Draw chunk "pixel" art
         parameters.context.imageSmoothingEnabled = false;
         drawSpriteClipped({
             parameters,
-            sprite: this.backgroundCanvas,
+            sprite,
             x: this.x * dims - extrude,
             y: this.y * dims - extrude,
             w: dims + 2 * extrude,
@@ -133,84 +115,81 @@ export class MapChunkView extends MapChunk {
      * @param {number} dpi
      */
     generateOverlayBuffer(canvas, context, w, h, dpi) {
-        context.fillStyle =
-            this.containedEntities.length > 0
-                ? THEME.map.chunkOverview.filled
-                : THEME.map.chunkOverview.empty;
-        context.fillRect(0, 0, w, h);
+        // context.fillStyle =
+        //     this.containedEntities.length > 0
+        //         ? THEME.map.chunkOverview.filled
+        //         : THEME.map.chunkOverview.empty;
+        // context.fillRect(0, 0, w, h);
 
-        if (this.root.app.settings.getAllSettings().displayChunkBorders) {
-            context.fillStyle = THEME.map.chunkBorders;
-            context.fillRect(0, 0, w, 1);
-            context.fillRect(0, 1, 1, h);
-        }
+        // if (this.root.app.settings.getAllSettings().displayChunkBorders) {
+        //     context.fillStyle = THEME.map.chunkBorders;
+        //     context.fillRect(0, 0, w, 1);
+        //     context.fillRect(0, 1, 1, h);
+        // }
 
         for (let x = 0; x < globalConfig.mapChunkSize; ++x) {
-            const lowerArray = this.lowerLayer[x];
-            const upperArray = this.contents[x];
             for (let y = 0; y < globalConfig.mapChunkSize; ++y) {
-                const upperContent = upperArray[y];
-                if (upperContent) {
-                    const staticComp = upperContent.components.StaticMapEntity;
-                    const data = getBuildingDataFromCode(staticComp.code);
-                    const metaBuilding = data.metaInstance;
+                // if (upperContent) {
+                //     const staticComp = upperContent.components.StaticMapEntity;
+                //     const data = getBuildingDataFromCode(staticComp.code);
+                //     const metaBuilding = data.metaInstance;
 
-                    const overlayMatrix = metaBuilding.getSpecialOverlayRenderMatrix(
-                        staticComp.rotation,
-                        data.rotationVariant,
-                        data.variant,
-                        upperContent
-                    );
+                //     const overlayMatrix = metaBuilding.getSpecialOverlayRenderMatrix(
+                //         staticComp.rotation,
+                //         data.rotationVariant,
+                //         data.variant,
+                //         upperContent
+                //     );
 
-                    if (overlayMatrix) {
-                        // Draw lower content first since it "shines" through
-                        const lowerContent = lowerArray[y];
-                        if (lowerContent) {
-                            context.fillStyle = lowerContent.getBackgroundColorAsResource();
-                            context.fillRect(
-                                x * CHUNK_OVERLAY_RES,
-                                y * CHUNK_OVERLAY_RES,
-                                CHUNK_OVERLAY_RES,
-                                CHUNK_OVERLAY_RES
-                            );
-                        }
+                //     if (overlayMatrix) {
+                //         // Draw lower content first since it "shines" through
+                //         const lowerContent = lowerArray[y];
+                //         if (lowerContent) {
+                //             context.fillStyle = lowerContent.getBackgroundColorAsResource();
+                //             context.fillRect(
+                //                 x * CHUNK_OVERLAY_RES,
+                //                 y * CHUNK_OVERLAY_RES,
+                //                 CHUNK_OVERLAY_RES,
+                //                 CHUNK_OVERLAY_RES
+                //             );
+                //         }
 
-                        context.fillStyle = metaBuilding.getSilhouetteColor(
-                            data.variant,
-                            data.rotationVariant
-                        );
-                        for (let dx = 0; dx < 3; ++dx) {
-                            for (let dy = 0; dy < 3; ++dy) {
-                                const isFilled = overlayMatrix[dx + dy * 3];
-                                if (isFilled) {
-                                    context.fillRect(
-                                        x * CHUNK_OVERLAY_RES + dx,
-                                        y * CHUNK_OVERLAY_RES + dy,
-                                        1,
-                                        1
-                                    );
-                                }
-                            }
-                        }
+                //         context.fillStyle = metaBuilding.getSilhouetteColor(
+                //             data.variant,
+                //             data.rotationVariant
+                //         );
+                //         for (let dx = 0; dx < 3; ++dx) {
+                //             for (let dy = 0; dy < 3; ++dy) {
+                //                 const isFilled = overlayMatrix[dx + dy * 3];
+                //                 if (isFilled) {
+                //                     context.fillRect(
+                //                         x * CHUNK_OVERLAY_RES + dx,
+                //                         y * CHUNK_OVERLAY_RES + dy,
+                //                         1,
+                //                         1
+                //                     );
+                //                 }
+                //             }
+                //         }
 
-                        continue;
-                    } else {
-                        context.fillStyle = metaBuilding.getSilhouetteColor(
-                            data.variant,
-                            data.rotationVariant
-                        );
-                        context.fillRect(
-                            x * CHUNK_OVERLAY_RES,
-                            y * CHUNK_OVERLAY_RES,
-                            CHUNK_OVERLAY_RES,
-                            CHUNK_OVERLAY_RES
-                        );
+                //         continue;
+                //     } else {
+                //         context.fillStyle = metaBuilding.getSilhouetteColor(
+                //             data.variant,
+                //             data.rotationVariant
+                //         );
+                //         context.fillRect(
+                //             x * CHUNK_OVERLAY_RES,
+                //             y * CHUNK_OVERLAY_RES,
+                //             CHUNK_OVERLAY_RES,
+                //             CHUNK_OVERLAY_RES
+                //         );
 
-                        continue;
-                    }
-                }
+                //         continue;
+                //     }
+                // }
 
-                const lowerContent = lowerArray[y];
+                const lowerContent = this.lowerLayer[x][y];
                 if (lowerContent) {
                     context.fillStyle = lowerContent.getBackgroundColorAsResource();
                     context.fillRect(

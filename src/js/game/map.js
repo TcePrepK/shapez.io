@@ -3,6 +3,7 @@ import { Vector } from "../core/vector";
 import { BasicSerializableObject, types } from "../savegame/serialization";
 import { BaseItem } from "./base_item";
 import { Entity } from "./entity";
+import { NumberItem } from "./items/number_item";
 import { MapChunkView } from "./map_chunk_view";
 import { GameRoot } from "./root";
 
@@ -109,7 +110,7 @@ export class BaseMap extends BasicSerializableObject {
      * Returns the lower layers content of the given tile
      * @param {number} x
      * @param {number} y
-     * @returns {BaseItem=}
+     * @returns {NumberItem=}
      */
     getLowerLayerContentXY(x, y) {
         return this.getOrCreateChunkAtTile(x, y).getLowerLayerFromWorldCoords(x, y);

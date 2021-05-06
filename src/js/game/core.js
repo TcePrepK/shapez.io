@@ -350,7 +350,7 @@ export class GameCore {
 
     draw() {
         const root = this.root;
-        const systems = root.systemMgr.systems;
+        // const systems = root.systemMgr.systems;
 
         this.root.dynamicTickrate.onFrameRendered();
 
@@ -387,7 +387,7 @@ export class GameCore {
 
         // Construct parameters required for drawing
         const widthOfChunk = globalConfig.mapChunkWorldSize;
-        const visibleRect = root.camera.getVisibleRect().expandedInAllDirections(widthOfChunk);
+        const visibleRect = root.camera.getVisibleRect().expandedInAllDirections(2 * widthOfChunk);
         const params = new DrawParameters({
             context: context,
             visibleRect,

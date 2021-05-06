@@ -37,14 +37,20 @@ export class NumberItem extends BaseItem {
         this.blocked = true;
         this.flagged = false;
 
-        this.flagSprite = Loader.getSprite("sprites/misc/flag.png");
+        this.flaggedSprite = Loader.getSprite("sprites/misc/flag.png");
+        this.blockedSprite = Loader.getSprite("sprites/misc/blocker.png");
     }
 
     getBackgroundColorAsResource() {
         if (this.blocked) {
-            return "#8b4513";
+            return THEME.map.grid;
         }
-        return isBombItem(this) ? "#ff0000" : THEME.map.grid;
+
+        if (isBombItem(this)) {
+            return "#ff0000";
+        }
+
+        return THEME.map.grid;
     }
 
     /**
@@ -55,12 +61,16 @@ export class NumberItem extends BaseItem {
      */
     drawItemCenteredImpl(x, y, parameters, diameter = globalConfig.defaultItemDiameter) {
         if (this.flagged) {
-            this.flagSprite.drawCachedCentered(parameters, x, y, globalConfig.tileSize);
-
+            this.flaggedSprite.drawCachedCentered(parameters, x, y, globalConfig.tileSize);
             return;
         }
 
-        if (this.value === 0 || this.blocked) {
+        if (this.blocked) {
+            this.blockedSprite.drawCachedCentered(parameters, x, y, globalConfig.tileSize);
+            return;
+        }
+
+        if (this.value === 0) {
             return;
         }
 
