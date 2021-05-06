@@ -6,6 +6,7 @@ import { MapChunk } from "./map_chunk";
 import { GameRoot } from "./root";
 import { THEME } from "./theme";
 import { drawSpriteClipped } from "../core/draw_utils";
+import { makeOffscreenBuffer } from "../core/buffer_utils";
 
 export const CHUNK_OVERLAY_RES = 3;
 
@@ -25,6 +26,15 @@ export class MapChunkView extends MapChunk {
         this.renderIteration = 0;
 
         this.markDirty();
+
+        const overlaySize = globalConfig.mapChunkSize * CHUNK_OVERLAY_RES;
+        const [canvas, context] = makeOffscreenBuffer(overlaySize, overlaySize, {
+            label: "buffer-chunk@" + this.root.currentLayer + "/" + this.renderKey,
+            smooth: true,
+        });
+
+        this.backgroundCanvas = canvas;
+        this.backgroundContext = context;
     }
 
     /**
@@ -78,23 +88,31 @@ export class MapChunkView extends MapChunk {
      */
     drawOverlay(parameters) {
         const overlaySize = globalConfig.mapChunkSize * CHUNK_OVERLAY_RES;
-        const sprite = this.root.buffers.getForKey({
-            key: "chunk@" + this.root.currentLayer,
-            subKey: this.renderKey,
-            w: overlaySize,
-            h: overlaySize,
-            dpi: 1,
-            redrawMethod: this.generateOverlayBuffer.bind(this),
-        });
+        // const sprite = this.root.buffers.getForKey({
+        //     key: "chunk@" + this.root.currentLayer,
+        //     subKey: this.renderKey,
+        //     w: overlaySize,
+        //     h: overlaySize,
+        //     dpi: 1,
+        //     redrawMethod: this.generateOverlayBuffer.bind(this),
+        // });
 
         const dims = globalConfig.mapChunkWorldSize;
         const extrude = 0.05;
+
+        this.generateOverlayBuffer(
+            this.backgroundCanvas,
+            this.backgroundContext,
+            overlaySize,
+            overlaySize,
+            1
+        );
 
         // Draw chunk "pixel" art
         parameters.context.imageSmoothingEnabled = false;
         drawSpriteClipped({
             parameters,
-            sprite,
+            sprite: this.backgroundCanvas,
             x: this.x * dims - extrude,
             y: this.y * dims - extrude,
             w: dims + 2 * extrude,
@@ -104,21 +122,6 @@ export class MapChunkView extends MapChunk {
         });
 
         parameters.context.imageSmoothingEnabled = true;
-        const resourcesScale = this.root.app.settings.getAllSettings().mapResourcesScale;
-
-        // Draw patch items
-        if (this.root.currentLayer === "regular" && resourcesScale > 0.05) {
-            const diameter = (70 / Math.pow(parameters.zoomLevel, 0.35)) * (0.2 + 2 * resourcesScale);
-
-            for (let i = 0; i < this.patches.length; ++i) {
-                const patch = this.patches[i];
-                if (patch.item.getItemType() === "shape") {
-                    const destX = this.x * dims + patch.pos.x * globalConfig.tileSize;
-                    const destY = this.y * dims + patch.pos.y * globalConfig.tileSize;
-                    patch.item.drawItemCenteredClipped(destX, destY, parameters, diameter);
-                }
-            }
-        }
     }
 
     /**

@@ -15,13 +15,39 @@ export class HUDTileToggle extends BaseHUDPart {
      * @param {enumMouseButton} button
      */
     downPreHandler(pos, button) {
+        if (this.root.camera.getIsMapOverlayActive()) {
+            return;
+        }
+
         const tile = this.root.camera.screenToWorld(pos).toTileSpace();
+        this.handleTileToggle(tile, button, true);
+    }
+
+    /**
+     * @param {Vector} tile
+     * @param {enumMouseButton} button
+     * @param {boolean} manual
+     * @returns
+     */
+    handleTileToggle(tile, button, manual = false) {
         const lowerLayer = this.root.map.getLowerLayerContentXY(tile.x, tile.y);
         if (!(lowerLayer instanceof NumberItem)) {
             return;
         }
 
         if (!lowerLayer.blocked) {
+            if (!manual || button === enumMouseButton.right) {
+                return;
+            }
+
+            this.handleTileToggle(tile.addScalars(0, -1), button); //  0
+            this.handleTileToggle(tile.addScalars(1, -1), button); //  45
+            this.handleTileToggle(tile.addScalars(1, 0), button); //   90
+            this.handleTileToggle(tile.addScalars(1, 1), button); //   135
+            this.handleTileToggle(tile.addScalars(0, 1), button); //   180
+            this.handleTileToggle(tile.addScalars(-1, 1), button); //  225
+            this.handleTileToggle(tile.addScalars(-1, 0), button); //  270
+            this.handleTileToggle(tile.addScalars(-1, -1), button); // 315
             return;
         }
 
@@ -38,15 +64,14 @@ export class HUDTileToggle extends BaseHUDPart {
             }
 
             if (lowerLayer.value === 0) {
-                const w = globalConfig.tileSize;
-                this.downPreHandler(new Vector(pos.x + w, pos.y), button);
-                this.downPreHandler(new Vector(pos.x - w, pos.y), button);
-                this.downPreHandler(new Vector(pos.x + w, pos.y + w), button);
-                this.downPreHandler(new Vector(pos.x + w, pos.y - w), button);
-                this.downPreHandler(new Vector(pos.x, pos.y + w), button);
-                this.downPreHandler(new Vector(pos.x - w, pos.y - w), button);
-                this.downPreHandler(new Vector(pos.x, pos.y - w), button);
-                this.downPreHandler(new Vector(pos.x - w, pos.y + w), button);
+                this.handleTileToggle(tile.addScalars(0, -1), button); //  0
+                this.handleTileToggle(tile.addScalars(1, -1), button); //  45
+                this.handleTileToggle(tile.addScalars(1, 0), button); //   90
+                this.handleTileToggle(tile.addScalars(1, 1), button); //   135
+                this.handleTileToggle(tile.addScalars(0, 1), button); //   180
+                this.handleTileToggle(tile.addScalars(-1, 1), button); //  225
+                this.handleTileToggle(tile.addScalars(-1, 0), button); //  270
+                this.handleTileToggle(tile.addScalars(-1, -1), button); // 315
             }
         } else if (button === enumMouseButton.right) {
             lowerLayer.flagged = !lowerLayer.flagged;

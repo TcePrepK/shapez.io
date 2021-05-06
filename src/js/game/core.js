@@ -320,6 +320,9 @@ export class GameCore {
             return false;
         }
 
+        root.systemMgr.update();
+        // root.particleMgr.update();
+
         this.duringLogicUpdate = false;
         root.dynamicTickrate.endTick();
         return true;
@@ -347,6 +350,7 @@ export class GameCore {
 
     draw() {
         const root = this.root;
+        const systems = root.systemMgr.systems;
 
         this.root.dynamicTickrate.onFrameRendered();
 
@@ -420,6 +424,13 @@ export class GameCore {
         if (this.overlayAlpha < 0.99) {
             // Background (grid, resources, etc)
             root.map.drawBackground(params);
+        }
+
+        if (this.overlayAlpha > 0.01) {
+            // Map overview
+            context.globalAlpha = this.overlayAlpha;
+            root.map.drawOverlay(params);
+            context.globalAlpha = 1;
         }
 
         // END OF GAME CONTENT

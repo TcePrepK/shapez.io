@@ -103,12 +103,12 @@ export class HUDWaypoints extends BaseHUDPart {
         /** @type {Array<Waypoint>}
          */
         this.waypoints = [
-            {
-                label: null,
-                center: { x: 0, y: 0 },
-                zoomLevel: 3,
-                layer: gMetaBuildingRegistry.findByClass(MetaHubBuilding).getLayer(),
-            },
+            // {
+            //     label: null,
+            //     center: { x: 0, y: 0 },
+            //     zoomLevel: 3,
+            //     layer: gMetaBuildingRegistry.findByClass(MetaHubBuilding).getLayer(),
+            // },
         ];
 
         // Create a buffer we can use to measure text
@@ -297,6 +297,7 @@ export class HUDWaypoints extends BaseHUDPart {
             label,
             center: { x: position.x, y: position.y },
             zoomLevel: this.root.camera.zoomLevel,
+            layer: this.root.currentLayer,
         });
 
         this.sortWaypoints();
@@ -520,7 +521,7 @@ export class HUDWaypoints extends BaseHUDPart {
             }
 
             // Render the small icon on the left
-            this.waypointSprites.drawCentered(
+            this.waypointSprites[this.root.currentLayer].drawCentered(
                 parameters.context,
                 bounds.x + contentPaddingX,
                 bounds.y + bounds.h / 2,
