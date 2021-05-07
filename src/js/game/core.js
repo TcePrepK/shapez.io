@@ -426,12 +426,12 @@ export class GameCore {
             root.map.drawBackground(params);
         }
 
-        if (this.overlayAlpha > 0.01) {
-            // Map overview
-            context.globalAlpha = this.overlayAlpha;
-            root.map.drawOverlay(params);
-            context.globalAlpha = 1;
-        }
+        // if (this.overlayAlpha > 0.01) {
+        //     // Map overview
+        //     context.globalAlpha = this.overlayAlpha;
+        //     root.map.drawOverlay(params);
+        //     context.globalAlpha = 1;
+        // }
 
         // END OF GAME CONTENT
         // -----

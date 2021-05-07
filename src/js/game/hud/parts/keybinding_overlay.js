@@ -7,6 +7,7 @@ import {
     KEYCODE_RMB,
     KEYMAPPINGS,
 } from "../../key_action_mapper";
+// @ts-ignore
 import { enumHubGoalRewards } from "../../tutorial_goals";
 import { BaseHUDPart } from "../base_hud_part";
 import { DynamicDomAttach } from "../dynamic_dom_attach";
@@ -156,111 +157,128 @@ export class HUDKeybindingOverlay extends BaseHUDPart {
                 condition: () => this.anyPlacementActive,
             },
 
-            {
-                // [OVERVIEW] Create marker with right click
-                label: T.ingame.keybindingsOverlay.createMarker,
-                keys: [KEYCODE_RMB],
-                condition: () => this.mapOverviewActive && !this.blueprintPlacementActive,
-            },
+            // {
+            //     // [OVERVIEW] Create marker with right click
+            //     label: T.ingame.keybindingsOverlay.createMarker,
+            //     keys: [KEYCODE_RMB],
+            //     condition: () => this.mapOverviewActive && !this.blueprintPlacementActive,
+            // },
 
             {
-                // Cancel placement
-                label: T.ingame.keybindingsOverlay.stopPlacement,
-                keys: [KEYCODE_RMB],
-                condition: () => this.anyPlacementActive,
-            },
-
-            {
-                // Delete with right click
-                label: T.ingame.keybindingsOverlay.delete,
-                keys: [KEYCODE_RMB],
-                condition: () =>
-                    !this.anyPlacementActive && !this.mapOverviewActive && !this.anythingSelectedOnMap,
-            },
-
-            {
-                // Pipette
-                label: T.ingame.keybindingsOverlay.pipette,
-                keys: [k.placement.pipette],
-                condition: () => !this.mapOverviewActive && !this.blueprintPlacementActive,
-            },
-
-            {
-                // Area select
-                label: T.ingame.keybindingsOverlay.selectBuildings,
-                keys: [k.massSelect.massSelectStart, ADDER_TOKEN, KEYCODE_LMB],
-                condition: () => !this.anyPlacementActive && !this.anythingSelectedOnMap,
-            },
-
-            {
-                // Place building
-                label: T.ingame.keybindingsOverlay.placeBuilding,
+                // Toggle Tile
+                // @ts-ignore
+                label: T.ingame.keybindingsOverlay.toggleTile,
                 keys: [KEYCODE_LMB],
-                condition: () => this.anyPlacementActive,
+                condition: () => true,
             },
 
             {
-                // Rotate
-                label: T.ingame.keybindingsOverlay.rotateBuilding,
-                keys: [k.placement.rotateWhilePlacing],
-                condition: () => this.anyPlacementActive && !this.beltPlannerActive,
+                // Flag Tile
+                // @ts-ignore
+                label: T.ingame.keybindingsOverlay.flagTile,
+                keys: [KEYCODE_RMB],
+                condition: () => true,
             },
 
             {
-                // [BELT PLANNER] Flip Side
-                label: T.ingame.keybindingsOverlay.plannerSwitchSide,
-                keys: [k.placement.switchDirectionLockSide],
-                condition: () => this.beltPlannerActive,
+                // Flag Tile
+                // @ts-ignore
+                label: T.ingame.keybindingsOverlay.toggleNeighbors,
+                keys: [KEYCODE_LMB, KEYCODE_LMB],
+                condition: () => true,
             },
 
-            {
-                // Place last blueprint
-                label: T.ingame.keybindingsOverlay.pasteLastBlueprint,
-                keys: [k.massSelect.pasteLastBlueprint],
-                condition: () => !this.blueprintPlacementActive && this.lastBlueprintAvailable,
-            },
+            // {
+            //     // Delete with right click
+            //     label: T.ingame.keybindingsOverlay.delete,
+            //     keys: [KEYCODE_RMB],
+            //     condition: () =>
+            //         !this.anyPlacementActive && !this.mapOverviewActive && !this.anythingSelectedOnMap,
+            // },
 
-            {
-                // Belt planner
-                label: T.ingame.keybindingsOverlay.lockBeltDirection,
-                keys: [k.placementModifiers.lockBeltDirection],
-                condition: () => this.buildingPlacementSupportsBeltPlanner && !this.beltPlannerActive,
-            },
+            // {
+            //     // Pipette
+            //     label: T.ingame.keybindingsOverlay.pipette,
+            //     keys: [k.placement.pipette],
+            //     condition: () => !this.mapOverviewActive && !this.blueprintPlacementActive,
+            // },
 
-            {
-                // [SELECTION] Destroy
-                label: T.ingame.keybindingsOverlay.delete,
-                keys: [k.massSelect.confirmMassDelete],
-                condition: () => this.anythingSelectedOnMap,
-            },
+            // {
+            //     // Area select
+            //     label: T.ingame.keybindingsOverlay.selectBuildings,
+            //     keys: [k.massSelect.massSelectStart, ADDER_TOKEN, KEYCODE_LMB],
+            //     condition: () => !this.anyPlacementActive && !this.anythingSelectedOnMap,
+            // },
 
-            {
-                // [SELECTION] Cancel
-                label: T.ingame.keybindingsOverlay.clearSelection,
-                keys: [k.general.back],
-                condition: () => this.anythingSelectedOnMap,
-            },
-            {
-                // [SELECTION] Cut
-                label: T.ingame.keybindingsOverlay.cutSelection,
-                keys: [k.massSelect.massSelectCut],
-                condition: () => this.anythingSelectedOnMap,
-            },
+            // {
+            //     // Place building
+            //     label: T.ingame.keybindingsOverlay.placeBuilding,
+            //     keys: [KEYCODE_LMB],
+            //     condition: () => this.anyPlacementActive,
+            // },
 
-            {
-                // [SELECTION] Copy
-                label: T.ingame.keybindingsOverlay.copySelection,
-                keys: [k.massSelect.massSelectCopy],
-                condition: () => this.anythingSelectedOnMap,
-            },
+            // {
+            //     // Rotate
+            //     label: T.ingame.keybindingsOverlay.rotateBuilding,
+            //     keys: [k.placement.rotateWhilePlacing],
+            //     condition: () => this.anyPlacementActive && !this.beltPlannerActive,
+            // },
 
-            {
-                // Switch layers
-                label: T.ingame.keybindingsOverlay.switchLayers,
-                keys: [k.ingame.switchLayers],
-                condition: () =>
-                    this.root.hubGoals.isRewardUnlocked(enumHubGoalRewards.reward_wires_painter_and_levers),
-            },
+            // {
+            //     // [BELT PLANNER] Flip Side
+            //     label: T.ingame.keybindingsOverlay.plannerSwitchSide,
+            //     keys: [k.placement.switchDirectionLockSide],
+            //     condition: () => this.beltPlannerActive,
+            // },
+
+            // {
+            //     // Place last blueprint
+            //     label: T.ingame.keybindingsOverlay.pasteLastBlueprint,
+            //     keys: [k.massSelect.pasteLastBlueprint],
+            //     condition: () => !this.blueprintPlacementActive && this.lastBlueprintAvailable,
+            // },
+
+            // {
+            //     // Belt planner
+            //     label: T.ingame.keybindingsOverlay.lockBeltDirection,
+            //     keys: [k.placementModifiers.lockBeltDirection],
+            //     condition: () => this.buildingPlacementSupportsBeltPlanner && !this.beltPlannerActive,
+            // },
+
+            // {
+            //     // [SELECTION] Destroy
+            //     label: T.ingame.keybindingsOverlay.delete,
+            //     keys: [k.massSelect.confirmMassDelete],
+            //     condition: () => this.anythingSelectedOnMap,
+            // },
+
+            // {
+            //     // [SELECTION] Cancel
+            //     label: T.ingame.keybindingsOverlay.clearSelection,
+            //     keys: [k.general.back],
+            //     condition: () => this.anythingSelectedOnMap,
+            // },
+            // {
+            //     // [SELECTION] Cut
+            //     label: T.ingame.keybindingsOverlay.cutSelection,
+            //     keys: [k.massSelect.massSelectCut],
+            //     condition: () => this.anythingSelectedOnMap,
+            // },
+
+            // {
+            //     // [SELECTION] Copy
+            //     label: T.ingame.keybindingsOverlay.copySelection,
+            //     keys: [k.massSelect.massSelectCopy],
+            //     condition: () => this.anythingSelectedOnMap,
+            // },
+
+            // {
+            //     // Switch layers
+            //     label: T.ingame.keybindingsOverlay.switchLayers,
+            //     keys: [k.ingame.switchLayers],
+            //     condition: () =>
+            //         this.root.hubGoals.isRewardUnlocked(enumHubGoalRewards.reward_wires_painter_and_levers),
+            // },
         ];
 
         if (!this.root.app.settings.getAllSettings().alwaysMultiplace) {

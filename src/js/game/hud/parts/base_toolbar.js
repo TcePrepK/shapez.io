@@ -25,7 +25,10 @@ export class HUDBaseToolbar extends BaseHUDPart {
 
         this.primaryBuildings = primaryBuildings;
         this.secondaryBuildings = secondaryBuildings;
-        this.visibilityCondition = visibilityCondition;
+        // this.visibilityCondition = visibilityCondition;
+        this.visibilityCondition = () => {
+            return false;
+        };
         this.htmlElementId = htmlElementId;
         this.layer = layer;
 

@@ -33,6 +33,7 @@
 @import "ingame_hud/buildings_toolbar";
 @import "ingame_hud/building_placer";
 @import "ingame_hud/beta_overlay";
+@import "ingame_hud/scoreboard";
 @import "ingame_hud/keybindings_overlay";
 @import "ingame_hud/unlock_notification";
 @import "ingame_hud/shop";
@@ -87,6 +88,7 @@ ingame_HUD_SandboxController,
 
 // Overlays
 ingame_HUD_BetaOverlay,
+ingame_HUD_Scoreboard,
 
 // Dialogs
 ingame_HUD_Shop,

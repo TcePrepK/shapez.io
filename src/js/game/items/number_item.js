@@ -37,19 +37,12 @@ export class NumberItem extends BaseItem {
         this.blocked = true;
         this.flagged = false;
 
-        this.flaggedSprite = Loader.getSprite("sprites/misc/flag.png");
-        this.blockedSprite = Loader.getSprite("sprites/misc/blocker.png");
+        this.bombSprite = Loader.getSprite("sprites/misc/minesweeper_bomb.png");
+        this.flaggedTileSprite = Loader.getSprite("sprites/misc/minesweeper_flag.png");
+        this.blockedTileSprite = Loader.getSprite("sprites/misc/minesweeper_blocker.png");
     }
 
     getBackgroundColorAsResource() {
-        if (this.blocked) {
-            return THEME.map.grid;
-        }
-
-        if (isBombItem(this)) {
-            return "#ff0000";
-        }
-
         return THEME.map.grid;
     }
 
@@ -61,12 +54,17 @@ export class NumberItem extends BaseItem {
      */
     drawItemCenteredImpl(x, y, parameters, diameter = globalConfig.defaultItemDiameter) {
         if (this.flagged) {
-            this.flaggedSprite.drawCachedCentered(parameters, x, y, globalConfig.tileSize);
+            this.flaggedTileSprite.drawCachedCentered(parameters, x, y, globalConfig.tileSize);
             return;
         }
 
         if (this.blocked) {
-            this.blockedSprite.drawCachedCentered(parameters, x, y, globalConfig.tileSize);
+            this.blockedTileSprite.drawCachedCentered(parameters, x, y, globalConfig.tileSize);
+            return;
+        }
+
+        if (isBombItem(this)) {
+            this.bombSprite.drawCachedCentered(parameters, x, y, globalConfig.tileSize);
             return;
         }
 
@@ -74,11 +72,10 @@ export class NumberItem extends BaseItem {
             return;
         }
 
-        const ctx = parameters.context;
-        ctx.fillStyle = "white";
-        ctx.strokeStyle = "black";
-        ctx.textAlign = "center";
-        ctx.fillText(String(this.value), x, y + 8);
+        parameters.context.fillStyle = "white";
+        parameters.context.strokeStyle = "black";
+        parameters.context.textAlign = "center";
+        parameters.context.fillText(String(this.value), x, y + 8);
     }
 }
 

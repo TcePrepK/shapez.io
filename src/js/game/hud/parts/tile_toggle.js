@@ -1,27 +1,45 @@
+import { makeDiv } from "../../../core/utils";
 import { Vector } from "../../../core/vector";
 import { enumMouseButton } from "../../camera";
 import { isBombItem, NumberItem } from "../../items/number_item";
+import { itemResolverSingleton } from "../../item_resolver";
 import { BaseHUDPart } from "../base_hud_part";
+import { DynamicDomAttach } from "../dynamic_dom_attach";
 
 export class HUDTileToggle extends BaseHUDPart {
-    initialize() {
-        // this.root.camera.downPreHandler.add(this.mouseDown, this);
-        // this.root.mo.add(this.mouseUp, this);
+    constructor(root) {
+        super(root);
 
-        this.root.canvas.addEventListener("mousedown", this.mouseDown.bind(this));
-        window.addEventListener("mouseup", this.mouseUp.bind(this));
+        this.root.canvas.addEventListener("mousedown", this.onMouseDown.bind(this));
+        window.addEventListener("mouseup", this.onMouseUp.bind(this));
+        window.addEventListener("dblclick", this.onMouseDoubleClick.bind(this));
 
-        /** @type {Array<Object<String, Number>>} */
+        /** @type Array<{
+         *   x: number,
+         *   y: number
+         * }> */
         this.markedList = [];
 
         this.firstShot = true;
+
+        this.score = 0;
     }
+
+    /**
+     * Should create all require elements
+     * @param {HTMLElement} parent
+     */
+    createElements(parent) {
+        this.element = makeDiv(parent, "ingame_HUD_Scoreboard", [], `<h2>CURRENT SCORE: ${this.score} </h2>`);
+    }
+
+    initialize() {}
 
     update() {
         this.handleMarkeds();
     }
 
-    mouseDown(event) {
+    onMouseDown(event) {
         if (this.root.camera.getIsMapOverlayActive() || event.button === 1) {
             return;
         }
@@ -57,8 +75,24 @@ export class HUDTileToggle extends BaseHUDPart {
         }, delay);
     }
 
-    mouseUp() {
+    onMouseUp() {
         this.mouseIsDown = false;
+    }
+
+    onMouseDoubleClick(event) {
+        if (this.root.camera.getIsMapOverlayActive() || event.button === 1 || event.button === 2) {
+            return;
+        }
+
+        const pos = new Vector(event.clientX, event.clientY);
+        const tile = this.root.camera.screenToWorld(pos).toTileSpace();
+        const item = this.root.map.getLowerLayerContentXY(tile.x, tile.y);
+
+        if (item.blocked) {
+            return;
+        }
+
+        this.handleToggleNeighbors(tile);
     }
 
     /**
@@ -67,66 +101,70 @@ export class HUDTileToggle extends BaseHUDPart {
      * @param {boolean} manual
      */
     handleTileToggle(tile, button, manual = false) {
-        const lowerLayer = this.root.map.getLowerLayerContentXY(tile.x, tile.y);
-        if (!(lowerLayer instanceof NumberItem)) {
-            return;
-        }
-
-        if (!lowerLayer.blocked) {
-            if (!manual || button === enumMouseButton.right) {
-                return;
-            }
-
-            for (let x = -1; x < 2; x++) {
-                for (let y = -1; y < 2; y++) {
-                    if (x === 0 && y === 0) {
-                        continue;
-                    }
-
-                    this.handleTileToggle(tile.addScalars(x, y), button);
-                }
-            }
-            return;
-        }
+        const item = this.root.map.getLowerLayerContentXY(tile.x, tile.y);
 
         if (button === enumMouseButton.left) {
-            if (lowerLayer.flagged) {
+            if (item.flagged) {
                 return;
             }
 
             this.markedList.push(tile.serializeSimple());
-        } else if (button === enumMouseButton.right) {
-            lowerLayer.flagged = !lowerLayer.flagged;
+        } else if (button === enumMouseButton.right && item.blocked) {
+            item.flagged = !item.flagged;
+        }
+    }
+
+    /**
+     * @param {Vector} tile
+     */
+    handleToggleNeighbors(tile) {
+        for (let x = -1; x < 2; x++) {
+            for (let y = -1; y < 2; y++) {
+                if (x === 0 && y === 0) {
+                    continue;
+                }
+
+                this.markedList.push(tile.addScalars(x, y).serializeSimple());
+            }
         }
     }
 
     handleMarkeds() {
-        console.log(this.markedList);
-        /** @type {Array<Vector>} */
+        /** @type {Array<Object<String, Number>>} */
         const nextMarkedList = [];
-        for (const tile of this.markedList) {
-            this.markedList.shift();
+        while (this.markedList.length > 0) {
+            const tile = this.markedList.shift();
 
             const item = this.root.map.getLowerLayerContentXY(tile.x, tile.y);
+
+            if (!item.blocked || item.flagged) {
+                continue;
+            }
+
+            item.blocked = false;
+            this.score += 0.5;
+
             if (isBombItem(item)) {
                 if (!this.firstShot) {
+                    this.score = 0;
                     this.root.gameOver = true;
+                    this.element.innerHTML = `<h2>GAME OVER</h2>`;
                     continue;
                 }
             }
 
+            this.element.innerHTML = `<h2>CURRENT SCORE: ${Math.floor(this.score)} </h2>`;
             this.firstShot = false;
-            item.blocked = false;
 
-            if (this.calculateValueOfTile(tile) === 0) {
+            if (this.calculateValueOfTile(new Vector(tile.x, tile.y)) === 0) {
                 for (let x = -1; x < 2; x++) {
                     for (let y = -1; y < 2; y++) {
                         if (x === 0 && y === 0) {
                             continue;
                         }
 
-                        const newTile = tile.addScalars(x, y);
-                        if (this.markedList.indexOf(newTile.serializeSimple()) != -1) {
+                        const newTile = { x: tile.x + x, y: tile.y + y };
+                        if (this.markedList.indexOf(newTile) != -1) {
                             continue;
                         }
 
