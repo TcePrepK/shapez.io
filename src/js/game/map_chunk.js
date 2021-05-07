@@ -1,17 +1,24 @@
 import { globalConfig } from "../core/config";
-import { createLogger } from "../core/logging";
 import { RandomNumberGenerator } from "../core/rng";
 import { fastArrayDeleteValueIfContained, make2DUndefinedArray } from "../core/utils";
-import { Vector } from "../core/vector";
-import { BaseItem } from "./base_item";
 import { Entity } from "./entity";
 import { GameRoot } from "./root";
 import { Rectangle } from "../core/rectangle";
-import { NumberItem, isBombItem } from "./items/number_item";
+import { NumberItem } from "./items/number_item";
 import { enumMouseButton } from "./camera";
 import { STOP_PROPAGATION } from "../core/signal";
 
-const logger = createLogger("map_chunk");
+export const enumDifficulties = {
+    easy: "easy",
+    normal: "normal",
+    hard: "hard",
+};
+
+export const enumDifficultiesToBombAmount = {
+    easy: 30,
+    normal: 40,
+    hard: 50,
+};
 
 export class MapChunk {
     /**
@@ -109,7 +116,8 @@ export class MapChunk {
 
         const rng = new RandomNumberGenerator(this.x + "|" + this.y + "|" + this.root.map.seed);
 
-        const bombAmount = 40;
+        const difficulty = this.root.map.difficulty;
+        const bombAmount = enumDifficultiesToBombAmount[difficulty];
         for (let i = 0; i < bombAmount; i++) {
             const x = rng.nextIntRange(0, globalConfig.mapChunkSize);
             const y = rng.nextIntRange(0, globalConfig.mapChunkSize);

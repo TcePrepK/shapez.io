@@ -3,7 +3,7 @@ import { Loader } from "../../core/loader";
 import { types } from "../../savegame/serialization";
 import { BaseItem } from "../base_item";
 import { globalConfig } from "../../core/config";
-import { THEME } from "../theme";
+import { THEME, THEMES } from "../theme";
 
 export class NumberItem extends BaseItem {
     static getId() {
@@ -44,6 +44,16 @@ export class NumberItem extends BaseItem {
 
     getBackgroundColorAsResource() {
         return THEME.map.grid;
+    }
+
+    getOverlayColorAsResource() {
+        if (this.blocked) {
+            return THEMES.dark.map.grid;
+        }
+        if (isBombItem(this)) {
+            return "#ff666a";
+        }
+        return THEMES.light.map.grid;
     }
 
     /**

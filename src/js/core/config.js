@@ -56,6 +56,10 @@ export const globalConfig = {
     mapChunkOverviewMinZoom: 0.9,
     mapChunkWorldSize: null, // COMPUTED
 
+    // Minesweeper
+    /** @type {String} */
+    difficulty: null,
+
     // Belt speeds
     // NOTICE: Update webpack.production.config too!
     beltSpeedItemsPerSecond: 2,

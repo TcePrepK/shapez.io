@@ -85,6 +85,7 @@ export class Camera extends BasicSerializableObject {
 
         // Handlers
         this.downPreHandler = /** @type {TypedSignal<[Vector, enumMouseButton]>} */ (new Signal());
+        this.doubleDownPreHandler = /** @type {TypedSignal<[Vector, enumMouseButton]>} */ (new Signal());
         this.movePreHandler = /** @type {TypedSignal<[Vector]>} */ (new Signal());
         // this.pinchPreHandler = /** @type {TypedSignal<[Vector]>} */ (new Signal());
         this.upPostHandler = /** @type {TypedSignal<[Vector]>} */ (new Signal());
@@ -303,6 +304,7 @@ export class Camera extends BasicSerializableObject {
         this.eventListenerTouchMove = this.onTouchMove.bind(this);
         this.eventListenerMousewheel = this.onMouseWheel.bind(this);
         this.eventListenerMouseDown = this.onMouseDown.bind(this);
+        this.eventListenerMouseDoubleDown = this.onMouseDoubleDown.bind(this);
         this.eventListenerMouseMove = this.onMouseMove.bind(this);
         this.eventListenerMouseUp = this.onMouseUp.bind(this);
 
@@ -315,6 +317,7 @@ export class Camera extends BasicSerializableObject {
 
         this.root.canvas.addEventListener("wheel", this.eventListenerMousewheel);
         this.root.canvas.addEventListener("mousedown", this.eventListenerMouseDown);
+        this.root.canvas.addEventListener("dblclick", this.eventListenerMouseDoubleDown);
         this.root.canvas.addEventListener("mousemove", this.eventListenerMouseMove);
         window.addEventListener("mouseup", this.eventListenerMouseUp);
         // this.root.canvas.addEventListener("mouseout", this.eventListenerMouseUp);
@@ -434,6 +437,7 @@ export class Camera extends BasicSerializableObject {
         }
 
         if (!this.checkPreventDoubleMouse()) {
+            console.log("Double Clicked ????");
             return;
         }
 
@@ -444,6 +448,32 @@ export class Camera extends BasicSerializableObject {
             this.downPreHandler.dispatch(new Vector(event.clientX, event.clientY), enumMouseButton.middle);
         } else if (event.button === 2) {
             this.downPreHandler.dispatch(new Vector(event.clientX, event.clientY), enumMouseButton.right);
+        }
+        return false;
+    }
+
+    /**
+     * Mousedown handler
+     * @param {MouseEvent} event
+     */
+    onMouseDoubleDown(event) {
+        if (event.cancelable) {
+            event.preventDefault();
+        }
+
+        this.touchPostMoveVelocity = new Vector(0, 0);
+        if (event.button === 0) {
+            this.combinedDoubleTouchStartHandler(event.clientX, event.clientY);
+        } else if (event.button === 1) {
+            this.doubleDownPreHandler.dispatch(
+                new Vector(event.clientX, event.clientY),
+                enumMouseButton.middle
+            );
+        } else if (event.button === 2) {
+            this.doubleDownPreHandler.dispatch(
+                new Vector(event.clientX, event.clientY),
+                enumMouseButton.right
+            );
         }
         return false;
     }
@@ -669,6 +699,26 @@ export class Camera extends BasicSerializableObject {
     combinedSingleTouchStartHandler(x, y) {
         const pos = new Vector(x, y);
         if (this.downPreHandler.dispatch(pos, enumMouseButton.left) === STOP_PROPAGATION) {
+            // Somebody else captured it
+            return;
+        }
+
+        this.touchPostMoveVelocity = new Vector(0, 0);
+        this.currentlyMoving = true;
+        this.lastMovingPosition = pos;
+        this.lastMovingPositionLastTick = null;
+        this.numTicksStandingStill = 0;
+        this.didMoveSinceTouchStart = false;
+    }
+
+    /**
+     * Internal touch start handler
+     * @param {number} x
+     * @param {number} y
+     */
+    combinedDoubleTouchStartHandler(x, y) {
+        const pos = new Vector(x, y);
+        if (this.doubleDownPreHandler.dispatch(pos, enumMouseButton.left) === STOP_PROPAGATION) {
             // Somebody else captured it
             return;
         }

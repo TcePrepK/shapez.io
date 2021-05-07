@@ -115,114 +115,41 @@ export class MapChunkView extends MapChunk {
      * @param {number} dpi
      */
     generateOverlayBuffer(canvas, context, w, h, dpi) {
-        // context.fillStyle =
-        //     this.containedEntities.length > 0
-        //         ? THEME.map.chunkOverview.filled
-        //         : THEME.map.chunkOverview.empty;
-        // context.fillRect(0, 0, w, h);
+        context.fillStyle = THEME.map.chunkOverview.filled;
+        // this.containedEntities.length > 0
+        //     ? THEME.map.chunkOverview.filled
+        //     : THEME.map.chunkOverview.empty;
+        context.fillRect(0, 0, w, h);
 
-        // if (this.root.app.settings.getAllSettings().displayChunkBorders) {
-        //     context.fillStyle = THEME.map.chunkBorders;
-        //     context.fillRect(0, 0, w, 1);
-        //     context.fillRect(0, 1, 1, h);
-        // }
+        if (this.root.app.settings.getAllSettings().displayChunkBorders) {
+            context.fillStyle = THEME.map.chunkBorders;
+            context.fillRect(0, 0, w, 1);
+            context.fillRect(0, 1, 1, h);
+        }
 
         for (let x = 0; x < globalConfig.mapChunkSize; ++x) {
             for (let y = 0; y < globalConfig.mapChunkSize; ++y) {
-                // if (upperContent) {
-                //     const staticComp = upperContent.components.StaticMapEntity;
-                //     const data = getBuildingDataFromCode(staticComp.code);
-                //     const metaBuilding = data.metaInstance;
-
-                //     const overlayMatrix = metaBuilding.getSpecialOverlayRenderMatrix(
-                //         staticComp.rotation,
-                //         data.rotationVariant,
-                //         data.variant,
-                //         upperContent
-                //     );
-
-                //     if (overlayMatrix) {
-                //         // Draw lower content first since it "shines" through
-                //         const lowerContent = lowerArray[y];
-                //         if (lowerContent) {
-                //             context.fillStyle = lowerContent.getBackgroundColorAsResource();
-                //             context.fillRect(
-                //                 x * CHUNK_OVERLAY_RES,
-                //                 y * CHUNK_OVERLAY_RES,
-                //                 CHUNK_OVERLAY_RES,
-                //                 CHUNK_OVERLAY_RES
-                //             );
-                //         }
-
-                //         context.fillStyle = metaBuilding.getSilhouetteColor(
-                //             data.variant,
-                //             data.rotationVariant
-                //         );
-                //         for (let dx = 0; dx < 3; ++dx) {
-                //             for (let dy = 0; dy < 3; ++dy) {
-                //                 const isFilled = overlayMatrix[dx + dy * 3];
-                //                 if (isFilled) {
-                //                     context.fillRect(
-                //                         x * CHUNK_OVERLAY_RES + dx,
-                //                         y * CHUNK_OVERLAY_RES + dy,
-                //                         1,
-                //                         1
-                //                     );
-                //                 }
-                //             }
-                //         }
-
-                //         continue;
-                //     } else {
-                //         context.fillStyle = metaBuilding.getSilhouetteColor(
-                //             data.variant,
-                //             data.rotationVariant
-                //         );
-                //         context.fillRect(
-                //             x * CHUNK_OVERLAY_RES,
-                //             y * CHUNK_OVERLAY_RES,
-                //             CHUNK_OVERLAY_RES,
-                //             CHUNK_OVERLAY_RES
-                //         );
-
-                //         continue;
-                //     }
-                // }
-
                 const lowerContent = this.lowerLayer[x][y];
-                if (lowerContent) {
-                    context.fillStyle = lowerContent.getBackgroundColorAsResource();
-                    context.fillRect(
-                        x * CHUNK_OVERLAY_RES,
-                        y * CHUNK_OVERLAY_RES,
-                        CHUNK_OVERLAY_RES,
-                        CHUNK_OVERLAY_RES
-                    );
+                const extra = 1;
+                if (!lowerContent) {
+                    return;
                 }
-            }
-        }
 
-        if (this.root.currentLayer === "wires") {
-            // Draw wires overlay
+                context.fillStyle = THEME.map.grid;
+                context.fillRect(
+                    x * CHUNK_OVERLAY_RES,
+                    y * CHUNK_OVERLAY_RES,
+                    CHUNK_OVERLAY_RES,
+                    CHUNK_OVERLAY_RES
+                );
 
-            context.fillStyle = THEME.map.wires.overlayColor;
-            context.fillRect(0, 0, w, h);
-
-            for (let x = 0; x < globalConfig.mapChunkSize; ++x) {
-                const wiresArray = this.wireContents[x];
-                for (let y = 0; y < globalConfig.mapChunkSize; ++y) {
-                    const content = wiresArray[y];
-                    if (!content) {
-                        continue;
-                    }
-                    MapChunkView.drawSingleWiresOverviewTile({
-                        context,
-                        x: x * CHUNK_OVERLAY_RES,
-                        y: y * CHUNK_OVERLAY_RES,
-                        entity: content,
-                        tileSizePixels: CHUNK_OVERLAY_RES,
-                    });
-                }
+                context.fillStyle = lowerContent.getOverlayColorAsResource();
+                context.fillRect(
+                    x * CHUNK_OVERLAY_RES + extra,
+                    y * CHUNK_OVERLAY_RES + extra,
+                    CHUNK_OVERLAY_RES - 2 * extra,
+                    CHUNK_OVERLAY_RES - 2 * extra
+                );
             }
         }
     }

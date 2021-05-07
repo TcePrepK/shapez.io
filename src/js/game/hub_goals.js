@@ -72,7 +72,7 @@ export class HubGoals extends BasicSerializableObject {
 
         this.root = root;
 
-        this.level = 10000;
+        this.level = 1;
 
         /**
          * Which story rewards we already gained
@@ -192,10 +192,10 @@ export class HubGoals extends BasicSerializableObject {
      * @param {enumHubGoalRewards} reward
      */
     isRewardUnlocked(reward) {
-        // if (G_IS_DEV && globalConfig.debug.allBuildingsUnlocked) {
-        return true;
-        // }
-        // return !!this.gainedRewards[reward];
+        if (G_IS_DEV && globalConfig.debug.allBuildingsUnlocked) {
+            return true;
+        }
+        return !!this.gainedRewards[reward];
     }
 
     /**

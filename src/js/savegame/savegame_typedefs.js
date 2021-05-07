@@ -30,7 +30,8 @@
  *   lastUpdate: number,
  *   version: number,
  *   internalId: string,
- *   level: number
+ *   level: number,
+ *   difficulty: string,
  *   name: string|null
  * }} SavegameMetadata
  *

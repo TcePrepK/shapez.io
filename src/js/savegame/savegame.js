@@ -13,6 +13,7 @@ import { SavegameInterface_V1005 } from "./schemas/1005";
 import { SavegameInterface_V1006 } from "./schemas/1006";
 import { SavegameInterface_V1007 } from "./schemas/1007";
 import { SavegameInterface_V1008 } from "./schemas/1008";
+import { enumDifficulties } from "../game/map_chunk";
 
 const logger = createLogger("savegame");
 
@@ -184,7 +185,7 @@ export class Savegame extends ReadWriteProxy {
      * Returns if this game has a serialized game dump
      */
     hasGameDump() {
-        return !!this.currentData.dump && this.currentData.dump.entities.length > 0;
+        return !!this.currentData.dump;
     }
 
     /**
@@ -275,8 +276,10 @@ export class Savegame extends ReadWriteProxy {
         this.metaDataRef.version = this.getCurrentVersion();
         if (!this.hasGameDump()) {
             this.metaDataRef.level = 0;
+            this.metaDataRef.difficulty = enumDifficulties.normal;
         } else {
             this.metaDataRef.level = this.currentData.dump.hubGoals.level;
+            this.metaDataRef.difficulty = this.currentData.dump.map.difficulty;
         }
 
         return this.app.savegameMgr.writeAsync();

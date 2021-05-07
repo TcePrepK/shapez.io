@@ -2,13 +2,8 @@
     position: fixed;
     background: $ingameHudBg;
     @include S(padding, 10px);
-    // @include S(padding-left, 50px);
-    // @include S(padding-right, 50px);
-    // @include S(bottom, 10px);
-    // @include S(left, 50%);
-    // @include S(top, 10px);
     left: 50%;
-    // transform: translateX(-50%);
+    transform: translateX(-50%);
     color: $colorBlueBright;
     @include Heading;
     text-transform: uppercase;

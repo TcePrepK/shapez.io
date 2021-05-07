@@ -281,6 +281,9 @@ export class GameCore {
         // Update automatic save after everything finished
         root.automaticSave.update();
 
+        // Update marked list after everything finished
+        root.map.update();
+
         return true;
     }
 
@@ -386,11 +389,9 @@ export class GameCore {
         }
 
         // Construct parameters required for drawing
-        const widthOfChunk = globalConfig.mapChunkWorldSize;
-        const visibleRect = root.camera.getVisibleRect().expandedInAllDirections(2 * widthOfChunk);
         const params = new DrawParameters({
             context: context,
-            visibleRect,
+            visibleRect: root.camera.getVisibleRect(),
             desiredAtlasScale,
             zoomLevel,
             root: root,
@@ -424,14 +425,31 @@ export class GameCore {
         if (this.overlayAlpha < 0.99) {
             // Background (grid, resources, etc)
             root.map.drawBackground(params);
+
+            // // Belt items
+            // systems.belt.drawBeltItems(params);
+
+            // Miner & Static map entities etc.
+            root.map.drawForeground(params);
+
+            // // HUB Overlay
+            // systems.hub.draw(params);
+
+            // Green wires overlay
+            root.hud.parts.wiresOverlay.draw(params);
+
+            if (this.root.currentLayer === "wires") {
+                // Static map entities
+                root.map.drawWiresForegroundLayer(params);
+            }
         }
 
-        // if (this.overlayAlpha > 0.01) {
-        //     // Map overview
-        //     context.globalAlpha = this.overlayAlpha;
-        //     root.map.drawOverlay(params);
-        //     context.globalAlpha = 1;
-        // }
+        if (this.overlayAlpha > 0.01) {
+            // Map overview
+            context.globalAlpha = this.overlayAlpha;
+            root.map.drawOverlay(params);
+            context.globalAlpha = 1;
+        }
 
         // END OF GAME CONTENT
         // -----

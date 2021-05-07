@@ -17,6 +17,7 @@ import {
 } from "../core/utils";
 import { HUDModalDialogs } from "../game/hud/parts/modal_dialogs";
 import { getApplicationSettingById } from "../profile/application_settings";
+import { enumDifficulties } from "../game/map_chunk";
 import { T } from "../translations";
 
 const trim = require("trim");
@@ -394,8 +395,11 @@ export class MainMenuState extends GameState {
                     null,
                     ["level"],
                     games[i].level
-                        ? T.mainMenu.savegameLevel.replace("<x>", "" + games[i].level)
-                        : T.mainMenu.savegameLevelUnknown
+                        ? T.mainMenu.savegameDifficulty.replace(
+                              "<x>",
+                              "" + String(games[i].difficulty).toUpperCase()
+                          )
+                        : T.mainMenu.savegameDifficultyUnknown
                 );
 
                 const name = makeDiv(
@@ -554,7 +558,7 @@ export class MainMenuState extends GameState {
         );
     }
 
-    onPlayButtonClicked() {
+    onDifficultySelected() {
         if (
             this.app.savegameMgr.getSavegamesMetaData().length > 0 &&
             !this.app.restrictionMgr.getHasUnlimitedSavegames()
@@ -572,6 +576,34 @@ export class MainMenuState extends GameState {
                 savegame,
             });
             this.app.analytics.trackUiClick("startgame_adcomplete");
+        });
+    }
+
+    onPlayButtonClicked() {
+        const buttonContainer = this.htmlElement.querySelector(".mainContainer .buttons");
+        removeAllChildren(buttonContainer);
+        makeDiv(buttonContainer, null, ["outer"], null);
+
+        const saveContainer = this.htmlElement.querySelector(".mainContainer .savegames");
+        saveContainer.remove();
+
+        for (const difficulty in enumDifficulties) {
+            const difficultyButton = makeButton(
+                this.htmlElement.querySelector(".mainContainer .outer"),
+                ["difficultyButton", "styledButton"],
+                difficulty
+            );
+            this.trackClicks(difficultyButton, () => {
+                globalConfig.difficulty = difficulty;
+                this.onDifficultySelected();
+            });
+        }
+
+        const back = makeButton(buttonContainer, ["backButton", "styledButton"], "Back");
+
+        this.trackClicks(back, () => {
+            this.renderMainMenu();
+            this.renderSavegames();
         });
     }
 
