@@ -4,7 +4,7 @@
  */
 export function cachebust(path) {
     if (G_IS_BROWSER && !G_IS_STANDALONE && !G_IS_DEV) {
-        return "/shapez/Minezsweeper/" + path;
+        return "/shapez/MinezSweeper/" + path;
     }
     return path;
 }
