@@ -72,6 +72,8 @@ mainMenu:
     madeBy: Gra wykonana przez <author-link>
     subreddit: Reddit
     savegameUnnamed: Zapis bez nazwy
+    savegameDifficulty: Difficulty <x>
+    savegameDifficultyUnknown: Unknown Difficulty
 dialogs:
     buttons:
         ok: OK
@@ -208,6 +210,9 @@ ingame:
         clearSelection: Wyczyść zaznaczenie
         pipette: Wybierz obiekt z mapy
         switchLayers: Przełącz warstwy
+        toggleTile: Toggle Tile
+        flagTile: Flag Tile
+        toggleNeighbors: Toggle Neighbor Tiles
     colors:
         red: Czerwony
         green: Zielony

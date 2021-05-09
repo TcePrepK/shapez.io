@@ -72,6 +72,8 @@ mainMenu:
     madeBy: Skapad av <author-link>
     subreddit: Reddit
     savegameUnnamed: Namnlöst
+    savegameDifficulty: Difficulty <x>
+    savegameDifficultyUnknown: Unknown Difficulty
 dialogs:
     buttons:
         ok: OK
@@ -207,6 +209,9 @@ ingame:
         clearSelection: Rensa vald
         pipette: Pipett
         switchLayers: Byt lager
+        toggleTile: Toggle Tile
+        flagTile: Flag Tile
+        toggleNeighbors: Toggle Neighbor Tiles
     buildingPlacement:
         cycleBuildingVariants: Tryck ned <key> För att bläddra igenom varianter.
         hotkeyLabel: "Snabbtangent: <key>"

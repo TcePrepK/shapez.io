@@ -73,6 +73,8 @@ mainMenu:
     madeBy: Făcut de <author-link>
     subreddit: Reddit
     savegameUnnamed: Fară nume
+    savegameDifficulty: Difficulty <x>
+    savegameDifficultyUnknown: Unknown Difficulty
 dialogs:
     buttons:
         ok: OK
@@ -209,6 +211,9 @@ ingame:
         clearSelection: Golește Secțiunea
         pipette: Pipette
         switchLayers: Switch layers
+        toggleTile: Toggle Tile
+        flagTile: Flag Tile
+        toggleNeighbors: Toggle Neighbor Tiles
     buildingPlacement:
         cycleBuildingVariants: Apasă <key> pentru a cicla variantele.
         hotkeyLabel: "Tasta: <key>"

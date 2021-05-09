@@ -71,6 +71,8 @@ mainMenu:
     madeBy: Создал <author-link>
     subreddit: Reddit
     savegameUnnamed: Без названия
+    savegameDifficulty: Difficulty <x>
+    savegameDifficultyUnknown: Unknown Difficulty
 dialogs:
     buttons:
         ok: OK
@@ -206,6 +208,9 @@ ingame:
         clearSelection: Отменить
         pipette: Пипетка
         switchLayers: Переключить слои
+        toggleTile: Toggle Tile
+        flagTile: Flag Tile
+        toggleNeighbors: Toggle Neighbor Tiles
     buildingPlacement:
         cycleBuildingVariants: Нажмите <key> для переключения вариантов.
         hotkeyLabel: "Клавиша: <key>"

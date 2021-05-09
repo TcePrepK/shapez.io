@@ -72,6 +72,8 @@ mainMenu:
     savegameLevel: Taso <x>
     savegameLevelUnknown: Tuntematon taso
     savegameUnnamed: Nimetön
+    savegameDifficulty: Difficulty <x>
+    savegameDifficultyUnknown: Unknown Difficulty
 dialogs:
     buttons:
         ok: OK
@@ -201,6 +203,9 @@ ingame:
         clearSelection: Tyhjennä valinta
         pipette: Pipetti
         switchLayers: Vaihda tasoa
+        toggleTile: Toggle Tile
+        flagTile: Flag Tile
+        toggleNeighbors: Toggle Neighbor Tiles
     colors:
         red: Punainen
         green: Vihreä
@@ -562,12 +567,11 @@ buildings:
 storyRewards:
     reward_cutter_and_trash:
         title: Muotojen Leikkaus
-        desc: Avasit <strong>Leikkurin</strong>, joka leikkaa muotoja
-            ylhäältä alas <strong>muodon suunnasta
-            riippumatta</strong>!<br><br>muista hankkiutua eroon jätteestä, tai
-            muuten <strong>se tukkii ja pysäyttää leikkurin</strong> - Siksi
-            olen antanut sinulle <strong>roskiksen</strong>, joka tuhoaa
-            kaiken sinne laitetun!
+        desc: Avasit <strong>Leikkurin</strong>, joka leikkaa muotoja ylhäältä alas
+            <strong>muodon suunnasta riippumatta</strong>!<br><br>muista
+            hankkiutua eroon jätteestä, tai muuten <strong>se tukkii ja
+            pysäyttää leikkurin</strong> - Siksi olen antanut sinulle
+            <strong>roskiksen</strong>, joka tuhoaa kaiken sinne laitetun!
     reward_rotater:
         title: Kääntö
         desc: Avasit <strong>Kääntäjän</strong>! Se kääntää muotoja myötäpäivään 90
@@ -629,11 +633,11 @@ storyRewards:
     reward_freeplay:
         title: Vapaapeli
         desc: Onnistuit! Avasit juuri <strong>vapaapelimuodon</strong>! Muodot luodaan
-            nyt <strong>satunnaisesti</strong><br><br> Koska keskusrakennus vaatii
-            tietyn <strong>kuljetuskapasiteetin</strong> tästä eteenpäin, suosittelen
-            lämpimästi rakentamaan koneen, joka tuottaa vaaditun muodon
-            automaattisesti!<br><br> Keskusrakennus lähettää pyydetyn muodon
-            johtotasolle, joten sinun ei tarvitse kuin analysoida se ja
+            nyt <strong>satunnaisesti</strong><br><br> Koska keskusrakennus
+            vaatii tietyn <strong>kuljetuskapasiteetin</strong> tästä eteenpäin,
+            suosittelen lämpimästi rakentamaan koneen, joka tuottaa vaaditun
+            muodon automaattisesti!<br><br> Keskusrakennus lähettää pyydetyn
+            muodon johtotasolle, joten sinun ei tarvitse kuin analysoida se ja
             konfiguroida tehtaasi sen perusteella.
     reward_blueprints:
         title: Piirustukset
@@ -959,9 +963,8 @@ keybindings:
 about:
     title: Tietoja tästä pelistä
     body: >-
-        Tämä peli on avointa lähdekoodia ja <a
-        href="https://github.com/tobspr" target="_blank">Tobias Springer</a>in
-        (siis minun) kehittämäni.<br><br>
+        Tämä peli on avointa lähdekoodia ja <a href="https://github.com/tobspr"
+        target="_blank">Tobias Springer</a>in (siis minun) kehittämäni.<br><br>
 
         Jos haluat avustaa, käy katsomassa <a href="<githublink>" target="_blank">shapez.io GitHubissa</a>.<br><br>
 

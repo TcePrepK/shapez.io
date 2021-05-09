@@ -85,7 +85,9 @@ export class NumberItem extends BaseItem {
         parameters.context.fillStyle = "white";
         parameters.context.strokeStyle = "black";
         parameters.context.textAlign = "center";
+        parameters.context.strokeText(String(this.value), x, y + 8);
         parameters.context.fillText(String(this.value), x, y + 8);
+        // parameters.context.stroke();
     }
 }
 

@@ -69,6 +69,8 @@ mainMenu:
     savegameLevel: Level <x>
     savegameLevelUnknown: Unknown Level
     savegameUnnamed: Unnamed
+    savegameDifficulty: Difficulty <x>
+    savegameDifficultyUnknown: Unknown Difficulty
 dialogs:
     buttons:
         ok: OK
@@ -200,6 +202,9 @@ ingame:
         clearSelection: Clear selection
         pipette: Pipette
         switchLayers: Switch layers
+        toggleTile: Toggle Tile
+        flagTile: Flag Tile
+        toggleNeighbors: Toggle Neighbor Tiles
     colors:
         red: Red
         green: Green

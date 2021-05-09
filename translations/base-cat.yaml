@@ -73,6 +73,8 @@ mainMenu:
     savegameLevel: Nivell <x>
     savegameLevelUnknown: Nivell desconegut
     savegameUnnamed: Unnamed
+    savegameDifficulty: Difficulty <x>
+    savegameDifficultyUnknown: Unknown Difficulty
 dialogs:
     buttons:
         ok: OK
@@ -208,6 +210,9 @@ ingame:
         clearSelection: Buidar selecció
         pipette: Pipeta
         switchLayers: Intercanviar capes
+        toggleTile: Toggle Tile
+        flagTile: Flag Tile
+        toggleNeighbors: Toggle Neighbor Tiles
     colors:
         red: Roig
         green: Verd

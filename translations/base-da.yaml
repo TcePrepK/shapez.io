@@ -72,6 +72,8 @@ mainMenu:
     savegameLevel: Niveau <x>
     savegameLevelUnknown: Ukendt Niveau
     savegameUnnamed: Unnamed
+    savegameDifficulty: Difficulty <x>
+    savegameDifficultyUnknown: Unknown Difficulty
 dialogs:
     buttons:
         ok: OK
@@ -205,6 +207,9 @@ ingame:
         clearSelection: Ryd Selektion
         pipette: Pipette
         switchLayers: Skift Lag
+        toggleTile: Toggle Tile
+        flagTile: Flag Tile
+        toggleNeighbors: Toggle Neighbor Tiles
     colors:
         red: Rød
         green: Grøn

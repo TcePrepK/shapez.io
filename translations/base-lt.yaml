@@ -71,6 +71,8 @@ mainMenu:
     madeBy: Made by <author-link>
     subreddit: Reddit
     savegameUnnamed: Unnamed
+    savegameDifficulty: Difficulty <x>
+    savegameDifficultyUnknown: Unknown Difficulty
 dialogs:
     buttons:
         ok: OK
@@ -201,6 +203,9 @@ ingame:
         clearSelection: Clear Selection
         pipette: Pipette
         switchLayers: Switch layers
+        toggleTile: Toggle Tile
+        flagTile: Flag Tile
+        toggleNeighbors: Toggle Neighbor Tiles
     buildingPlacement:
         cycleBuildingVariants: Press <key> to cycle variants.
         hotkeyLabel: "Hotkey: <key>"

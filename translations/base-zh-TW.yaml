@@ -65,6 +65,8 @@ mainMenu:
     madeBy: 作者：<author-link>
     subreddit: Reddit
     savegameUnnamed: 未命名
+    savegameDifficulty: Difficulty <x>
+    savegameDifficultyUnknown: Unknown Difficulty
 dialogs:
     buttons:
         ok: 確認
@@ -179,6 +181,9 @@ ingame:
         clearSelection: 清空選取
         pipette: 滴管
         switchLayers: 切換層
+        toggleTile: Toggle Tile
+        flagTile: Flag Tile
+        toggleNeighbors: Toggle Neighbor Tiles
     buildingPlacement:
         cycleBuildingVariants: 按<key>鍵以選擇建築變體。
         hotkeyLabel: 快捷鍵：<key>

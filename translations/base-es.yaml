@@ -72,6 +72,8 @@ mainMenu:
     savegameLevel: Nivel <x>
     savegameLevelUnknown: Nivel desconocido
     savegameUnnamed: Sin nombre
+    savegameDifficulty: Difficulty <x>
+    savegameDifficultyUnknown: Unknown Difficulty
 dialogs:
     buttons:
         ok: OK
@@ -208,6 +210,9 @@ ingame:
         clearSelection: Limpiar selección
         pipette: Cuentagotas
         switchLayers: Cambiar capas
+        toggleTile: Toggle Tile
+        flagTile: Flag Tile
+        toggleNeighbors: Toggle Neighbor Tiles
     colors:
         red: Rojo
         green: Verde
@@ -319,9 +324,9 @@ ingame:
             21_3_place_button: ¡Genial! ¡Ahora pon un <strong>Interruptor</strong> y
                 conéctalo con cables!
             21_4_press_button: "Presiona el interruptor para hacer que <strong>emita una
-                señal verdadera</strong> lo cual activa el pintador.<br><br>
-                PD: ¡No necesitas conectar todas las entradas! Intenta
-                conectando sólo dos."
+                señal verdadera</strong> lo cual activa el pintador.<br><br> PD:
+                ¡No necesitas conectar todas las entradas! Intenta conectando
+                sólo dos."
     connectedMiners:
         one_miner: 1 Minero
         n_miners: <amount> Mineros

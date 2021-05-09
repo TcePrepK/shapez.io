@@ -115,6 +115,8 @@ mainMenu:
 
     savegameLevel: Level <x>
     savegameLevelUnknown: Unknown Level
+    savegameDifficulty: Difficulty <x>
+    savegameDifficultyUnknown: Unknown Difficulty
     savegameUnnamed: Unnamed
 
 dialogs:
@@ -276,6 +278,9 @@ ingame:
         clearSelection: Clear selection
         pipette: Pipette
         switchLayers: Switch layers
+        toggleTile: "Toggle Tile"
+        flagTile: "Flag Tile"
+        toggleNeighbors: "Toggle Neighbor Tiles"
 
     # Names of the colors, used for the color blind mode
     colors:

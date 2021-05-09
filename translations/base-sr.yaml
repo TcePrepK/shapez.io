@@ -72,6 +72,8 @@ mainMenu:
     savegameLevel: Nivo <x>
     savegameLevelUnknown: Nepoznat Nivo
     savegameUnnamed: Unnamed
+    savegameDifficulty: Difficulty <x>
+    savegameDifficultyUnknown: Unknown Difficulty
 dialogs:
     buttons:
         ok: OK
@@ -203,6 +205,9 @@ ingame:
         clearSelection: Očisti odabir
         pipette: Pipeta
         switchLayers: Promeni sloj
+        toggleTile: Toggle Tile
+        flagTile: Flag Tile
+        toggleNeighbors: Toggle Neighbor Tiles
     colors:
         red: Crvena
         green: Zelena

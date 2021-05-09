@@ -376,60 +376,74 @@ export class MainMenuState extends GameState {
         if (oldContainer) {
             oldContainer.remove();
         }
+
         const games = this.savedGames;
-        if (games.length > 0) {
-            const parent = makeDiv(this.htmlElement.querySelector(".mainContainer"), null, ["savegames"]);
+        if (games.length < 0) {
+            return;
+        }
 
-            for (let i = 0; i < games.length; ++i) {
-                const elem = makeDiv(parent, null, ["savegame"]);
+        const parent = makeDiv(this.htmlElement.querySelector(".mainContainer"), null, ["savegames"]);
 
+        for (let i = 0; i < games.length; ++i) {
+            const elem = makeDiv(parent, null, ["savegame"]);
+
+            makeDiv(
+                elem,
+                null,
+                ["playtime"],
+                formatSecondsToTimeAgo((new Date().getTime() - games[i].lastUpdate) / 1000.0)
+            );
+
+            if (games[i].difficulty) {
                 makeDiv(
                     elem,
                     null,
-                    ["playtime"],
-                    formatSecondsToTimeAgo((new Date().getTime() - games[i].lastUpdate) / 1000.0)
-                );
-
-                makeDiv(
-                    elem,
-                    null,
-                    ["level"],
-                    games[i].level
+                    ["difficulty"],
+                    games[i].difficulty
                         ? T.mainMenu.savegameDifficulty.replace(
                               "<x>",
                               "" + String(games[i].difficulty).toUpperCase()
                           )
                         : T.mainMenu.savegameDifficultyUnknown
                 );
-
-                const name = makeDiv(
+            } else {
+                makeDiv(
                     elem,
                     null,
-                    ["name"],
-                    "<span>" + (games[i].name ? games[i].name : T.mainMenu.savegameUnnamed) + "</span>"
+                    ["level"],
+                    games[i].level
+                        ? T.mainMenu.savegameLevel.replace("<x>", "" + games[i].level)
+                        : T.mainMenu.savegameLevelUnknown
                 );
-
-                const deleteButton = document.createElement("button");
-                deleteButton.classList.add("styledButton", "deleteGame");
-                elem.appendChild(deleteButton);
-
-                const downloadButton = document.createElement("button");
-                downloadButton.classList.add("styledButton", "downloadGame");
-                elem.appendChild(downloadButton);
-
-                const renameButton = document.createElement("button");
-                renameButton.classList.add("styledButton", "renameGame");
-                name.appendChild(renameButton);
-
-                const resumeButton = document.createElement("button");
-                resumeButton.classList.add("styledButton", "resumeGame");
-                elem.appendChild(resumeButton);
-
-                this.trackClicks(deleteButton, () => this.deleteGame(games[i]));
-                this.trackClicks(downloadButton, () => this.downloadGame(games[i]));
-                this.trackClicks(resumeButton, () => this.resumeGame(games[i]));
-                this.trackClicks(renameButton, () => this.requestRenameSavegame(games[i]));
             }
+
+            const name = makeDiv(
+                elem,
+                null,
+                ["name"],
+                "<span>" + (games[i].name ? games[i].name : T.mainMenu.savegameUnnamed) + "</span>"
+            );
+
+            const deleteButton = document.createElement("button");
+            deleteButton.classList.add("styledButton", "deleteGame");
+            elem.appendChild(deleteButton);
+
+            const downloadButton = document.createElement("button");
+            downloadButton.classList.add("styledButton", "downloadGame");
+            elem.appendChild(downloadButton);
+
+            const renameButton = document.createElement("button");
+            renameButton.classList.add("styledButton", "renameGame");
+            name.appendChild(renameButton);
+
+            const resumeButton = document.createElement("button");
+            resumeButton.classList.add("styledButton", "resumeGame");
+            elem.appendChild(resumeButton);
+
+            this.trackClicks(deleteButton, () => this.deleteGame(games[i]));
+            this.trackClicks(downloadButton, () => this.downloadGame(games[i]));
+            this.trackClicks(resumeButton, () => this.resumeGame(games[i]));
+            this.trackClicks(renameButton, () => this.requestRenameSavegame(games[i]));
         }
     }
 
@@ -585,7 +599,9 @@ export class MainMenuState extends GameState {
         makeDiv(buttonContainer, null, ["outer"], null);
 
         const saveContainer = this.htmlElement.querySelector(".mainContainer .savegames");
-        saveContainer.remove();
+        if (saveContainer) {
+            saveContainer.remove();
+        }
 
         for (const difficulty in enumDifficulties) {
             const difficultyButton = makeButton(

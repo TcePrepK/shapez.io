@@ -69,6 +69,8 @@ mainMenu:
     savegameLevel: Level <x>
     savegameLevelUnknown: Unbekanntes Level
     savegameUnnamed: Unbenannt
+    savegameDifficulty: Difficulty <x>
+    savegameDifficultyUnknown: Unknown Difficulty
 dialogs:
     buttons:
         ok: OK
@@ -202,6 +204,9 @@ ingame:
         clearSelection: Auswahl aufheben
         pipette: Pipette
         switchLayers: Ebenen wechseln
+        toggleTile: Toggle Tile
+        flagTile: Flag Tile
+        toggleNeighbors: Toggle Neighbor Tiles
     colors:
         red: Rot
         green: Grün
@@ -913,7 +918,8 @@ settings:
                 position, otherwise in the middle of the screen.
         mapResourcesScale:
             title: Größe der Ressourcen auf der Karte
-            description: Legt die Größe der Ressourcen auf der Karte (beim Herauszoomen) fest.
+            description: Legt die Größe der Ressourcen auf der Karte (beim Herauszoomen)
+                fest.
 keybindings:
     title: Tastenbelegung
     hint: "Tipp: Benutze STRG, UMSCH and ALT! Sie aktivieren verschiedene

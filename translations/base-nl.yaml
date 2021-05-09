@@ -72,6 +72,8 @@ mainMenu:
     madeBy: Gemaakt door <author-link>
     subreddit: Reddit
     savegameUnnamed: Naamloos
+    savegameDifficulty: Difficulty <x>
+    savegameDifficultyUnknown: Unknown Difficulty
 dialogs:
     buttons:
         ok: OK
@@ -209,6 +211,9 @@ ingame:
         clearSelection: Annuleer selectie
         pipette: Pipet
         switchLayers: Wissel lagen
+        toggleTile: Toggle Tile
+        flagTile: Flag Tile
+        toggleNeighbors: Toggle Neighbor Tiles
     buildingPlacement:
         cycleBuildingVariants: Druk op <key> om tussen varianten te wisselen.
         hotkeyLabel: "Hotkey: <key>"

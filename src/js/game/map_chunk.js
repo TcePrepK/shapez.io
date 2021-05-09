@@ -85,23 +85,6 @@ export class MapChunk {
         };
 
         this.generateChunk();
-
-        // this.root.camera.downPreHandler.add(this.onMouseDown, this);
-    }
-
-    onMouseDown(pos, button) {
-        if (button !== enumMouseButton.left || !this.root.camera.getIsMapOverlayActive()) {
-            return;
-        }
-
-        const tile = this.root.camera.screenToWorld(pos).toTileSpace();
-        const chunk = this.root.map.getChunkAtTileOrNull(tile.x, tile.y);
-
-        if (chunk) {
-            console.log(chunk);
-        }
-
-        return STOP_PROPAGATION;
     }
 
     /**

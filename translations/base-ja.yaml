@@ -63,6 +63,8 @@ mainMenu:
     savegameLevel: レベル <x>
     savegameLevelUnknown: 不明なレベル
     savegameUnnamed: 無名のデータ
+    savegameDifficulty: Difficulty <x>
+    savegameDifficultyUnknown: Unknown Difficulty
 dialogs:
     buttons:
         ok: OK
@@ -178,6 +180,9 @@ ingame:
         clearSelection: 選択範囲をクリア
         pipette: スポイト
         switchLayers: レイヤーを変更
+        toggleTile: Toggle Tile
+        flagTile: Flag Tile
+        toggleNeighbors: Toggle Neighbor Tiles
     colors:
         red: 赤
         green: 緑
@@ -558,18 +563,21 @@ storyRewards:
         desc: <strong>回転機</strong>のバリエーションが利用可能になりました！　180°の回転ができるようになります！（サプライズ！ :D）
     reward_wires_painter_and_levers:
         title: ワイヤ＆着色機(四分割)
-        desc: "<strong>ワイヤレイヤ</strong>が利用可能になりました: これは通常の レイヤーの上にある別のレイヤであり、多くの新しい要素があります！<br><br>
-            まず最初に、<strong>四色着色機</strong>が利用可能になりました - 着色するスロットをワイヤレイヤで接続してください！<br><br>
-            ワイヤレイヤに切り替えるには、<strong>E</strong>を押します。 <br><br>
-            補足: 設定で<strong>ヒントを有効にする</strong>と、 ワイヤのチュートリアルが有効になります。"
+        desc: "<strong>ワイヤレイヤ</strong>が利用可能になりました: これは通常の
+            レイヤーの上にある別のレイヤであり、多くの新しい要素があります！<br><br>
+            まず最初に、<strong>四色着色機</strong>が利用可能になりました -
+            着色するスロットをワイヤレイヤで接続してください！<br><br>
+            ワイヤレイヤに切り替えるには、<strong>E</strong>を押します。 <br><br> 補足:
+            設定で<strong>ヒントを有効にする</strong>と、 ワイヤのチュートリアルが有効になります。"
     reward_filter:
         title: アイテムフィルタ
         desc: <strong>アイテムフィルタ</strong>が利用可能になりました！　ワイヤレイヤの信号と一致するかどうかに応じて、アイテムを上側または右側の出力に分離します。<br><br>
             また、真偽値(0/1)信号を入力すれば全てのアイテムの通過・非通過を制御できます。
     reward_display:
         title: ディスプレイ
-        desc: "<strong>ディスプレイ</strong>が利用可能になりました - ワイヤレイヤで信号を接続することで、その内容を表示できます！<br><br>
-            補足: ベルトリーダーとストレージが最後に通過したアイテムを出力していることに気づきましたか？ それをディスプレイに表示してみてください！"
+        desc: "<strong>ディスプレイ</strong>が利用可能になりました -
+            ワイヤレイヤで信号を接続することで、その内容を表示できます！<br><br> 補足:
+            ベルトリーダーとストレージが最後に通過したアイテムを出力していることに気づきましたか？ それをディスプレイに表示してみてください！"
     reward_constant_signal:
         title: 定数信号
         desc: <strong>定数信号</strong>がワイヤレイヤで利用可能になりました！　これは例えば<strong>アイテムフィルタ</strong>に接続すると便利です。<br><br>
@@ -860,9 +868,9 @@ tips:
     - 切断機は配置された向きを考慮せず、常に垂直に切断します。
     - ストレージは左側の出力を優先します。
     - 増築可能なデザインを作るために時間を使ってください。それだけの価値があります！
-    - <b>SHIFT</b>を使用すると複数の建物を一度に配置できます。
+    - Invest time to build repeatable designs - it's worth it!
     - <b>ALT</b>を押しながらベルトを設置すると、向きを逆転できます。
-    - 効率が重要です！
+    - You can hold <b>ALT</b> to invert the direction of placed belts.
     - ハブから遠くに離れるほど、形状資源はより複雑な形になります。
     - 機械の速度には上限があるので、最大効率を得るためには入力を分割してください。
     - 効率を最大化するために分配機/合流機を使用できます。
@@ -878,8 +886,8 @@ tips:
     - モジュールがあれば、空間はただの認識に過ぎなくなる――生ある人間に対する気遣いだ。
     - 設計図としての工場を別に作っておくと、工場のモジュール化において重要な役割を果たします。
     - 混色機をよく見ると、色の混ぜ方が解ります。
-    - <b>CTRL</b> + クリックで範囲選択ができます。
-    - ハブに近すぎる設計物を作ると、のちの設計の邪魔になるかもしれません。
+    - Have a closer look at the color mixer, and your questions will be answered.
+    - Use <b>CTRL</b> + Click to select an area.
     - アップグレードリストの各形状の横にあるピンのアイコンは、その形状を画面左に固定表示します。
     - 三原色全てを混ぜ合わせると白になります！
     - マップは無限の広さがあります。臆せずに拡張してください。
@@ -893,3 +901,4 @@ tips:
     - F4を押すことで、FPSとTickレートを表示できます。
     - F4を2回押すと、マウスとカメラの座標を表示できます。
     - 左のピン留めされた図形をクリックすると、固定を解除できます。
+    - You can click a pinned shape on the left side to unpin it.

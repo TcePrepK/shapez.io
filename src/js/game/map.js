@@ -104,6 +104,10 @@ export class BaseMap extends BasicSerializableObject {
         }
 
         const tile = this.root.camera.screenToWorld(pos).toTileSpace();
+        if (this.firstShot && button === enumMouseButton.left) {
+            this.handleFirstShot(tile);
+            return;
+        }
 
         if (button === enumMouseButton.right) {
             this.handleTileToggle(tile, enumMouseButton.right);
@@ -142,7 +146,6 @@ export class BaseMap extends BasicSerializableObject {
      * @param {enumMouseButton} button
      */
     onMouseDoubleClick(pos, button) {
-        console.log("Double Clicked");
         if (this.root.camera.getIsMapOverlayActive() || button !== enumMouseButton.left) {
             return;
         }
@@ -177,7 +180,7 @@ export class BaseMap extends BasicSerializableObject {
                 return;
             }
 
-            this.toggleList.push(tile.serializeSimple());
+            this.toggleList.push(tile);
         } else if (button === enumMouseButton.right && item.blocked) {
             item.flagged = !item.flagged;
 
@@ -209,7 +212,7 @@ export class BaseMap extends BasicSerializableObject {
 
                 const movedVector = tile.addScalars(x, y);
                 this.toggledTileList.push(movedVector);
-                this.toggleList.push(movedVector.serializeSimple());
+                this.toggleList.push(movedVector);
             }
         }
     }
@@ -221,6 +224,7 @@ export class BaseMap extends BasicSerializableObject {
         /** @type {Array<Object<String, Number>>} */
         const nextToggleList = [];
         while (this.toggleList.length > 0) {
+            this.firstShot = false;
             const tile = this.toggleList.shift();
 
             const item = this.root.map.getLowerLayerContentXY(tile.x, tile.y);
@@ -233,18 +237,15 @@ export class BaseMap extends BasicSerializableObject {
             this.score += 0.5;
 
             if (isBombItem(item)) {
-                if (!this.firstShot) {
-                    this.score = 0;
-                    this.root.gameOver = true;
-                    document.getElementById("scoreboard").innerHTML = `<h2 id="scoreboard">GAME OVER</h2>`;
-                    continue;
-                }
+                this.score = 0;
+                this.root.gameOver = true;
+                document.getElementById("scoreboard").innerHTML = `<h2 id="scoreboard">GAME OVER</h2>`;
+                continue;
             }
 
             document.getElementById(
                 "scoreboard"
             ).innerHTML = `<h2 id="scoreboard">CURRENT SCORE: ${Math.floor(this.score)} </h2>`;
-            this.firstShot = false;
 
             if (this.calculateValueOfTile(new Vector(tile.x, tile.y)) === 0) {
                 for (let x = -1; x < 2; x++) {
@@ -269,6 +270,35 @@ export class BaseMap extends BasicSerializableObject {
         if (fast && this.toggleList.length != 0) {
             this.handleMarkeds(fast);
         }
+    }
+
+    /**
+     * @param {Vector} pos
+     */
+    handleFirstShot(pos) {
+        const item = this.root.map.getLowerLayerContentXY(pos.x, pos.y);
+
+        if (item.flagged) {
+            return;
+        }
+
+        this.score += 0.5 * 9;
+
+        for (let i = -1; i < 2; i++) {
+            for (let j = -1; j < 2; j++) {
+                const tile = new Vector(pos.x + i, pos.y + j);
+                const neighbor = this.root.map.getLowerLayerContentXY(tile.x, tile.y);
+                if (isBombItem(neighbor)) {
+                    neighbor.value = 0;
+                }
+            }
+        }
+
+        this.handleToggleNeighbors(pos);
+
+        document.getElementById("scoreboard").innerHTML = `<h2 id="scoreboard">CURRENT SCORE: ${Math.floor(
+            this.score
+        )} </h2>`;
     }
 
     /**

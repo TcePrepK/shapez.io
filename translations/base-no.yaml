@@ -73,6 +73,8 @@ mainMenu:
     madeBy: Laget av <author-link>
     subreddit: Reddit
     savegameUnnamed: Unnamed
+    savegameDifficulty: Difficulty <x>
+    savegameDifficultyUnknown: Unknown Difficulty
 dialogs:
     buttons:
         ok: OK
@@ -207,6 +209,9 @@ ingame:
         clearSelection: Fjern Valgte
         pipette: Pipette
         switchLayers: Bytt lag
+        toggleTile: Toggle Tile
+        flagTile: Flag Tile
+        toggleNeighbors: Toggle Neighbor Tiles
     buildingPlacement:
         cycleBuildingVariants: Trykk <key> for å veksle mellom variantene.
         hotkeyLabel: "Hotkey: <key>"

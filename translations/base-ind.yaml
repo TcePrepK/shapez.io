@@ -17,8 +17,8 @@ steamPage:
     notch_comment: Oh sial. Saya benar-benar harus tidur, namun sepertinya saya baru
         menemukan bagaimana cara membuat komputer di shapez.io
     steam_review_comment: Game ini telah mencuri hidup saya dan saya tidak
-        menginginkannya kembali. Game pembuatan pabrik yang sangat santai yang tidak
-        akan membiarkan saya berhenti membuat pabrik saya lebih efisien.
+        menginginkannya kembali. Game pembuatan pabrik yang sangat santai yang
+        tidak akan membiarkan saya berhenti membuat pabrik saya lebih efisien.
 global:
     loading: Memuat
     error: Terjadi kesalahan
@@ -69,6 +69,8 @@ mainMenu:
     savegameLevel: Level <x>
     savegameLevelUnknown: Level tidak diketahui
     savegameUnnamed: Tidak Dinamai
+    savegameDifficulty: Difficulty <x>
+    savegameDifficultyUnknown: Unknown Difficulty
 dialogs:
     buttons:
         ok: OK
@@ -206,6 +208,9 @@ ingame:
         clearSelection: Hapus pilihan
         pipette: Pipet
         switchLayers: Ganti lapisan
+        toggleTile: Toggle Tile
+        flagTile: Flag Tile
+        toggleNeighbors: Toggle Neighbor Tiles
     colors:
         red: Merah
         green: Hijau

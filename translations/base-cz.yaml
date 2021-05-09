@@ -69,6 +69,8 @@ mainMenu:
     savegameLevel: Úroveň <x>
     savegameLevelUnknown: Neznámá úroveň
     savegameUnnamed: Nepojmenovaný
+    savegameDifficulty: Difficulty <x>
+    savegameDifficultyUnknown: Unknown Difficulty
 dialogs:
     buttons:
         ok: OK
@@ -199,6 +201,9 @@ ingame:
         clearSelection: Zrušit výběr
         pipette: Kapátko
         switchLayers: Změnit vrstvy
+        toggleTile: Toggle Tile
+        flagTile: Flag Tile
+        toggleNeighbors: Toggle Neighbor Tiles
     buildingPlacement:
         cycleBuildingVariants: Zmáčkněte <key> pro přepínání mezi variantami.
         hotkeyLabel: "Klávesová zkratka: <key>"

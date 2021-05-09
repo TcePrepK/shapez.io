@@ -72,6 +72,8 @@ mainMenu:
     savegameLevel: Рівень <x>
     savegameLevelUnknown: Невідомий рівень
     savegameUnnamed: Unnamed
+    savegameDifficulty: Difficulty <x>
+    savegameDifficultyUnknown: Unknown Difficulty
 dialogs:
     buttons:
         ok: Гаразд
@@ -205,6 +207,9 @@ ingame:
         clearSelection: Очистити виділене
         pipette: Піпетка
         switchLayers: Змінити шар
+        toggleTile: Toggle Tile
+        flagTile: Flag Tile
+        toggleNeighbors: Toggle Neighbor Tiles
     colors:
         red: Червоний
         green: Зелений

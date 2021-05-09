@@ -276,6 +276,12 @@ export class GameCore {
         if (!(G_IS_DEV && globalConfig.debug.manualTickOnly)) {
             // Perform logic ticks
             this.root.time.performTicks(deltaMs, this.boundInternalTick);
+
+            // Update analytics
+            root.productionAnalytics.update();
+
+            // Check achievements
+            root.achievementProxy.update();
         }
 
         // Update automatic save after everything finished

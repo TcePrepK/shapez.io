@@ -337,6 +337,7 @@ export class Camera extends BasicSerializableObject {
         this.root.canvas.removeEventListener("wheel", this.eventListenerMousewheel);
         this.root.canvas.removeEventListener("mousedown", this.eventListenerMouseDown);
         this.root.canvas.removeEventListener("mousemove", this.eventListenerMouseMove);
+        this.root.canvas.removeEventListener("dblclick", this.eventListenerMouseDoubleDown);
         window.removeEventListener("mouseup", this.eventListenerMouseUp);
         // this.root.canvas.removeEventListener("mouseout", this.eventListenerMouseUp);
     }
