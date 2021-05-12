@@ -43,7 +43,7 @@ export class Blueprint {
             const clone = entity.clone();
             newEntities.push(clone);
 
-            const pos = entity.components.StaticMapEntity.getTileSpaceBounds().getCenter();
+            const pos = entity.components.StaticMapEntity.getMainHitBox().getCenter();
             averagePosition.addInplace(pos);
         }
 
@@ -79,7 +79,7 @@ export class Blueprint {
             const staticComp = entity.components.StaticMapEntity;
             const newPos = staticComp.origin.add(tile);
 
-            const rect = staticComp.getTileSpaceBounds();
+            const rect = staticComp.getMainHitBox();
             rect.moveBy(tile.x, tile.y);
 
             if (!parameters.root.logic.checkCanPlaceEntity(entity, tile)) {

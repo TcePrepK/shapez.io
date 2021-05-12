@@ -425,15 +425,16 @@ export class MapChunk {
      * @param {number} tileX
      * @param {number} tileY
      * @param {Layer} layer
-     * @param {Entity=} contents
+     * @param {Entity} contents
      */
     setLayerContentFromWorldCords(tileX, tileY, layer, contents) {
-        const localX = tileX - this.tileX;
-        const localY = tileY - this.tileY;
+        const localX = Math.floor(tileX) - this.tileX;
+        const localY = Math.floor(tileY) - this.tileY;
         assert(localX >= 0, "Local X is < 0");
         assert(localY >= 0, "Local Y is < 0");
         assert(localX < globalConfig.mapChunkSize, "Local X is >= chunk size");
         assert(localY < globalConfig.mapChunkSize, "Local Y is >= chunk size");
+        assert(contents, "No content given");
 
         if (layer === "regular") {
             if (!this.contents[localX][localY]) {
@@ -447,14 +448,41 @@ export class MapChunk {
             this.wireContents[localX][localY].push(contents);
         }
 
-        if (contents) {
-            if (this.containedEntities.indexOf(contents) < 0) {
-                this.containedEntities.push(contents);
-            }
-
-            if (this.containedEntitiesByLayer[layer].indexOf(contents) < 0) {
-                this.containedEntitiesByLayer[layer].push(contents);
-            }
+        if (this.containedEntities.indexOf(contents) < 0) {
+            this.containedEntities.push(contents);
         }
+
+        if (this.containedEntitiesByLayer[layer].indexOf(contents) < 0) {
+            this.containedEntitiesByLayer[layer].push(contents);
+        }
+    }
+
+    /**
+     * Sets the chunks contents
+     * @param {number} tileX
+     * @param {number} tileY
+     * @param {Layer} layer
+     */
+    removeLayerContentFromWorldCords(tileX, tileY, layer) {
+        const localX = Math.floor(tileX) - this.tileX;
+        const localY = Math.floor(tileY) - this.tileY;
+        assert(localX >= 0, "Local X is < 0");
+        assert(localY >= 0, "Local Y is < 0");
+        assert(localX < globalConfig.mapChunkSize, "Local X is >= chunk size");
+        assert(localY < globalConfig.mapChunkSize, "Local Y is >= chunk size");
+
+        const content = this.root.map.getExactTileContent(new Vector(tileX, tileY), layer);
+        if (!content) {
+            return;
+        }
+
+        if (layer === "regular") {
+            fastArrayDeleteValueIfContained(this.contents[localX][localY], content);
+        } else {
+            fastArrayDeleteValueIfContained(this.wireContents[localX][localY], content);
+        }
+
+        fastArrayDeleteValueIfContained(this.containedEntities, content);
+        fastArrayDeleteValueIfContained(this.containedEntitiesByLayer[layer], content);
     }
 }

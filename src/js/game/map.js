@@ -62,8 +62,8 @@ export class BaseMap extends BasicSerializableObject {
      * @returns {MapChunkView}
      */
     getOrCreateChunkAtTile(tileX, tileY) {
-        const chunkX = Math.floor(tileX / globalConfig.mapChunkSize);
-        const chunkY = Math.floor(tileY / globalConfig.mapChunkSize);
+        const chunkX = Math.floor(Math.floor(tileX) / globalConfig.mapChunkSize);
+        const chunkY = Math.floor(Math.floor(tileY) / globalConfig.mapChunkSize);
         return this.getChunk(chunkX, chunkY, true);
     }
 
@@ -116,10 +116,15 @@ export class BaseMap extends BasicSerializableObject {
         const chunk = this.getChunkAtTileOrNull(tile.x, tile.y);
 
         if (!chunk) {
-            return null;
+            return;
         }
 
         const contents = chunk.getLayerContentsFromWorldCoords(tile.x, tile.y, layer);
+
+        if (!contents) {
+            return;
+        }
+
         for (const content of contents) {
             const staticComp = content.components.StaticMapEntity;
             if (!staticComp.containsPoint(pos.x, pos.y)) {
@@ -250,7 +255,7 @@ export class BaseMap extends BasicSerializableObject {
                 for (let dy = 0; dy < rect.h; ++dy) {
                     const x = rect.x + dx;
                     const y = rect.y + dy;
-                    this.getOrCreateChunkAtTile(x, y).setLayerContentFromWorldCords(x, y, entity.layer);
+                    this.getOrCreateChunkAtTile(x, y).removeLayerContentFromWorldCords(x, y, entity.layer);
                 }
             }
         }

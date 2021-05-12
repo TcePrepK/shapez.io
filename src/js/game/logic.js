@@ -137,15 +137,13 @@ export class GameLogic {
             // Remove any removeable colliding entities on the same layer
             for (let x = rect.x; x < rect.x + rect.w; ++x) {
                 for (let y = rect.y; y < rect.y + rect.h; ++y) {
-                    const contents = this.root.map.getLayerContentXY(
-                        Math.round(x),
-                        Math.round(y),
-                        entity.layer
-                    );
+                    const contents = this.root.map.getLayerContentXY(x, y, entity.layer);
 
                     if (!contents) {
                         continue;
                     }
+
+                    console.log(contents);
 
                     for (const content of contents) {
                         assertAlways(

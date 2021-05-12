@@ -67,13 +67,19 @@ export class BeltUnderlaysSystem extends GameSystemWithFilter {
             for (let y = 0; y < area.h; ++y) {
                 const tileX = area.x + x;
                 const tileY = area.y + y;
-                const entity = this.root.map.getLayerContentXY(tileX, tileY, "regular");
-                if (entity) {
+                const entities = this.root.map.getLayerContentXY(tileX, tileY, "regular");
+                if (!entities) {
+                    continue;
+                }
+
+                for (const entity of entities) {
                     const underlayComp = entity.components.BeltUnderlays;
-                    if (underlayComp) {
-                        for (let i = 0; i < underlayComp.underlays.length; ++i) {
-                            underlayComp.underlays[i].cachedType = null;
-                        }
+                    if (!underlayComp) {
+                        continue;
+                    }
+
+                    for (let i = 0; i < underlayComp.underlays.length; ++i) {
+                        underlayComp.underlays[i].cachedType = null;
                     }
                 }
             }
@@ -87,7 +93,7 @@ export class BeltUnderlaysSystem extends GameSystemWithFilter {
      * @returns {boolean}
      */
     checkIsAcceptorConnected(tile, fromDirection) {
-        const contents = this.root.map.getLayerContentXY(tile.x, tile.y, "regular");
+        const contents = this.root.map.getExactTileContent(tile, "regular");
         if (!contents) {
             return false;
         }
@@ -133,7 +139,7 @@ export class BeltUnderlaysSystem extends GameSystemWithFilter {
      * @returns {boolean}
      */
     checkIsEjectorConnected(tile, toDirection) {
-        const contents = this.root.map.getLayerContentXY(tile.x, tile.y, "regular");
+        const contents = this.root.map.getExactTileContent(tile, "regular");
         if (!contents) {
             return false;
         }

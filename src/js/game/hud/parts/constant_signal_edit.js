@@ -18,7 +18,7 @@ export class HUDConstantSignalEdit extends BaseHUDPart {
         }
 
         const tile = this.root.camera.screenToWorld(pos).toTileSpace();
-        const contents = this.root.map.getLayerContentXY(tile.x, tile.y, "wires");
+        const contents = this.root.map.getExactTileContent(tile, "wires");
         if (contents) {
             const constantComp = contents.components.ConstantSignal;
             if (constantComp) {

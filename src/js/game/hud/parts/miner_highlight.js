@@ -33,7 +33,7 @@ export class HUDMinerHighlight extends BaseHUDPart {
         const worldPos = this.root.camera.screenToWorld(mousePos);
         const hoveredTile = worldPos.toTileSpace();
 
-        const contents = this.root.map.getTileContent(hoveredTile, "regular");
+        const contents = this.root.map.getExactTileContent(hoveredTile, "regular");
         if (!contents) {
             // Empty tile
             return;
@@ -151,20 +151,22 @@ export class HUDMinerHighlight extends BaseHUDPart {
         // Search within a 1x1 grid - this assumes miners are always 1x1
         for (let dx = -1; dx <= 1; ++dx) {
             for (let dy = -1; dy <= 1; ++dy) {
-                const contents = this.root.map.getTileContent(
+                const contents = this.root.map.getExactTileContent(
                     new Vector(origin.x + dx, origin.y + dy),
                     "regular"
                 );
-                if (contents) {
-                    const minerComp = contents.components.Miner;
-                    if (minerComp && minerComp.chainable) {
-                        // Found a miner connected to this entity
-                        if (!seenUids.has(contents.uid)) {
-                            if (this.root.systemMgr.systems.miner.findChainedMiner(contents) === entity) {
-                                results.push(contents);
-                                seenUids.add(contents.uid);
-                                results.push(...this.findConnectedMiners(contents, seenUids));
-                            }
+                if (!contents) {
+                    continue;
+                }
+
+                const minerComp = contents.components.Miner;
+                if (minerComp && minerComp.chainable) {
+                    // Found a miner connected to this entity
+                    if (!seenUids.has(contents.uid)) {
+                        if (this.root.systemMgr.systems.miner.findChainedMiner(contents) === entity) {
+                            results.push(contents);
+                            seenUids.add(contents.uid);
+                            results.push(...this.findConnectedMiners(contents, seenUids));
                         }
                     }
                 }

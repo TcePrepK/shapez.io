@@ -31,37 +31,19 @@ export class StaticMapEntitySystem extends GameSystem {
         }
 
         const contents = chunk.containedEntitiesByLayer.regular;
-        for (let i = 0; i < contents.length; ++i) {
-            const entity = contents[i];
-
-            const staticComp = entity.components.StaticMapEntity;
+        for (const content of contents) {
+            const staticComp = content.components.StaticMapEntity;
             const sprite = staticComp.getSprite();
-
-            // Avoid drawing an entity twice which has been drawn for
-            // another chunk already
-            if (this.drawnUids.has(entity.uid)) {
-                continue;
-            }
-
             if (sprite) {
+                // Avoid drawing an entity twice which has been drawn for
+                // another chunk already
+                if (this.drawnUids.has(content.uid)) {
+                    continue;
+                }
+
+                this.drawnUids.add(content.uid);
                 staticComp.drawSpriteOnBoundsClipped(parameters, sprite, 2);
             }
-
-            this.drawnUids.add(entity.uid);
-            // const origin = staticComp.origin.multiplyScalar(globalConfig.tileSize);
-
-            // parameters.context.translate(origin.x, origin.y);
-            parameters.context.globalAlpha = 0.2;
-
-            const hitBoxes = staticComp.getTileSpaceBounds();
-            parameters.context.fillStyle = "blue";
-            for (const hitBox of hitBoxes) {
-                const rect = hitBox.allScaled(globalConfig.tileSize);
-                parameters.context.fillRect(rect.x, rect.y, rect.w, rect.h);
-            }
-
-            parameters.context.globalAlpha = 1;
-            // parameters.context.translate(-origin.x, -origin.y);
         }
     }
 
@@ -79,8 +61,13 @@ export class StaticMapEntitySystem extends GameSystem {
         const contents = chunk.wireContents;
         for (let y = 0; y < globalConfig.mapChunkSize; ++y) {
             for (let x = 0; x < globalConfig.mapChunkSize; ++x) {
-                const entity = contents[x][y];
-                if (entity) {
+                const entities = contents[x][y];
+
+                if (!entities) {
+                    continue;
+                }
+
+                for (const entity of entities) {
                     if (drawnUids.has(entity.uid)) {
                         continue;
                     }

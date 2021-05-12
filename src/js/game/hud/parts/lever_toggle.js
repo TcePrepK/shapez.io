@@ -14,7 +14,7 @@ export class HUDLeverToggle extends BaseHUDPart {
      */
     downPreHandler(pos, button) {
         const tile = this.root.camera.screenToWorld(pos).toTileSpace();
-        const contents = this.root.map.getLayerContentXY(tile.x, tile.y, "regular");
+        const contents = this.root.map.getExactTileContent(tile, "regular");
         if (contents) {
             const leverComp = contents.components.Lever;
             if (leverComp) {
