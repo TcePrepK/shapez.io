@@ -46,10 +46,12 @@ export class MapView extends BaseMap {
     onEntityChanged(entity) {
         const staticComp = entity.components.StaticMapEntity;
         if (staticComp) {
-            const rect = staticComp.getTileSpaceBounds();
-            for (let x = rect.x; x <= rect.right(); ++x) {
-                for (let y = rect.y; y <= rect.bottom(); ++y) {
-                    this.root.map.getOrCreateChunkAtTile(x, y).markDirty();
+            const hitBoxes = staticComp.getTileSpaceBounds();
+            for (const rect of hitBoxes) {
+                for (let x = rect.x; x <= rect.right(); ++x) {
+                    for (let y = rect.y; y <= rect.bottom(); ++y) {
+                        this.root.map.getOrCreateChunkAtTile(x, y).markDirty();
+                    }
                 }
             }
         }

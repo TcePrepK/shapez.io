@@ -1,3 +1,4 @@
+import { Rectangle } from "../../core/rectangle";
 import { formatBigNumber } from "../../core/utils";
 import { enumDirection, Vector } from "../../core/vector";
 import { T } from "../../translations";
@@ -29,7 +30,7 @@ export class MetaStorageBuilding extends MetaBuilding {
     }
 
     getDimensions() {
-        return new Vector(2, 2);
+        return [new Rectangle(0, 0, 2, 2)];
     }
 
     /**

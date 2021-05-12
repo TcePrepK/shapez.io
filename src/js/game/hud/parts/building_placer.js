@@ -20,6 +20,7 @@ import { HUDBuildingPlacerLogic } from "./building_placer_logic";
 import { makeOffscreenBuffer } from "../../../core/buffer_utils";
 import { layers } from "../../root";
 import { getCodeFromBuildingData } from "../../building_codes";
+import { Rectangle } from "../../../core/rectangle";
 
 export class HUDBuildingPlacer extends HUDBuildingPlacerLogic {
     /**
@@ -213,13 +214,33 @@ export class HUDBuildingPlacer extends HUDBuildingPlacerLogic {
 
             const iconSize = 64;
 
-            const dimensions = metaBuilding.getDimensions(variant);
+            const hitBoxes = metaBuilding.getDimensions(variant);
+            let top = 0;
+            let right = 0;
+            let bottom = 0;
+            let left = 0;
+            for (const rect of hitBoxes) {
+                if (rect.top() < top) {
+                    top = rect.top();
+                }
+                if (rect.right() > right) {
+                    right = rect.right();
+                }
+                if (rect.bottom() > bottom) {
+                    bottom = rect.bottom();
+                }
+                if (rect.left() < left) {
+                    left = rect.left();
+                }
+            }
+            const mainHitBox = Rectangle.fromTRBL(top, right, bottom, left);
+
             const sprite = metaBuilding.getPreviewSprite(0, variant);
             const spriteWrapper = makeDiv(element, null, ["iconWrap"]);
-            spriteWrapper.setAttribute("data-tile-w", String(dimensions.x));
-            spriteWrapper.setAttribute("data-tile-h", String(dimensions.y));
+            spriteWrapper.setAttribute("data-tile-w", String(mainHitBox.w));
+            spriteWrapper.setAttribute("data-tile-h", String(mainHitBox.h));
 
-            spriteWrapper.innerHTML = sprite.getAsHTML(iconSize * dimensions.x, iconSize * dimensions.y);
+            spriteWrapper.innerHTML = sprite.getAsHTML(iconSize * mainHitBox.w, iconSize * mainHitBox.h);
 
             const detector = new ClickDetector(element, {
                 consumeEvents: true,
@@ -314,7 +335,7 @@ export class HUDBuildingPlacer extends HUDBuildingPlacerLogic {
         if (connectedEntities) {
             for (let i = 0; i < connectedEntities.length; ++i) {
                 const connectedEntity = connectedEntities[i];
-                const connectedWsPoint = connectedEntity.components.StaticMapEntity.getTileSpaceBounds()
+                const connectedWsPoint = connectedEntity.components.StaticMapEntity.getMainHitBox()
                     .getCenter()
                     .toWorldSpace();
 
@@ -359,6 +380,7 @@ export class HUDBuildingPlacer extends HUDBuildingPlacerLogic {
         parameters.context.lineWidth = 1;
 
         // Determine the bounds and visualize them
+        // const entityBounds = staticComp.getMainHitBox().moveByVector(staticComp.origin);
         const entityBounds = staticComp.getTileSpaceBounds();
         const drawBorder = -3;
         if (canBuild) {
@@ -369,14 +391,16 @@ export class HUDBuildingPlacer extends HUDBuildingPlacerLogic {
             parameters.context.fillStyle = "rgba(255, 0, 0, 0.2)";
         }
 
-        parameters.context.beginRoundedRect(
-            entityBounds.x * globalConfig.tileSize - drawBorder,
-            entityBounds.y * globalConfig.tileSize - drawBorder,
-            entityBounds.w * globalConfig.tileSize + 2 * drawBorder,
-            entityBounds.h * globalConfig.tileSize + 2 * drawBorder,
-            4
-        );
-        parameters.context.stroke();
+        for (const rect of entityBounds) {
+            parameters.context.beginRoundedRect(
+                rect.x * globalConfig.tileSize - drawBorder,
+                rect.y * globalConfig.tileSize - drawBorder,
+                rect.w * globalConfig.tileSize + 2 * drawBorder,
+                rect.h * globalConfig.tileSize + 2 * drawBorder,
+                4
+            );
+            parameters.context.stroke();
+        }
         // parameters.context.fill();
         parameters.context.globalAlpha = 1;
 

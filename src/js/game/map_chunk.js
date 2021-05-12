@@ -35,13 +35,13 @@ export class MapChunk {
 
         /**
          * Stores the contents of the regular layer
-         * @type {Array<Array<?Entity>>}
+         * @type {Array<Array<Array<?Entity>>>}
          */
         this.contents = make2DUndefinedArray(globalConfig.mapChunkSize, globalConfig.mapChunkSize);
 
         /**
          * Stores the contents of the wires layer
-         *  @type {Array<Array<?Entity>>}
+         *  @type {Array<Array<Array<?Entity>>>}
          */
         this.wireContents = make2DUndefinedArray(globalConfig.mapChunkSize, globalConfig.mapChunkSize);
 
@@ -346,7 +346,7 @@ export class MapChunk {
      * Returns the contents of this chunk from the given world space coordinates
      * @param {number} worldX
      * @param {number} worldY
-     * @returns {Entity=}
+     * @returns {Array<Entity>=}
      */
     getTileContentFromWorldCoords(worldX, worldY) {
         const localX = worldX - this.tileX;
@@ -363,9 +363,9 @@ export class MapChunk {
      * @param {number} worldX
      * @param {number} worldY
      * @param {Layer} layer
-     * @returns {Entity=}
+     * @returns {Array<Entity>=}
      */
-    getLayerContentFromWorldCoords(worldX, worldY, layer) {
+    getLayerContentsFromWorldCoords(worldX, worldY, layer) {
         const localX = worldX - this.tileX;
         const localY = worldY - this.tileY;
         assert(localX >= 0, "Local X is < 0");
@@ -392,15 +392,15 @@ export class MapChunk {
         assert(localX < globalConfig.mapChunkSize, "Local X is >= chunk size");
         assert(localY < globalConfig.mapChunkSize, "Local Y is >= chunk size");
 
-        const regularContent = this.contents[localX][localY];
-        const wireContent = this.wireContents[localX][localY];
+        const regularContents = this.contents[localX][localY];
+        const wireContents = this.wireContents[localX][localY];
 
-        const result = [];
-        if (regularContent) {
-            result.push(regularContent);
+        let result = [];
+        if (regularContents) {
+            result = result.concat(regularContents);
         }
-        if (wireContent) {
-            result.push(wireContent);
+        if (wireContents) {
+            result = result.concat(wireContents);
         }
         return result;
     }
@@ -409,7 +409,7 @@ export class MapChunk {
      * Returns the chunks contents from the given local coordinates
      * @param {number} localX
      * @param {number} localY
-     * @returns {Entity=}
+     * @returns {Array<Entity>=}
      */
     getTileContentFromLocalCoords(localX, localY) {
         assert(localX >= 0, "Local X is < 0");
@@ -424,10 +424,10 @@ export class MapChunk {
      * Sets the chunks contents
      * @param {number} tileX
      * @param {number} tileY
-     * @param {Entity=} contents
      * @param {Layer} layer
+     * @param {Entity=} contents
      */
-    setLayerContentFromWorldCords(tileX, tileY, contents, layer) {
+    setLayerContentFromWorldCords(tileX, tileY, layer, contents) {
         const localX = tileX - this.tileX;
         const localY = tileY - this.tileY;
         assert(localX >= 0, "Local X is < 0");
@@ -435,25 +435,16 @@ export class MapChunk {
         assert(localX < globalConfig.mapChunkSize, "Local X is >= chunk size");
         assert(localY < globalConfig.mapChunkSize, "Local Y is >= chunk size");
 
-        let oldContents;
         if (layer === "regular") {
-            oldContents = this.contents[localX][localY];
+            if (!this.contents[localX][localY]) {
+                this.contents[localX][localY] = [];
+            }
+            this.contents[localX][localY].push(contents);
         } else {
-            oldContents = this.wireContents[localX][localY];
-        }
-
-        assert(contents === null || !oldContents, "Tile already used: " + tileX + " / " + tileY);
-
-        if (oldContents) {
-            // Remove from list (the old contents must be reigstered)
-            fastArrayDeleteValueIfContained(this.containedEntities, oldContents);
-            fastArrayDeleteValueIfContained(this.containedEntitiesByLayer[layer], oldContents);
-        }
-
-        if (layer === "regular") {
-            this.contents[localX][localY] = contents;
-        } else {
-            this.wireContents[localX][localY] = contents;
+            if (!this.wireContents[localX][localY]) {
+                this.wireContents[localX][localY] = [];
+            }
+            this.wireContents[localX][localY].push(contents);
         }
 
         if (contents) {

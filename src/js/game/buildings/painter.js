@@ -13,6 +13,7 @@ import { defaultBuildingVariant, MetaBuilding } from "../meta_building";
 import { GameRoot } from "../root";
 import { enumHubGoalRewards } from "../tutorial_goals";
 import { WiredPinsComponent, enumPinSlotType } from "../components/wired_pins";
+import { Rectangle } from "../../core/rectangle";
 
 /** @enum {string} */
 export const enumPainterVariants = { mirrored: "mirrored", double: "double", quad: "quad" };
@@ -26,11 +27,11 @@ export class MetaPainterBuilding extends MetaBuilding {
         switch (variant) {
             case defaultBuildingVariant:
             case enumPainterVariants.mirrored:
-                return new Vector(2, 1);
+                return [new Rectangle(0, 0, 2, 1)];
             case enumPainterVariants.double:
-                return new Vector(2, 2);
+                return [new Rectangle(0, 0, 2, 2)];
             case enumPainterVariants.quad:
-                return new Vector(4, 1);
+                return [new Rectangle(0, 0, 4, 1)];
             default:
                 assertAlways(false, "Unknown painter variant: " + variant);
         }

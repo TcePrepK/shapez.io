@@ -161,10 +161,10 @@ export class BeltPath extends BasicSerializableObject {
      * @returns {Rectangle}
      */
     computeBounds() {
-        let bounds = this.entityPath[0].components.StaticMapEntity.getTileSpaceBounds();
+        let bounds = this.entityPath[0].components.StaticMapEntity.getMainHitBox();
         for (let i = 1; i < this.entityPath.length; ++i) {
             const staticComp = this.entityPath[i].components.StaticMapEntity;
-            const otherBounds = staticComp.getTileSpaceBounds();
+            const otherBounds = staticComp.getMainHitBox();
             bounds = bounds.getUnion(otherBounds);
         }
         return bounds.allScaled(globalConfig.tileSize);
@@ -208,9 +208,8 @@ export class BeltPath extends BasicSerializableObject {
         const ejectSlotTargetWsTile = ejectSlotWsTile.add(ejectSlotWsDirectionVector);
 
         // Try to find the given acceptor component to take the item
-        const targetEntity = this.root.map.getLayerContentXY(
-            ejectSlotTargetWsTile.x,
-            ejectSlotTargetWsTile.y,
+        const targetEntity = this.root.map.getExactTileContent(
+            new Vector(ejectSlotTargetWsTile.x, ejectSlotTargetWsTile.y),
             "regular"
         );
 
@@ -1327,16 +1326,22 @@ export class BeltPath extends BasicSerializableObject {
 
         const tile = this.root.camera.screenToWorld(mousePos).toTileSpace();
         const contents = this.root.map.getLayerContentXY(tile.x, tile.y, "regular");
-        if (!contents || !contents.components.Belt) {
+        if (!contents) {
             // Nothing below
             return true;
         }
 
-        if (contents.components.Belt.assignedPath !== this) {
-            // Not this path
-            return true;
+        for (const content of contents) {
+            if (!content.components.Belt) {
+                continue;
+            }
+
+            if (content.components.Belt.assignedPath !== this) {
+                // Not this path
+                return true;
+            }
+            return false;
         }
-        return false;
     }
 
     /**

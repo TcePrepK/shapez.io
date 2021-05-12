@@ -49,10 +49,6 @@ export class MetaWireBuilding extends MetaBuilding {
         return [defaultBuildingVariant, wireVariants.second];
     }
 
-    getDimensions() {
-        return new Vector(1, 1);
-    }
-
     getStayInPlacementMode() {
         return true;
     }

@@ -192,10 +192,10 @@ export class Rectangle {
     /**
      * Moves the rectangle by the given vector
      * @param {Vector} vec
+     * @returns {Rectangle}
      */
     moveByVector(vec) {
-        this.x += vec.x;
-        this.y += vec.y;
+        return new Rectangle(this.x + vec.x, this.y + vec.y, this.w, this.h);
     }
 
     /**

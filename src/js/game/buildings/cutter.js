@@ -1,3 +1,4 @@
+import { Rectangle } from "../../core/rectangle";
 import { formatItemsPerSecond } from "../../core/utils";
 import { enumDirection, Vector } from "../../core/vector";
 import { T } from "../../translations";
@@ -24,9 +25,9 @@ export class MetaCutterBuilding extends MetaBuilding {
     getDimensions(variant) {
         switch (variant) {
             case defaultBuildingVariant:
-                return new Vector(2, 1);
+                return [new Rectangle(0, 0, 2, 1)];
             case enumCutterVariants.quad:
-                return new Vector(4, 1);
+                return [new Rectangle(0, 0, 4, 1)];
             default:
                 assertAlways(false, "Unknown cutter variant: " + variant);
         }

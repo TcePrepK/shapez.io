@@ -57,22 +57,32 @@ export class GameLogic {
      */
     checkCanPlaceEntity(entity, offset = null) {
         // Compute area of the building
-        const rect = entity.components.StaticMapEntity.getTileSpaceBounds();
-        if (offset) {
-            rect.x += offset.x;
-            rect.y += offset.y;
-        }
+        const hitBoxes = entity.components.StaticMapEntity.getTileSpaceBounds();
+        for (const rect of hitBoxes) {
+            if (offset) {
+                rect.x += offset.x;
+                rect.y += offset.y;
+            }
+            // Check the whole area of the building
+            for (let x = rect.x; x < rect.x + rect.w; ++x) {
+                for (let y = rect.y; y < rect.y + rect.h; ++y) {
+                    // Check if there is any direct collision
+                    const otherEntities = this.root.map.getLayerContentXY(
+                        Math.round(x),
+                        Math.round(y),
+                        entity.layer
+                    );
 
-        // Check the whole area of the building
-        for (let x = rect.x; x < rect.x + rect.w; ++x) {
-            for (let y = rect.y; y < rect.y + rect.h; ++y) {
-                // Check if there is any direct collision
-                const otherEntity = this.root.map.getLayerContentXY(x, y, entity.layer);
-                if (otherEntity) {
-                    const metaClass = otherEntity.components.StaticMapEntity.getMetaBuilding();
-                    if (!metaClass.getIsReplaceable()) {
-                        // This one is a direct blocker
-                        return false;
+                    if (!otherEntities) {
+                        continue;
+                    }
+
+                    for (const otherEntity of otherEntities) {
+                        const metaClass = otherEntity.components.StaticMapEntity.getMetaBuilding();
+                        if (!metaClass.getIsReplaceable()) {
+                            // This one is a direct blocker
+                            return false;
+                        }
                     }
                 }
             }
@@ -122,18 +132,29 @@ export class GameLogic {
      */
     freeEntityAreaBeforeBuild(entity) {
         const staticComp = entity.components.StaticMapEntity;
-        const rect = staticComp.getTileSpaceBounds();
-        // Remove any removeable colliding entities on the same layer
-        for (let x = rect.x; x < rect.x + rect.w; ++x) {
-            for (let y = rect.y; y < rect.y + rect.h; ++y) {
-                const contents = this.root.map.getLayerContentXY(x, y, entity.layer);
-                if (contents) {
-                    assertAlways(
-                        contents.components.StaticMapEntity.getMetaBuilding().getIsReplaceable(),
-                        "Tried to replace non-repleaceable entity"
+        const hitBoxes = staticComp.getTileSpaceBounds();
+        for (const rect of hitBoxes) {
+            // Remove any removeable colliding entities on the same layer
+            for (let x = rect.x; x < rect.x + rect.w; ++x) {
+                for (let y = rect.y; y < rect.y + rect.h; ++y) {
+                    const contents = this.root.map.getLayerContentXY(
+                        Math.round(x),
+                        Math.round(y),
+                        entity.layer
                     );
-                    if (!this.tryDeleteBuilding(contents)) {
-                        assertAlways(false, "Tried to replace non-repleaceable entity #2");
+
+                    if (!contents) {
+                        continue;
+                    }
+
+                    for (const content of contents) {
+                        assertAlways(
+                            content.components.StaticMapEntity.getMetaBuilding().getIsReplaceable(),
+                            "Tried to replace non-repleaceable entity"
+                        );
+                        if (!this.tryDeleteBuilding(content)) {
+                            assertAlways(false, "Tried to replace non-repleaceable entity #2");
+                        }
                     }
                 }
             }
@@ -233,27 +254,27 @@ export class GameLogic {
         }
 
         // Now check if there's a connectable entity on the wires layer
-        const targetEntity = this.root.map.getTileContent(targetTile, "wires");
-        if (!targetEntity) {
+        const targetEntities = this.root.map.getTileContent(targetTile, "wires");
+        if (!targetEntities) {
             return false;
         }
 
-        const targetStaticComp = targetEntity.components.StaticMapEntity;
+        for (const targetEntity of targetEntities) {
+            // Check if its a crossing
+            const wireTunnelComp = targetEntity.components.WireTunnel;
+            if (wireTunnelComp) {
+                return true;
+            }
 
-        // Check if its a crossing
-        const wireTunnelComp = targetEntity.components.WireTunnel;
-        if (wireTunnelComp) {
-            return true;
+            // Check if its a wire
+            const wiresComp = targetEntity.components.Wire;
+            if (!wiresComp) {
+                return false;
+            }
+
+            // It's connected if its the same variant
+            return wiresComp.variant === wireVariant;
         }
-
-        // Check if its a wire
-        const wiresComp = targetEntity.components.Wire;
-        if (!wiresComp) {
-            return false;
-        }
-
-        // It's connected if its the same variant
-        return wiresComp.variant === wireVariant;
     }
 
     /**
@@ -315,8 +336,17 @@ export class GameLogic {
     getIsEntityIntersectedWithMatrix(entity, worldPos) {
         const staticComp = entity.components.StaticMapEntity;
         const tile = worldPos.toTileSpace();
+        const hitBoxes = staticComp.getTileSpaceBounds();
 
-        if (!staticComp.getTileSpaceBounds().containsPoint(tile.x, tile.y)) {
+        let intersection = false;
+        for (const rect of hitBoxes) {
+            if (rect.containsPoint(tile.x, tile.y)) {
+                intersection = true;
+                break;
+            }
+        }
+
+        if (!intersection) {
             // No intersection at all
             return;
         }
@@ -362,8 +392,12 @@ export class GameLogic {
                     continue;
                 }
 
-                const entity = this.root.map.getLayerContentXY(tile.x + dx, tile.y + dy, "regular");
-                if (entity) {
+                const entities = this.root.map.getLayerContentXY(tile.x + dx, tile.y + dy, "regular");
+                if (!entities) {
+                    continue;
+                }
+
+                for (const entity of entities) {
                     let ejectorSlots = [];
                     let acceptorSlots = [];
 

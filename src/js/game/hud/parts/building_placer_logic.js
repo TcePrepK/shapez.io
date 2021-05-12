@@ -329,14 +329,16 @@ export class HUDBuildingPlacerLogic extends BaseHUDPart {
         }
 
         const worldPos = this.root.camera.screenToWorld(mousePosition);
-        const tile = worldPos.toTileSpace();
-        const contents = this.root.map.getTileContent(tile, this.root.currentLayer);
-        if (contents) {
-            if (this.root.logic.tryDeleteBuilding(contents)) {
-                this.root.soundProxy.playUi(SOUNDS.destroyBuilding);
-                return true;
-            }
+        const entity = this.root.map.getExactTileContent(worldPos, this.root.currentLayer);
+        if (!entity) {
+            return false;
         }
+
+        if (this.root.logic.tryDeleteBuilding(entity)) {
+            this.root.soundProxy.playUi(SOUNDS.destroyBuilding);
+            return true;
+        }
+
         return false;
     }
 
@@ -358,8 +360,8 @@ export class HUDBuildingPlacerLogic extends BaseHUDPart {
         const worldPos = this.root.camera.screenToWorld(mousePosition);
         const tile = worldPos.toTileSpace();
 
-        const contents = this.root.map.getTileContent(tile, this.root.currentLayer);
-        if (!contents) {
+        const entity = this.root.map.getExactTileContent(worldPos, this.root.currentLayer);
+        if (!entity) {
             const tileBelow = this.root.map.getLowerLayerContentXY(tile.x, tile.y);
 
             // Check if there's a shape or color item below, if so select the miner
@@ -381,7 +383,7 @@ export class HUDBuildingPlacerLogic extends BaseHUDPart {
         }
 
         // Try to extract the building
-        const buildingCode = contents.components.StaticMapEntity.code;
+        const buildingCode = entity.components.StaticMapEntity.code;
         const extracted = getBuildingDataFromCode(buildingCode);
 
         // Disable pipetting the hub
@@ -402,7 +404,7 @@ export class HUDBuildingPlacerLogic extends BaseHUDPart {
 
         this.currentMetaBuilding.set(extracted.metaInstance);
         this.currentVariant.set(extracted.variant);
-        this.currentBaseRotation = contents.components.StaticMapEntity.rotation;
+        this.currentBaseRotation = entity.components.StaticMapEntity.rotation;
     }
 
     /**
@@ -453,33 +455,32 @@ export class HUDBuildingPlacerLogic extends BaseHUDPart {
             variant: this.currentVariant.get(),
         });
 
-        if (entity) {
-            // Succesfully placed, find which entity we actually placed
-            this.root.signals.entityManuallyPlaced.dispatch(entity);
-
-            // Check if we should flip the orientation (used for tunnels)
-            if (
-                metaBuilding.getFlipOrientationAfterPlacement() &&
-                !this.root.keyMapper.getBinding(
-                    KEYMAPPINGS.placementModifiers.placementDisableAutoOrientation
-                ).pressed
-            ) {
-                this.currentBaseRotation = (180 + this.currentBaseRotation) % 360;
-            }
-
-            // Check if we should stop placement
-            if (
-                !metaBuilding.getStayInPlacementMode() &&
-                !this.root.keyMapper.getBinding(KEYMAPPINGS.placementModifiers.placeMultiple).pressed &&
-                !this.root.app.settings.getAllSettings().alwaysMultiplace
-            ) {
-                // Stop placement
-                this.currentMetaBuilding.set(null);
-            }
-            return true;
-        } else {
+        if (!entity) {
             return false;
         }
+
+        // Succesfully placed, find which entity we actually placed
+        this.root.signals.entityManuallyPlaced.dispatch(entity);
+
+        // Check if we should flip the orientation (used for tunnels)
+        if (
+            metaBuilding.getFlipOrientationAfterPlacement() &&
+            !this.root.keyMapper.getBinding(KEYMAPPINGS.placementModifiers.placementDisableAutoOrientation)
+                .pressed
+        ) {
+            this.currentBaseRotation = (180 + this.currentBaseRotation) % 360;
+        }
+
+        // Check if we should stop placement
+        if (
+            !metaBuilding.getStayInPlacementMode() &&
+            !this.root.keyMapper.getBinding(KEYMAPPINGS.placementModifiers.placeMultiple).pressed &&
+            !this.root.app.settings.getAllSettings().alwaysMultiplace
+        ) {
+            // Stop placement
+            this.currentMetaBuilding.set(null);
+        }
+        return true;
     }
 
     /**
@@ -654,7 +655,6 @@ export class HUDBuildingPlacerLogic extends BaseHUDPart {
                 new StaticMapEntityComponent({
                     origin: new Vector(0, 0),
                     rotation: 0,
-                    tileSize: metaBuilding.getDimensions(this.currentVariant.get()).copy(),
                     code: getCodeFromBuildingData(metaBuilding, variant, 0),
                 })
             );
@@ -777,7 +777,10 @@ export class HUDBuildingPlacerLogic extends BaseHUDPart {
                 while (this.currentlyDeleting || this.currentMetaBuilding.get()) {
                     if (this.currentlyDeleting) {
                         // Deletion
-                        const contents = this.root.map.getLayerContentXY(x0, y0, this.root.currentLayer);
+                        const contents = this.root.map.getExactTileContent(
+                            new Vector(x0, y0),
+                            this.root.currentLayer
+                        );
                         if (contents && !contents.queuedForDestroy && !contents.destroyed) {
                             if (this.root.logic.tryDeleteBuilding(contents)) {
                                 anythingDeleted = true;

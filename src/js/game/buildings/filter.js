@@ -1,3 +1,4 @@
+import { Rectangle } from "../../core/rectangle";
 import { formatItemsPerSecond } from "../../core/utils";
 import { enumDirection, Vector } from "../../core/vector";
 import { T } from "../../translations";
@@ -27,7 +28,7 @@ export class MetaFilterBuilding extends MetaBuilding {
     }
 
     getDimensions() {
-        return new Vector(2, 1);
+        return [new Rectangle(0, 0, 2, 1)];
     }
 
     getShowWiresLayerPreview() {

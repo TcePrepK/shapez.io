@@ -1,3 +1,4 @@
+import { Rectangle } from "../../core/rectangle";
 import { formatItemsPerSecond } from "../../core/utils";
 import { enumDirection, Vector } from "../../core/vector";
 import { T } from "../../translations";
@@ -19,7 +20,7 @@ export class MetaStackerBuilding extends MetaBuilding {
     }
 
     getDimensions() {
-        return new Vector(2, 1);
+        return [new Rectangle(0, 0, 2.5, 1), new Rectangle(0, 1, 1, 0.5), new Rectangle(2, 1, 1, 1)];
     }
 
     /**

@@ -6,6 +6,7 @@ import { StaticMapEntityComponent } from "./components/static_map_entity";
 import { Entity } from "./entity";
 import { GameRoot } from "./root";
 import { getCodeFromBuildingData } from "./building_codes";
+import { Rectangle } from "../core/rectangle";
 
 export const defaultBuildingVariant = "default";
 
@@ -37,7 +38,7 @@ export class MetaBuilding {
      * Should return the dimensions of the building
      */
     getDimensions(variant = defaultBuildingVariant) {
-        return new Vector(1, 1);
+        return [new Rectangle(0, 0, 1, 1)];
     }
 
     /**
@@ -207,7 +208,6 @@ export class MetaBuilding {
                 origin: new Vector(origin.x, origin.y),
                 rotation,
                 originalRotation,
-                tileSize: this.getDimensions(variant).copy(),
                 code: getCodeFromBuildingData(this, variant, rotationVariant),
             })
         );

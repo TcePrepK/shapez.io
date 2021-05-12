@@ -36,16 +36,32 @@ export class StaticMapEntitySystem extends GameSystem {
 
             const staticComp = entity.components.StaticMapEntity;
             const sprite = staticComp.getSprite();
-            if (sprite) {
-                // Avoid drawing an entity twice which has been drawn for
-                // another chunk already
-                if (this.drawnUids.has(entity.uid)) {
-                    continue;
-                }
 
-                this.drawnUids.add(entity.uid);
+            // Avoid drawing an entity twice which has been drawn for
+            // another chunk already
+            if (this.drawnUids.has(entity.uid)) {
+                continue;
+            }
+
+            if (sprite) {
                 staticComp.drawSpriteOnBoundsClipped(parameters, sprite, 2);
             }
+
+            this.drawnUids.add(entity.uid);
+            // const origin = staticComp.origin.multiplyScalar(globalConfig.tileSize);
+
+            // parameters.context.translate(origin.x, origin.y);
+            parameters.context.globalAlpha = 0.2;
+
+            const hitBoxes = staticComp.getTileSpaceBounds();
+            parameters.context.fillStyle = "blue";
+            for (const hitBox of hitBoxes) {
+                const rect = hitBox.allScaled(globalConfig.tileSize);
+                parameters.context.fillRect(rect.x, rect.y, rect.w, rect.h);
+            }
+
+            parameters.context.globalAlpha = 1;
+            // parameters.context.translate(-origin.x, -origin.y);
         }
     }
 

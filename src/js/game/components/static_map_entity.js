@@ -24,11 +24,58 @@ export class StaticMapEntityComponent extends Component {
     }
 
     /**
-     * Returns the effective tile size
-     * @returns {Vector}
+     * Effective hit boxes
+     * @returns {Array<Rectangle>}
      */
-    getTileSize() {
-        return getBuildingDataFromCode(this.code).tileSize;
+    get hitBoxes() {
+        return getBuildingDataFromCode(this.code).hitBoxes;
+    }
+
+    /**
+     * Main rectangle
+     * @returns {Rectangle}
+     */
+    getMainHitBox() {
+        if (this.hitBoxes.length === 1) {
+            return this.hitBoxes[0];
+        }
+
+        let top = 0;
+        let right = 0;
+        let bottom = 0;
+        let left = 0;
+        for (const rect of this.hitBoxes) {
+            if (rect.top() < top) {
+                top = rect.top();
+            }
+            if (rect.right() > right) {
+                right = rect.right();
+            }
+            if (rect.bottom() > bottom) {
+                bottom = rect.bottom();
+            }
+            if (rect.left() < left) {
+                left = rect.left();
+            }
+        }
+        return Rectangle.fromTRBL(top, right, bottom, left);
+    }
+
+    /**
+     * Returns if hitbox contains given point
+     * @param {Number} x
+     * @param {Number} y
+     */
+    containsPoint(x, y) {
+        for (const rect of this.hitBoxes) {
+            if (!rect.containsPoint(x, y)) {
+                continue;
+            }
+
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -93,13 +140,7 @@ export class StaticMapEntityComponent extends Component {
      * @param {number=} param0.originalRotation Original Rotation in degrees. Must be multiple of 90
      * @param {number=} param0.code Building code
      */
-    constructor({
-        origin = new Vector(),
-        tileSize = new Vector(1, 1),
-        rotation = 0,
-        originalRotation = 0,
-        code = 0,
-    }) {
+    constructor({ origin = new Vector(), rotation = 0, originalRotation = 0, code = 0 }) {
         super();
         assert(
             rotation % 90 === 0,
@@ -114,22 +155,60 @@ export class StaticMapEntityComponent extends Component {
 
     /**
      * Returns the effective rectangle of this entity in tile space
-     * @returns {Rectangle}
+     * @returns {Array<Rectangle>}
      */
     getTileSpaceBounds() {
-        const size = this.getTileSize();
-        switch (this.rotation) {
-            case 0:
-                return new Rectangle(this.origin.x, this.origin.y, size.x, size.y);
-            case 90:
-                return new Rectangle(this.origin.x - size.y + 1, this.origin.y, size.y, size.x);
-            case 180:
-                return new Rectangle(this.origin.x - size.x + 1, this.origin.y - size.y + 1, size.x, size.y);
-            case 270:
-                return new Rectangle(this.origin.x, this.origin.y - size.x + 1, size.y, size.x);
-            default:
-                assert(false, "Invalid rotation");
+        /** @type {Array<Rectangle>} */
+        const rotatedHitBoxes = [];
+        for (const rect of this.hitBoxes) {
+            const pos = new Vector(rect.x, rect.y);
+            // const rotPos = pos.rotateFastMultipleOf90(this.rotation);
+            const width = rect.w;
+            const height = rect.h;
+            const newPos = pos.rotateFastMultipleOf90(this.rotation);
+
+            switch (this.rotation) {
+                case 0: {
+                    rotatedHitBoxes.push(
+                        new Rectangle(this.origin.x + newPos.x, this.origin.y + newPos.y, width, height)
+                    );
+                    continue;
+                }
+                case 180: {
+                    rotatedHitBoxes.push(
+                        new Rectangle(
+                            this.origin.x + newPos.x - width + 1,
+                            this.origin.y + newPos.y - height + 1,
+                            width,
+                            height
+                        )
+                    );
+                    continue;
+                }
+                case 90: {
+                    rotatedHitBoxes.push(
+                        new Rectangle(this.origin.x + newPos.x, this.origin.y + newPos.y, height, width)
+                    );
+                    continue;
+                }
+                case 270: {
+                    rotatedHitBoxes.push(
+                        new Rectangle(
+                            this.origin.x + newPos.x - height + 1,
+                            this.origin.y + newPos.y - width + 1,
+                            height,
+                            width
+                        )
+                    );
+                    continue;
+                }
+                default:
+                    assert(false, "Invalid rotation");
+                    continue;
+            }
         }
+
+        return rotatedHitBoxes;
     }
 
     /**
@@ -194,51 +273,14 @@ export class StaticMapEntityComponent extends Component {
      * @param {DrawParameters} parameters
      */
     shouldBeDrawn(parameters) {
-        let x = 0;
-        let y = 0;
-        let w = 0;
-        let h = 0;
-        const size = this.getTileSize();
-
-        switch (this.rotation) {
-            case 0: {
-                x = this.origin.x;
-                y = this.origin.y;
-                w = size.x;
-                h = size.y;
-                break;
-            }
-            case 90: {
-                x = this.origin.x - size.y + 1;
-                y = this.origin.y;
-                w = size.y;
-                h = size.x;
-                break;
-            }
-            case 180: {
-                x = this.origin.x - size.x + 1;
-                y = this.origin.y - size.y + 1;
-                w = size.x;
-                h = size.y;
-                break;
-            }
-            case 270: {
-                x = this.origin.x;
-                y = this.origin.y - size.x + 1;
-                w = size.y;
-                h = size.x;
-                break;
-            }
-            default:
-                assert(false, "Invalid rotation");
+        const visibleRect = parameters.visibleRect;
+        const bounds = this.getTileSpaceBounds();
+        for (const bound of bounds) {
+            visibleRect.containsRect(bound.allScaled(globalConfig.tileSize));
+            return true;
         }
 
-        return parameters.visibleRect.containsRect4Params(
-            x * globalConfig.tileSize,
-            y * globalConfig.tileSize,
-            w * globalConfig.tileSize,
-            h * globalConfig.tileSize
-        );
+        return false;
     }
 
     /**
@@ -252,7 +294,8 @@ export class StaticMapEntityComponent extends Component {
         if (!this.shouldBeDrawn(parameters) && !overridePosition) {
             return;
         }
-        const size = this.getTileSize();
+        const size = this.getMainHitBox();
+        const hitBoxes = this.hitBoxes;
         let worldX = this.origin.x * globalConfig.tileSize;
         let worldY = this.origin.y * globalConfig.tileSize;
 
@@ -265,10 +308,13 @@ export class StaticMapEntityComponent extends Component {
             // Early out, is faster
             sprite.drawCached(
                 parameters,
-                worldX - extrudePixels * size.x,
-                worldY - extrudePixels * size.y,
-                globalConfig.tileSize * size.x + 2 * extrudePixels * size.x,
-                globalConfig.tileSize * size.y + 2 * extrudePixels * size.y
+                worldX - extrudePixels * size.w,
+                worldY - extrudePixels * size.h,
+                globalConfig.tileSize * size.w + 2 * extrudePixels * size.w,
+                globalConfig.tileSize * size.h + 2 * extrudePixels * size.h,
+                true,
+                size,
+                hitBoxes
             );
         } else {
             const rotationCenterX = worldX + globalConfig.halfTileSize;
@@ -278,11 +324,13 @@ export class StaticMapEntityComponent extends Component {
             parameters.context.rotate(Math.radians(this.rotation));
             sprite.drawCached(
                 parameters,
-                -globalConfig.halfTileSize - extrudePixels * size.x,
-                -globalConfig.halfTileSize - extrudePixels * size.y,
-                globalConfig.tileSize * size.x + 2 * extrudePixels * size.x,
-                globalConfig.tileSize * size.y + 2 * extrudePixels * size.y,
-                false // no clipping possible here
+                -globalConfig.halfTileSize - extrudePixels * size.w,
+                -globalConfig.halfTileSize - extrudePixels * size.h,
+                globalConfig.tileSize * size.w + 2 * extrudePixels * size.w,
+                globalConfig.tileSize * size.h + 2 * extrudePixels * size.h,
+                false, // no clipping possible here
+                size,
+                hitBoxes
             );
             parameters.context.rotate(-Math.radians(this.rotation));
             parameters.context.translate(-rotationCenterX, -rotationCenterY);

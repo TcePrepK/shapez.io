@@ -5,6 +5,7 @@ import { enumItemProcessorTypes, ItemProcessorComponent } from "../components/it
 import { Entity } from "../entity";
 import { MetaBuilding } from "../meta_building";
 import { WiredPinsComponent, enumPinSlotType } from "../components/wired_pins";
+import { Rectangle } from "../../core/rectangle";
 
 export class MetaHubBuilding extends MetaBuilding {
     constructor() {
@@ -12,7 +13,7 @@ export class MetaHubBuilding extends MetaBuilding {
     }
 
     getDimensions() {
-        return new Vector(4, 4);
+        return [new Rectangle(0, 0, 4, 4)];
     }
 
     getSilhouetteColor() {

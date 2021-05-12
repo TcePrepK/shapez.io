@@ -125,7 +125,7 @@ export class BeltSystem extends GameSystemWithFilter {
 
         const metaBelt = gMetaBuildingRegistry.findByClass(MetaBeltBuilding);
         // Compute affected area
-        const originalRect = staticComp.getTileSpaceBounds();
+        const originalRect = staticComp.getMainHitBox();
         const affectedArea = originalRect.expandedInAllDirections(1);
 
         /** @type {Set<BeltPath>} */
@@ -363,7 +363,10 @@ export class BeltSystem extends GameSystemWithFilter {
         const followUpVector = enumDirectionToVector[followUpDirection];
 
         const followUpTile = staticComp.origin.add(followUpVector);
-        const followUpEntity = this.root.map.getLayerContentXY(followUpTile.x, followUpTile.y, entity.layer);
+        const followUpEntity = this.root.map.getExactTileContent(
+            new Vector(followUpTile.x, followUpTile.y),
+            entity.layer
+        );
 
         // Check if there's a belt at the tile we point to
         if (followUpEntity) {
@@ -393,7 +396,10 @@ export class BeltSystem extends GameSystemWithFilter {
         const supplyVector = enumDirectionToVector[supplyDirection];
 
         const supplyTile = staticComp.origin.add(supplyVector);
-        const supplyEntity = this.root.map.getLayerContentXY(supplyTile.x, supplyTile.y, entity.layer);
+        const supplyEntity = this.root.map.getExactTileContent(
+            new Vector(supplyTile.x, supplyTile.y),
+            entity.layer
+        );
 
         // Check if there's a belt at the tile we point to
         if (supplyEntity) {
@@ -509,8 +515,13 @@ export class BeltSystem extends GameSystemWithFilter {
             if (mousePos && this.root.currentLayer === "regular") {
                 const tile = this.root.camera.screenToWorld(mousePos).toTileSpace();
                 const contents = this.root.map.getLayerContentXY(tile.x, tile.y, "regular");
-                if (contents && contents.components.Belt) {
-                    hoveredBeltPath = contents.components.Belt.assignedPath;
+                if (contents) {
+                    for (const content of contents) {
+                        if (!content.components.Belt) {
+                            continue;
+                        }
+                        hoveredBeltPath = content.components.Belt.assignedPath;
+                    }
                 }
             }
 

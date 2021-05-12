@@ -30,10 +30,6 @@ export class MetaConstantSignalBuilding extends MetaBuilding {
         return "wires";
     }
 
-    getDimensions() {
-        return new Vector(1, 1);
-    }
-
     getRenderPins() {
         return false;
     }

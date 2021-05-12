@@ -46,10 +46,18 @@ export class ItemEjectorSystem extends GameSystemWithFilter {
                 const tileY = area.y + y;
                 // @NOTICE: Item ejector currently only supports regular layer
                 const contents = this.root.map.getLayerContentXY(tileX, tileY, "regular");
-                if (contents && contents.components.ItemEjector) {
-                    if (!seenUids.has(contents.uid)) {
-                        seenUids.add(contents.uid);
-                        this.recomputeSingleEntityCache(contents);
+                if (!contents) {
+                    continue;
+                }
+
+                for (const content of contents) {
+                    if (!content.components.ItemEjector) {
+                        continue;
+                    }
+
+                    if (!seenUids.has(content.uid)) {
+                        seenUids.add(content.uid);
+                        this.recomputeSingleEntityCache(content);
                     }
                 }
             }

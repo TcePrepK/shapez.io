@@ -57,10 +57,6 @@ export class MetaLogicGateBuilding extends MetaBuilding {
         return "wires";
     }
 
-    getDimensions() {
-        return new Vector(1, 1);
-    }
-
     getSpecialOverlayRenderMatrix(rotation, rotationVariant, variant) {
         return overlayMatrices[variant][rotation];
     }

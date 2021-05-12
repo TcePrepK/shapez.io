@@ -58,7 +58,7 @@ export class StaleAreaDetector {
             for (let i = 0; i < componentIds.length; ++i) {
                 if (entity.components[componentIds[i]]) {
                     // Entity is relevant, compute affected area
-                    const area = entity.components.StaticMapEntity.getTileSpaceBounds().expandedInAllDirections(
+                    const area = entity.components.StaticMapEntity.getMainHitBox().expandedInAllDirections(
                         tilesAround
                     );
                     this.invalidate(area);

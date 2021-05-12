@@ -38,10 +38,6 @@ export class MetaTransistorBuilding extends MetaBuilding {
         return "wires";
     }
 
-    getDimensions() {
-        return new Vector(1, 1);
-    }
-
     getAvailableVariants() {
         return [defaultBuildingVariant, enumTransistorVariants.mirrored];
     }

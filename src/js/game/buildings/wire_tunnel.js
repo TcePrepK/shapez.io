@@ -39,10 +39,6 @@ export class MetaWireTunnelBuilding extends MetaBuilding {
         return false;
     }
 
-    getDimensions() {
-        return new Vector(1, 1);
-    }
-
     /** @returns {"wires"} **/
     getLayer() {
         return "wires";

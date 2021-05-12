@@ -149,8 +149,19 @@ export class AtlasSprite extends BaseSprite {
      * @param {number} w
      * @param {number} h
      * @param {boolean=} clipping Whether to perform culling
+     * @param {Rectangle} mainHitBox
+     * @param {Array<Rectangle>} hitBoxes
      */
-    drawCached(parameters, x, y, w = null, h = null, clipping = true) {
+    drawCached(
+        parameters,
+        x,
+        y,
+        w = null,
+        h = null,
+        clipping = true,
+        mainHitBox = new Rectangle(0, 0, 1, 1),
+        hitBoxes = [new Rectangle(0, 0, 1, 1)]
+    ) {
         if (G_IS_DEV) {
             assert(parameters instanceof DrawParameters, "Not a valid context");
             assert(!!w && w > 0, "Not a valid width:" + w);
@@ -201,23 +212,31 @@ export class AtlasSprite extends BaseSprite {
             destH = intersection.h;
         }
 
-        parameters.context.drawImage(
-            link.atlas,
+        const srcPW = srcW / mainHitBox.w;
+        const srcPH = srcH / mainHitBox.h;
 
-            // atlas src pos
-            srcX,
-            srcY,
+        const destPW = destW / mainHitBox.w;
+        const destPH = destH / mainHitBox.h;
 
-            // atlas src size
-            srcW,
-            srcH,
+        for (const rect of hitBoxes) {
+            parameters.context.drawImage(
+                link.atlas,
 
-            // dest pos and size
-            destX - EXTRUDE,
-            destY - EXTRUDE,
-            destW + 2 * EXTRUDE,
-            destH + 2 * EXTRUDE
-        );
+                // atlas src pos
+                srcX + srcPW * rect.x,
+                srcY + srcPH * rect.y,
+
+                // atlas src size
+                srcPW * rect.w,
+                srcPH * rect.h,
+
+                // dest pos and size
+                destX + destPW * rect.x - EXTRUDE,
+                destY + destPH * rect.y - EXTRUDE,
+                destPW * rect.w + 2 * EXTRUDE,
+                destPH * rect.h + 2 * EXTRUDE
+            );
+        }
     }
 
     /**

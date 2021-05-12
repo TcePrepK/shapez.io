@@ -9,6 +9,7 @@ import { enumHubGoalRewards } from "../tutorial_goals";
 import { T } from "../../translations";
 import { formatItemsPerSecond, generateMatrixRotations } from "../../core/utils";
 import { BeltUnderlaysComponent } from "../components/belt_underlays";
+import { Rectangle } from "../../core/rectangle";
 
 /** @enum {string} */
 export const enumBalancerVariants = {
@@ -34,12 +35,12 @@ export class MetaBalancerBuilding extends MetaBuilding {
     getDimensions(variant) {
         switch (variant) {
             case defaultBuildingVariant:
-                return new Vector(2, 1);
+                return [new Rectangle(0, 0, 2, 1)];
             case enumBalancerVariants.merger:
             case enumBalancerVariants.mergerInverse:
             case enumBalancerVariants.splitter:
             case enumBalancerVariants.splitterInverse:
-                return new Vector(1, 1);
+                return [new Rectangle(0, 0, 1, 1)];
             default:
                 assertAlways(false, "Unknown balancer variant: " + variant);
         }

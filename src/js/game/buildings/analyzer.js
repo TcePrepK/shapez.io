@@ -30,10 +30,6 @@ export class MetaAnalyzerBuilding extends MetaBuilding {
         return "wires";
     }
 
-    getDimensions() {
-        return new Vector(1, 1);
-    }
-
     getRenderPins() {
         // We already have it included
         return false;

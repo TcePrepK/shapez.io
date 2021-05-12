@@ -23,10 +23,6 @@ export class MetaTrashBuilding extends MetaBuilding {
         return "#ed1d5d";
     }
 
-    getDimensions() {
-        return new Vector(1, 1);
-    }
-
     getSpecialOverlayRenderMatrix(rotation) {
         return overlayMatrix[rotation];
     }

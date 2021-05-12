@@ -29,10 +29,6 @@ export class MetaReaderBuilding extends MetaBuilding {
         return root.hubGoals.isRewardUnlocked(enumHubGoalRewards.reward_belt_reader);
     }
 
-    getDimensions() {
-        return new Vector(1, 1);
-    }
-
     getShowWiresLayerPreview() {
         return true;
     }

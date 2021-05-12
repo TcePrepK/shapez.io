@@ -23,10 +23,6 @@ export class MetaLeverBuilding extends MetaBuilding {
         return root.hubGoals.isRewardUnlocked(enumHubGoalRewards.reward_wires_painter_and_levers);
     }
 
-    getDimensions() {
-        return new Vector(1, 1);
-    }
-
     getSprite() {
         return null;
     }
