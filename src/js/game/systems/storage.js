@@ -83,7 +83,7 @@ export class StorageSystem extends GameSystemWithFilter {
 
             const context = parameters.context;
             context.globalAlpha = storageComp.overlayOpacity;
-            const center = staticComp.getTileSpaceBounds().getCenter().toWorldSpace();
+            const center = staticComp.getMovedTileSpaceBounds().getCenter().toWorldSpace();
             storedItem.drawItemCenteredClipped(center.x, center.y, parameters, 30);
 
             this.storageOverlaySprite.drawCached(parameters, center.x - 15, center.y + 15, 30, 15);

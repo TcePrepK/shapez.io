@@ -310,7 +310,7 @@ export class HUDMassSelector extends BaseHUDPart {
                         renderedUids.add(uid);
 
                         const staticComp = contents.components.StaticMapEntity;
-                        const bounds = staticComp.getTileSpaceBounds();
+                        const bounds = staticComp.getMovedTileSpaceBounds();
                         parameters.context.beginRoundedRect(
                             bounds.x * globalConfig.tileSize + boundsBorder,
                             bounds.y * globalConfig.tileSize + boundsBorder,
@@ -328,7 +328,7 @@ export class HUDMassSelector extends BaseHUDPart {
         this.selectedUids.forEach(uid => {
             const entity = this.root.entityMgr.findByUid(uid);
             const staticComp = entity.components.StaticMapEntity;
-            const bounds = staticComp.getTileSpaceBounds();
+            const bounds = staticComp.getMovedTileSpaceBounds();
             parameters.context.beginRoundedRect(
                 bounds.x * globalConfig.tileSize + boundsBorder,
                 bounds.y * globalConfig.tileSize + boundsBorder,

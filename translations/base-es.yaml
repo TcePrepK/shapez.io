@@ -319,9 +319,9 @@ ingame:
             21_3_place_button: ¡Genial! ¡Ahora pon un <strong>Interruptor</strong> y
                 conéctalo con cables!
             21_4_press_button: "Presiona el interruptor para hacer que <strong>emita una
-                señal verdadera</strong> lo cual activa el pintador.<br><br>
-                PD: ¡No necesitas conectar todas las entradas! Intenta
-                conectando sólo dos."
+                señal verdadera</strong> lo cual activa el pintador.<br><br> PD:
+                ¡No necesitas conectar todas las entradas! Intenta conectando
+                sólo dos."
     connectedMiners:
         one_miner: 1 Minero
         n_miners: <amount> Mineros
@@ -990,6 +990,7 @@ keybindings:
         rotateToDown: "Rotate: Point Down"
         rotateToRight: "Rotate: Point Right"
         rotateToLeft: "Rotate: Point Left"
+        placeOffGrid: Allows you to place off grid
 about:
     title: Sobre el juego
     body: >-

@@ -152,7 +152,7 @@ export class Entity extends BasicSerializableObject {
 
         if (G_IS_DEV && staticComp && globalConfig.debug.showEntityBounds) {
             if (staticComp) {
-                const transformed = staticComp.getTileSpaceBounds();
+                const transformed = staticComp.getMovedTileSpaceBounds();
                 context.strokeStyle = "rgba(255, 0, 0, 0.5)";
                 context.lineWidth = 2;
                 // const boundsSize = 20;

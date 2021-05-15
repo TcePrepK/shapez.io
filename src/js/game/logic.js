@@ -57,32 +57,40 @@ export class GameLogic {
      */
     checkCanPlaceEntity(entity, offset = null) {
         // Compute area of the building
-        const hitBoxes = entity.components.StaticMapEntity.getTileSpaceBounds();
+        const staticComp = entity.components.StaticMapEntity;
+        const hitBoxes = staticComp.getMovedTileSpaceBounds();
         for (const rect of hitBoxes) {
             if (offset) {
                 rect.x += offset.x;
                 rect.y += offset.y;
             }
             // Check the whole area of the building
-            for (let x = rect.x; x < rect.x + rect.w; ++x) {
-                for (let y = rect.y; y < rect.y + rect.h; ++y) {
+            for (let dx = 0; dx < rect.w + 1; ++dx) {
+                for (let dy = 0; dy < rect.h + 1; ++dy) {
+                    const x = Math.floor(rect.x) + dx;
+                    const y = Math.floor(rect.y) + dy;
+
                     // Check if there is any direct collision
-                    const otherEntities = this.root.map.getLayerContentXY(
-                        Math.round(x),
-                        Math.round(y),
-                        entity.layer
-                    );
+                    const otherEntities = this.root.map.getLayerContentXY(x, y, entity.layer);
 
                     if (!otherEntities) {
                         continue;
                     }
 
                     for (const otherEntity of otherEntities) {
-                        const metaClass = otherEntity.components.StaticMapEntity.getMetaBuilding();
-                        if (!metaClass.getIsReplaceable()) {
-                            // This one is a direct blocker
-                            return false;
+                        const otherStaticComp = otherEntity.components.StaticMapEntity;
+
+                        if (!staticComp.isIntersect(otherStaticComp)) {
+                            continue;
                         }
+
+                        const metaClass = otherEntity.components.StaticMapEntity.getMetaBuilding();
+                        if (metaClass.getIsReplaceable()) {
+                            continue;
+                        }
+
+                        // This one is a direct blocker
+                        return false;
                     }
                 }
             }
@@ -132,7 +140,7 @@ export class GameLogic {
      */
     freeEntityAreaBeforeBuild(entity) {
         const staticComp = entity.components.StaticMapEntity;
-        const hitBoxes = staticComp.getTileSpaceBounds();
+        const hitBoxes = staticComp.getMovedTileSpaceBounds();
         for (const rect of hitBoxes) {
             // Remove any removeable colliding entities on the same layer
             for (let x = rect.x; x < rect.x + rect.w; ++x) {
@@ -143,9 +151,12 @@ export class GameLogic {
                         continue;
                     }
 
-                    console.log(contents);
-
                     for (const content of contents) {
+                        const otherStaticComp = content.components.StaticMapEntity;
+                        if (!staticComp.isIntersect(otherStaticComp)) {
+                            continue;
+                        }
+
                         assertAlways(
                             content.components.StaticMapEntity.getMetaBuilding().getIsReplaceable(),
                             "Tried to replace non-repleaceable entity"
@@ -334,7 +345,7 @@ export class GameLogic {
     getIsEntityIntersectedWithMatrix(entity, worldPos) {
         const staticComp = entity.components.StaticMapEntity;
         const tile = worldPos.toTileSpace();
-        const hitBoxes = staticComp.getTileSpaceBounds();
+        const hitBoxes = staticComp.getMovedTileSpaceBounds();
 
         let intersection = false;
         for (const rect of hitBoxes) {

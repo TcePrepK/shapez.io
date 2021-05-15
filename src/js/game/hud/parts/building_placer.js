@@ -20,7 +20,7 @@ import { HUDBuildingPlacerLogic } from "./building_placer_logic";
 import { makeOffscreenBuffer } from "../../../core/buffer_utils";
 import { layers } from "../../root";
 import { getCodeFromBuildingData } from "../../building_codes";
-import { Rectangle } from "../../../core/rectangle";
+import { getUnionOfMultipleRectangles, Rectangle } from "../../../core/rectangle";
 
 export class HUDBuildingPlacer extends HUDBuildingPlacerLogic {
     /**
@@ -316,7 +316,25 @@ export class HUDBuildingPlacer extends HUDBuildingPlacerLogic {
         const metaBuilding = this.currentMetaBuilding.get();
 
         const worldPos = this.root.camera.screenToWorld(mousePosition);
-        const mouseTile = worldPos.toTileSpace();
+
+        const hitBoxes = metaBuilding.getDimensions(this.currentVariant.get());
+        const mainHitbox = getUnionOfMultipleRectangles(hitBoxes);
+
+        const width = mainHitbox.w;
+        const height = mainHitbox.h;
+        let size = width < height ? width : height;
+        size = clamp(size, 0, 1);
+
+        let mouseTile = worldPos
+            .divideScalar(globalConfig.tileSize)
+            .divideScalar(size)
+            .floor()
+            .multiplyScalar(size)
+            .strip();
+
+        if (this.root.keyMapper.getBinding(KEYMAPPINGS.placementModifiers.placeOffGrid).pressed) {
+            mouseTile = worldPos.divideScalar(globalConfig.tileSize).subScalar(size / 2);
+        }
 
         // Compute best rotation variant
         const {
@@ -381,8 +399,8 @@ export class HUDBuildingPlacer extends HUDBuildingPlacerLogic {
 
         // Determine the bounds and visualize them
         // const entityBounds = staticComp.getMainHitBox().moveByVector(staticComp.origin);
-        const entityBounds = staticComp.getTileSpaceBounds();
-        const drawBorder = -3;
+        const entityBounds = staticComp.getMovedTileSpaceBounds();
+        let drawBorder = -3;
         if (canBuild) {
             parameters.context.strokeStyle = "rgba(56, 235, 111, 0.5)";
             parameters.context.fillStyle = "rgba(56, 235, 111, 0.2)";
@@ -392,6 +410,9 @@ export class HUDBuildingPlacer extends HUDBuildingPlacerLogic {
         }
 
         for (const rect of entityBounds) {
+            if (rect.w < 0.1875 || rect.h < 0.1875) {
+                drawBorder = 0;
+            }
             parameters.context.beginRoundedRect(
                 rect.x * globalConfig.tileSize - drawBorder,
                 rect.y * globalConfig.tileSize - drawBorder,
@@ -406,7 +427,7 @@ export class HUDBuildingPlacer extends HUDBuildingPlacerLogic {
 
         // HACK to draw the entity sprite
         const previewSprite = metaBuilding.getBlueprintSprite(rotationVariant, this.currentVariant.get());
-        staticComp.origin = worldPos.divideScalar(globalConfig.tileSize).subScalars(0.5, 0.5);
+        staticComp.origin = worldPos.divideScalar(globalConfig.tileSize).subScalars(size / 2, size / 2);
         staticComp.drawSpriteOnBoundsClipped(parameters, previewSprite);
         staticComp.origin = mouseTile;
 

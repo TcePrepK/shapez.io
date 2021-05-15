@@ -17,8 +17,8 @@ steamPage:
     notch_comment: Oh sial. Saya benar-benar harus tidur, namun sepertinya saya baru
         menemukan bagaimana cara membuat komputer di shapez.io
     steam_review_comment: Game ini telah mencuri hidup saya dan saya tidak
-        menginginkannya kembali. Game pembuatan pabrik yang sangat santai yang tidak
-        akan membiarkan saya berhenti membuat pabrik saya lebih efisien.
+        menginginkannya kembali. Game pembuatan pabrik yang sangat santai yang
+        tidak akan membiarkan saya berhenti membuat pabrik saya lebih efisien.
 global:
     loading: Memuat
     error: Terjadi kesalahan
@@ -1008,6 +1008,7 @@ keybindings:
         rotateToDown: "Rotate: Point Down"
         rotateToRight: "Rotate: Point Right"
         rotateToLeft: "Rotate: Point Left"
+        placeOffGrid: Allows you to place off grid
 about:
     title: Tentang permainan ini
     body: >-

@@ -35,6 +35,15 @@ declare interface CanvasRenderingContext2D {
     webkitImageSmoothingEnabled: boolean;
 }
 
+declare interface Math {
+    /**
+     * Returns stripped number
+     * @param {number} num
+     * @returns
+     */
+    strip(num: number): number;
+}
+
 // Just for compatibility with the shared code
 declare interface Logger {
     log(...args);

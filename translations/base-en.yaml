@@ -1155,6 +1155,7 @@ keybindings:
         placementDisableAutoOrientation: Disable automatic orientation
         placeMultiple: Stay in placement mode
         placeInverse: Invert automatic belt orientation
+        placeOffGrid: Allows you to place off grid
 
 about:
     title: About this Game

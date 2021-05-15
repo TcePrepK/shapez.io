@@ -46,7 +46,7 @@ export class MapView extends BaseMap {
     onEntityChanged(entity) {
         const staticComp = entity.components.StaticMapEntity;
         if (staticComp) {
-            const hitBoxes = staticComp.getTileSpaceBounds();
+            const hitBoxes = staticComp.getMovedTileSpaceBounds();
             for (const rect of hitBoxes) {
                 for (let x = rect.x; x <= rect.right(); ++x) {
                     for (let y = rect.y; y <= rect.bottom(); ++y) {

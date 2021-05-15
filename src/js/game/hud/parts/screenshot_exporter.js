@@ -41,7 +41,7 @@ export class HUDScreenshotExporter extends BaseHUDPart {
         const minTile = new Vector(0, 0);
         const maxTile = new Vector(0, 0);
         for (let i = 0; i < staticEntities.length; ++i) {
-            const bounds = staticEntities[i].components.StaticMapEntity.getTileSpaceBounds();
+            const bounds = staticEntities[i].components.StaticMapEntity.getMovedTileSpaceBounds();
             minTile.x = Math.min(minTile.x, bounds.x);
             minTile.y = Math.min(minTile.y, bounds.y);
 

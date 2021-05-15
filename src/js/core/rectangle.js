@@ -355,3 +355,36 @@ export class Rectangle {
         );
     }
 }
+
+/**
+ * @param {Array<Rectangle>} rectangles
+ */
+export function getUnionOfMultipleRectangles(rectangles) {
+    if (rectangles.length === 1) {
+        return rectangles[0];
+    }
+
+    if (rectangles.length === 2) {
+        return rectangles[0].getUnion(rectangles[1]);
+    }
+
+    let top = 0;
+    let right = 0;
+    let bottom = 0;
+    let left = 0;
+    for (const rect of rectangles) {
+        if (rect.top() < top) {
+            top = rect.top();
+        }
+        if (rect.right() > right) {
+            right = rect.right();
+        }
+        if (rect.bottom() > bottom) {
+            bottom = rect.bottom();
+        }
+        if (rect.left() < left) {
+            left = rect.left();
+        }
+    }
+    return Rectangle.fromTRBL(top, right, bottom, left);
+}

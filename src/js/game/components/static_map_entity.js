@@ -1,7 +1,8 @@
 import { globalConfig } from "../../core/config";
 import { DrawParameters } from "../../core/draw_parameters";
-import { Rectangle } from "../../core/rectangle";
+import { Rectangle, getUnionOfMultipleRectangles } from "../../core/rectangle";
 import { AtlasSprite } from "../../core/sprites";
+import { clamp } from "../../core/utils";
 import { enumDirection, Vector } from "../../core/vector";
 import { types } from "../../savegame/serialization";
 import { getBuildingDataFromCode } from "../building_codes";
@@ -36,29 +37,23 @@ export class StaticMapEntityComponent extends Component {
      * @returns {Rectangle}
      */
     getMainHitBox() {
-        if (this.hitBoxes.length === 1) {
-            return this.hitBoxes[0];
-        }
+        return getUnionOfMultipleRectangles(this.hitBoxes);
+    }
 
-        let top = 0;
-        let right = 0;
-        let bottom = 0;
-        let left = 0;
-        for (const rect of this.hitBoxes) {
-            if (rect.top() < top) {
-                top = rect.top();
-            }
-            if (rect.right() > right) {
-                right = rect.right();
-            }
-            if (rect.bottom() > bottom) {
-                bottom = rect.bottom();
-            }
-            if (rect.left() < left) {
-                left = rect.left();
-            }
-        }
-        return Rectangle.fromTRBL(top, right, bottom, left);
+    /**
+     * Moved main rectangle
+     * @returns {Rectangle}
+     */
+    getMovedMainHitBox() {
+        return getUnionOfMultipleRectangles(this.getMovedTileSpaceBounds());
+    }
+
+    /**
+     * Moved main rectangle
+     * @returns {Rectangle}
+     */
+    getRotatedMainHitBox() {
+        return getUnionOfMultipleRectangles(this.getTileSpaceBounds());
     }
 
     /**
@@ -67,7 +62,8 @@ export class StaticMapEntityComponent extends Component {
      * @param {Number} y
      */
     containsPoint(x, y) {
-        for (const rect of this.hitBoxes) {
+        const hitBoxes = this.getMovedTileSpaceBounds();
+        for (const rect of hitBoxes) {
             if (!rect.containsPoint(x, y)) {
                 continue;
             }
@@ -76,6 +72,46 @@ export class StaticMapEntityComponent extends Component {
         }
 
         return false;
+    }
+
+    /**
+     * Returns if hitbox intersect with given hitboxes
+     * @param {StaticMapEntityComponent} otherStaticComp
+     */
+    isIntersect(otherStaticComp) {
+        const mainHitbox = this.getMovedMainHitBox();
+        const otherMainHitbox = otherStaticComp.getMovedMainHitBox();
+
+        const intersection = mainHitbox.getIntersection(otherMainHitbox);
+        if (!intersection) {
+            return false;
+        }
+
+        let mainIntersect = false;
+        for (const rect of this.getMovedTileSpaceBounds()) {
+            if (!rect.getIntersection(intersection)) {
+                continue;
+            }
+
+            mainIntersect = true;
+            break;
+        }
+
+        let otherIntersect = false;
+        for (const rect of otherStaticComp.getMovedTileSpaceBounds()) {
+            if (!rect.getIntersection(intersection)) {
+                continue;
+            }
+
+            otherIntersect = true;
+            break;
+        }
+
+        if (!mainIntersect || !otherIntersect) {
+            return false;
+        }
+
+        return true;
     }
 
     /**
@@ -161,45 +197,30 @@ export class StaticMapEntityComponent extends Component {
         /** @type {Array<Rectangle>} */
         const rotatedHitBoxes = [];
         for (const rect of this.hitBoxes) {
+            // const pos = rect.getCenter();
             const pos = new Vector(rect.x, rect.y);
-            // const rotPos = pos.rotateFastMultipleOf90(this.rotation);
             const width = rect.w;
             const height = rect.h;
             const newPos = pos.rotateFastMultipleOf90(this.rotation);
 
+            // const newOrigin = this.origin.add(newPos);
+            // const newOrigin = this.origin;
+
             switch (this.rotation) {
                 case 0: {
-                    rotatedHitBoxes.push(
-                        new Rectangle(this.origin.x + newPos.x, this.origin.y + newPos.y, width, height)
-                    );
-                    continue;
-                }
-                case 180: {
-                    rotatedHitBoxes.push(
-                        new Rectangle(
-                            this.origin.x + newPos.x - width + 1,
-                            this.origin.y + newPos.y - height + 1,
-                            width,
-                            height
-                        )
-                    );
+                    rotatedHitBoxes.push(new Rectangle(newPos.x, newPos.y, width, height));
                     continue;
                 }
                 case 90: {
-                    rotatedHitBoxes.push(
-                        new Rectangle(this.origin.x + newPos.x, this.origin.y + newPos.y, height, width)
-                    );
+                    rotatedHitBoxes.push(new Rectangle(newPos.x, newPos.y, height, width));
+                    continue;
+                }
+                case 180: {
+                    rotatedHitBoxes.push(new Rectangle(newPos.x - (width - height), newPos.y, width, height));
                     continue;
                 }
                 case 270: {
-                    rotatedHitBoxes.push(
-                        new Rectangle(
-                            this.origin.x + newPos.x - height + 1,
-                            this.origin.y + newPos.y - width + 1,
-                            height,
-                            width
-                        )
-                    );
+                    rotatedHitBoxes.push(new Rectangle(newPos.x, newPos.y - (width - height), height, width));
                     continue;
                 }
                 default:
@@ -209,6 +230,20 @@ export class StaticMapEntityComponent extends Component {
         }
 
         return rotatedHitBoxes;
+    }
+
+    /**
+     * Returns the moved effective rectangle of this entity in tile space
+     * @returns {Array<Rectangle>}
+     */
+    getMovedTileSpaceBounds() {
+        const rotated = this.getTileSpaceBounds();
+        const tiles = [];
+        for (const rect of rotated) {
+            tiles.push(rect.moveByVector(this.origin));
+        }
+
+        return tiles;
     }
 
     /**
@@ -274,13 +309,9 @@ export class StaticMapEntityComponent extends Component {
      */
     shouldBeDrawn(parameters) {
         const visibleRect = parameters.visibleRect;
-        const bounds = this.getTileSpaceBounds();
-        for (const bound of bounds) {
-            visibleRect.containsRect(bound.allScaled(globalConfig.tileSize));
-            return true;
-        }
+        const mainHitbox = this.getMovedMainHitBox().allScaled(globalConfig.tileSize);
 
-        return false;
+        return visibleRect.getIntersection(mainHitbox) ? true : false;
     }
 
     /**
@@ -317,15 +348,20 @@ export class StaticMapEntityComponent extends Component {
                 hitBoxes
             );
         } else {
-            const rotationCenterX = worldX + globalConfig.halfTileSize;
-            const rotationCenterY = worldY + globalConfig.halfTileSize;
+            const width = size.w;
+            const height = size.h;
+            let off = width < height ? width : height;
+            off = clamp(off, 0, 1);
+            const centerOff = globalConfig.halfTileSize * off;
+            let rotationCenterX = worldX + centerOff;
+            let rotationCenterY = worldY + centerOff;
 
             parameters.context.translate(rotationCenterX, rotationCenterY);
             parameters.context.rotate(Math.radians(this.rotation));
             sprite.drawCached(
                 parameters,
-                -globalConfig.halfTileSize - extrudePixels * size.w,
-                -globalConfig.halfTileSize - extrudePixels * size.h,
+                -centerOff - extrudePixels * size.w,
+                -centerOff - extrudePixels * size.h,
                 globalConfig.tileSize * size.w + 2 * extrudePixels * size.w,
                 globalConfig.tileSize * size.h + 2 * extrudePixels * size.h,
                 false, // no clipping possible here

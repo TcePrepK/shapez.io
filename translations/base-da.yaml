@@ -963,6 +963,7 @@ keybindings:
         rotateToDown: "Rotate: Point Down"
         rotateToRight: "Rotate: Point Right"
         rotateToLeft: "Rotate: Point Left"
+        placeOffGrid: Allows you to place off grid
 about:
     title: Om dette spil
     body: >-

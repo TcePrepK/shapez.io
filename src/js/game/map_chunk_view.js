@@ -146,8 +146,12 @@ export class MapChunkView extends MapChunk {
             const lowerArray = this.lowerLayer[x];
             const upperArray = this.contents[x];
             for (let y = 0; y < globalConfig.mapChunkSize; ++y) {
-                const upperContent = upperArray[y];
-                if (upperContent) {
+                const upperContents = upperArray[y];
+                if (!upperContents) {
+                    continue;
+                }
+
+                for (const upperContent of upperContents) {
                     const staticComp = upperContent.components.StaticMapEntity;
                     const data = getBuildingDataFromCode(staticComp.code);
                     const metaBuilding = data.metaInstance;
@@ -229,17 +233,20 @@ export class MapChunkView extends MapChunk {
             for (let x = 0; x < globalConfig.mapChunkSize; ++x) {
                 const wiresArray = this.wireContents[x];
                 for (let y = 0; y < globalConfig.mapChunkSize; ++y) {
-                    const content = wiresArray[y];
-                    if (!content) {
+                    const contents = wiresArray[y];
+                    if (!contents) {
                         continue;
                     }
-                    MapChunkView.drawSingleWiresOverviewTile({
-                        context,
-                        x: x * CHUNK_OVERLAY_RES,
-                        y: y * CHUNK_OVERLAY_RES,
-                        entity: content,
-                        tileSizePixels: CHUNK_OVERLAY_RES,
-                    });
+
+                    for (const content of contents) {
+                        MapChunkView.drawSingleWiresOverviewTile({
+                            context,
+                            x: x * CHUNK_OVERLAY_RES,
+                            y: y * CHUNK_OVERLAY_RES,
+                            entity: content,
+                            tileSizePixels: CHUNK_OVERLAY_RES,
+                        });
+                    }
                 }
             }
         }

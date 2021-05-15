@@ -366,8 +366,8 @@ export class MapChunk {
      * @returns {Array<Entity>=}
      */
     getLayerContentsFromWorldCoords(worldX, worldY, layer) {
-        const localX = worldX - this.tileX;
-        const localY = worldY - this.tileY;
+        const localX = Math.floor(worldX) - this.tileX;
+        const localY = Math.floor(worldY) - this.tileY;
         assert(localX >= 0, "Local X is < 0");
         assert(localY >= 0, "Local Y is < 0");
         assert(localX < globalConfig.mapChunkSize, "Local X is >= chunk size");
@@ -378,6 +378,7 @@ export class MapChunk {
             return this.wireContents[localX][localY] || null;
         }
     }
+
     /**
      * Returns the contents of this chunk from the given world space coordinates
      * @param {number} worldX
@@ -463,7 +464,7 @@ export class MapChunk {
      * @param {number} tileY
      * @param {Layer} layer
      */
-    removeLayerContentFromWorldCords(tileX, tileY, layer) {
+    removeLayerContentFromWorldCords(tileX, tileY, layer, entity) {
         const localX = Math.floor(tileX) - this.tileX;
         const localY = Math.floor(tileY) - this.tileY;
         assert(localX >= 0, "Local X is < 0");
@@ -471,18 +472,24 @@ export class MapChunk {
         assert(localX < globalConfig.mapChunkSize, "Local X is >= chunk size");
         assert(localY < globalConfig.mapChunkSize, "Local Y is >= chunk size");
 
-        const content = this.root.map.getExactTileContent(new Vector(tileX, tileY), layer);
-        if (!content) {
+        const contents = this.root.map.getTileContent(new Vector(tileX, tileY), layer);
+        if (!contents) {
             return;
         }
 
-        if (layer === "regular") {
-            fastArrayDeleteValueIfContained(this.contents[localX][localY], content);
-        } else {
-            fastArrayDeleteValueIfContained(this.wireContents[localX][localY], content);
-        }
+        for (const content of contents) {
+            if (content !== entity) {
+                continue;
+            }
 
-        fastArrayDeleteValueIfContained(this.containedEntities, content);
-        fastArrayDeleteValueIfContained(this.containedEntitiesByLayer[layer], content);
+            if (layer === "regular") {
+                fastArrayDeleteValueIfContained(this.contents[localX][localY], content);
+            } else {
+                fastArrayDeleteValueIfContained(this.wireContents[localX][localY], content);
+            }
+
+            fastArrayDeleteValueIfContained(this.containedEntities, content);
+            fastArrayDeleteValueIfContained(this.containedEntitiesByLayer[layer], content);
+        }
     }
 }

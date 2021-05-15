@@ -104,7 +104,7 @@ export class MinerSystem extends GameSystemWithFilter {
         const ejectingDirection = staticComp.localDirectionToWorld(ejectingSlot.direction);
 
         const targetTile = ejectingPos.add(enumDirectionToVector[ejectingDirection]);
-        const targetContents = this.root.map.getTileContent(targetTile, "regular");
+        const targetContents = this.root.map.getExactTileContent(targetTile, "regular");
 
         // Check if we are connected to another miner and thus do not eject directly
         if (targetContents) {

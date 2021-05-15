@@ -117,7 +117,7 @@ export class MetaCutterBuilding extends MetaBuilding {
             }
 
             default:
-                assertAlways(false, "Unknown painter variant: " + variant);
+                assertAlways(false, "Unknown cutter variant: " + variant);
         }
     }
 }

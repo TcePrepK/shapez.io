@@ -20,7 +20,7 @@ export class MetaStackerBuilding extends MetaBuilding {
     }
 
     getDimensions() {
-        return [new Rectangle(0, 0, 2.5, 1), new Rectangle(0, 1, 1, 0.5), new Rectangle(2, 1, 1, 1)];
+        return [new Rectangle(0, 0, 1, 0.5)];
     }
 
     /**

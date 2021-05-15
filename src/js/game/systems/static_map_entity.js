@@ -34,6 +34,22 @@ export class StaticMapEntitySystem extends GameSystem {
         for (const content of contents) {
             const staticComp = content.components.StaticMapEntity;
             const sprite = staticComp.getSprite();
+
+            for (const box of staticComp.getMovedTileSpaceBounds()) {
+                const rect = box.allScaled(globalConfig.tileSize);
+                parameters.context.fillStyle = "blue";
+                parameters.context.globalAlpha = 0.2;
+                parameters.context.fillRect(rect.x, rect.y, rect.w, rect.h);
+                parameters.context.globalAlpha = 1;
+            }
+
+            const box = staticComp.getMovedMainHitBox();
+            const rect = box.allScaled(globalConfig.tileSize);
+            parameters.context.fillStyle = "red";
+            parameters.context.globalAlpha = 0.2;
+            parameters.context.fillRect(rect.x, rect.y, rect.w, rect.h);
+            parameters.context.globalAlpha = 1;
+
             if (sprite) {
                 // Avoid drawing an entity twice which has been drawn for
                 // another chunk already

@@ -389,6 +389,12 @@ export function clamp(v, minimum = 0, maximum = 1) {
     return Math.max(minimum, Math.min(maximum, v));
 }
 
+Math.strip = function (num) {
+    const off = 10000000000000; // Not random ! Please don't question
+
+    return this.round(num * off) / off;
+};
+
 /**
  * Helper method to create a new div element
  * @param {string=} id

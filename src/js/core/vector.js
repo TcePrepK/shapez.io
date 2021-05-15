@@ -333,6 +333,14 @@ export class Vector {
     }
 
     /**
+     * Strips and returns a new vector
+     * @returns {Vector}
+     */
+    strip() {
+        return new Vector(Math.strip(this.x), Math.strip(this.y));
+    }
+
+    /**
      * Converts this vector from world to tile space and return a new vector
      * @returns {Vector}
      */

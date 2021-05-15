@@ -14,7 +14,8 @@ import { MetaMinerBuilding, enumMinerVariants } from "../../buildings/miner";
 import { enumHubGoalRewards } from "../../tutorial_goals";
 import { getBuildingDataFromCode, getCodeFromBuildingData } from "../../building_codes";
 import { MetaHubBuilding } from "../../buildings/hub";
-import { safeModulo } from "../../../core/utils";
+import { clamp, safeModulo } from "../../../core/utils";
+import { getUnionOfMultipleRectangles } from "../../../core/rectangle";
 
 /**
  * Contains all logic for the building placer - this doesn't include the rendering
@@ -87,6 +88,12 @@ export class HUDBuildingPlacerLogic extends BaseHUDPart {
          * @type {Vector}
          */
         this.lastDragTile = null;
+
+        /**
+         * The off tile we last dragged from
+         * @type {Vector}
+         */
+        this.lastOffDragTile = null;
 
         /**
          * The side for direction lock
@@ -255,6 +262,7 @@ export class HUDBuildingPlacerLogic extends BaseHUDPart {
         this.currentlyDeleting = false;
         this.initialPlacementVector = null;
         this.lastDragTile = null;
+        this.lastOffDragTile = null;
     }
 
     /**
@@ -329,7 +337,8 @@ export class HUDBuildingPlacerLogic extends BaseHUDPart {
         }
 
         const worldPos = this.root.camera.screenToWorld(mousePosition);
-        const entity = this.root.map.getExactTileContent(worldPos, this.root.currentLayer);
+        const tile = worldPos.divideScalar(globalConfig.tileSize);
+        const entity = this.root.map.getExactTileContent(tile, this.root.currentLayer);
         if (!entity) {
             return false;
         }
@@ -358,9 +367,10 @@ export class HUDBuildingPlacerLogic extends BaseHUDPart {
         }
 
         const worldPos = this.root.camera.screenToWorld(mousePosition);
+        const divPos = worldPos.divideScalar(globalConfig.tileSize);
         const tile = worldPos.toTileSpace();
 
-        const entity = this.root.map.getExactTileContent(worldPos, this.root.currentLayer);
+        const entity = this.root.map.getExactTileContent(divPos, this.root.currentLayer);
         if (!entity) {
             const tileBelow = this.root.map.getLowerLayerContentXY(tile.x, tile.y);
 
@@ -679,19 +689,44 @@ export class HUDBuildingPlacerLogic extends BaseHUDPart {
         }
 
         const metaBuilding = this.currentMetaBuilding.get();
+        const worldPos = this.root.camera.screenToWorld(pos);
+
+        let size = 1 / 32;
+        if (metaBuilding) {
+            const hitBoxes = metaBuilding.getDimensions(this.currentVariant.get());
+            const mainHitbox = getUnionOfMultipleRectangles(hitBoxes);
+
+            const width = mainHitbox.w;
+            const height = mainHitbox.h;
+            size = width < height ? width : height;
+            size = clamp(size, 0, 1);
+        }
+
+        let offTile = worldPos
+            .divideScalar(globalConfig.tileSize)
+            .divideScalar(size)
+            .floor()
+            .multiplyScalar(size)
+            .strip();
 
         // Placement
         if (button === enumMouseButton.left && metaBuilding) {
             this.currentlyDragging = true;
             this.currentlyDeleting = false;
-            this.lastDragTile = this.root.camera.screenToWorld(pos).toTileSpace();
+            this.lastDragTile = worldPos.toTileSpace();
+            this.lastOffDragTile = offTile;
+
+            if (this.root.keyMapper.getBinding(KEYMAPPINGS.placementModifiers.placeOffGrid).pressed) {
+                offTile = worldPos.divideScalar(globalConfig.tileSize).subScalar(size / 2);
+            }
 
             // Place initial building, but only if direction lock is not active
             if (!this.isDirectionLockActive) {
-                if (this.tryPlaceCurrentBuildingAt(this.lastDragTile)) {
+                if (this.tryPlaceCurrentBuildingAt(offTile)) {
                     this.root.soundProxy.playUi(metaBuilding.getPlacementSound());
                 }
             }
+
             return STOP_PROPAGATION;
         }
 
@@ -702,7 +737,8 @@ export class HUDBuildingPlacerLogic extends BaseHUDPart {
         ) {
             this.currentlyDragging = true;
             this.currentlyDeleting = true;
-            this.lastDragTile = this.root.camera.screenToWorld(pos).toTileSpace();
+            this.lastDragTile = worldPos.toTileSpace();
+            this.lastOffDragTile = offTile;
             if (this.deleteBelowCursor()) {
                 return STOP_PROPAGATION;
             }
@@ -729,13 +765,29 @@ export class HUDBuildingPlacerLogic extends BaseHUDPart {
         }
 
         const metaBuilding = this.currentMetaBuilding.get();
-        if ((metaBuilding || this.currentlyDeleting) && this.lastDragTile) {
-            const oldPos = this.lastDragTile;
-            let newPos = this.root.camera.screenToWorld(pos).toTileSpace();
+        if ((metaBuilding || this.currentlyDeleting) && this.lastOffDragTile) {
+            const oldPos = this.lastOffDragTile;
+            const worldPos = this.root.camera.screenToWorld(pos);
+            let size = 32; // 1 / minSize aka (1 / 32) 1px
+            if (metaBuilding) {
+                const hitbox = metaBuilding.getDimensions(this.currentVariant.get());
+                const mainHitbox = getUnionOfMultipleRectangles(hitbox);
+                const width = mainHitbox.w;
+                const height = mainHitbox.h;
+                size = 1 / (width < height ? width : height);
+                // size = clamp(size, 0, 1);
+            }
+
+            const newPos = worldPos
+                .divideScalar(globalConfig.tileSize)
+                .divideScalar(1 / size)
+                .floor()
+                .multiplyScalar(1 / size)
+                .strip();
 
             // Check if camera is moving, since then we do nothing
             if (this.root.camera.desiredCenter) {
-                this.lastDragTile = newPos;
+                this.lastOffDragTile = newPos;
                 return;
             }
 
@@ -760,10 +812,11 @@ export class HUDBuildingPlacerLogic extends BaseHUDPart {
                 }
 
                 // bresenham
-                let x0 = oldPos.x;
-                let y0 = oldPos.y;
-                let x1 = newPos.x;
-                let y1 = newPos.y;
+                // const size = 1 / size;
+                let x0 = oldPos.x * size;
+                let y0 = oldPos.y * size;
+                let x1 = newPos.x * size;
+                let y1 = newPos.y * size;
 
                 var dx = Math.abs(x1 - x0);
                 var dy = Math.abs(y1 - y0);
@@ -775,20 +828,23 @@ export class HUDBuildingPlacerLogic extends BaseHUDPart {
                 let anythingDeleted = false;
 
                 while (this.currentlyDeleting || this.currentMetaBuilding.get()) {
+                    const tile = new Vector(x0 / size, y0 / size).strip();
+                    // console.log(tile);
                     if (this.currentlyDeleting) {
                         // Deletion
-                        const contents = this.root.map.getExactTileContent(
-                            new Vector(x0, y0),
-                            this.root.currentLayer
-                        );
+                        const contents = this.root.map.getExactTileContent(tile, this.root.currentLayer);
                         if (contents && !contents.queuedForDestroy && !contents.destroyed) {
+                            // console.log(tile);
+                            // console.log(size);
+                            // console.log(oldPos);
+                            // console.log(newPos);
                             if (this.root.logic.tryDeleteBuilding(contents)) {
                                 anythingDeleted = true;
                             }
                         }
                     } else {
                         // Placement
-                        if (this.tryPlaceCurrentBuildingAt(new Vector(x0, y0))) {
+                        if (this.tryPlaceCurrentBuildingAt(tile)) {
                             anythingPlaced = true;
                         }
                     }
@@ -797,11 +853,11 @@ export class HUDBuildingPlacerLogic extends BaseHUDPart {
                     var e2 = 2 * err;
                     if (e2 > -dy) {
                         err -= dy;
-                        x0 += sx;
+                        x0 = Math.strip(x0 + sx);
                     }
                     if (e2 < dx) {
                         err += dx;
-                        y0 += sy;
+                        y0 = Math.strip(y0 + sy);
                     }
                 }
 
@@ -813,7 +869,7 @@ export class HUDBuildingPlacerLogic extends BaseHUDPart {
                 }
             }
 
-            this.lastDragTile = newPos;
+            this.lastOffDragTile = newPos;
             return STOP_PROPAGATION;
         }
     }

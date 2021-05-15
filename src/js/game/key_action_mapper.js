@@ -111,6 +111,7 @@ export const KEYMAPPINGS = {
         placementDisableAutoOrientation: { keyCode: 17 }, // CTRL
         placeMultiple: { keyCode: 16 }, // SHIFT
         placeInverse: { keyCode: 18 }, // ALT
+        placeOffGrid: { keyCode: 17 }, // ALT
     },
 };
 

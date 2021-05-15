@@ -7,6 +7,7 @@ import { GameRoot } from "../root";
 import { enumHubGoalRewards } from "../tutorial_goals";
 import { T } from "../../translations";
 import { formatItemsPerSecond, generateMatrixRotations } from "../../core/utils";
+import { Rectangle } from "../../core/rectangle";
 
 /** @enum {string} */
 export const enumMinerVariants = { chainable: "chainable" };
@@ -33,6 +34,10 @@ export class MetaMinerBuilding extends MetaBuilding {
     getAdditionalStatistics(root, variant) {
         const speed = root.hubGoals.getMinerBaseSpeed();
         return [[T.ingame.buildingPlacement.infoTexts.speed, formatItemsPerSecond(speed)]];
+    }
+
+    getDimensions() {
+        return [new Rectangle(0, 0, 1, 1)];
     }
 
     /**

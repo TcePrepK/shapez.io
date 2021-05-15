@@ -1,4 +1,5 @@
 import { globalConfig } from "../core/config";
+import { Rectangle } from "../core/rectangle";
 import { Vector } from "../core/vector";
 import { BasicSerializableObject, types } from "../savegame/serialization";
 import { BaseItem } from "./base_item";
@@ -62,8 +63,10 @@ export class BaseMap extends BasicSerializableObject {
      * @returns {MapChunkView}
      */
     getOrCreateChunkAtTile(tileX, tileY) {
-        const chunkX = Math.floor(Math.floor(tileX) / globalConfig.mapChunkSize);
-        const chunkY = Math.floor(Math.floor(tileY) / globalConfig.mapChunkSize);
+        tileX = Math.floor(tileX);
+        tileY = Math.floor(tileY);
+        const chunkX = Math.floor(tileX / globalConfig.mapChunkSize);
+        const chunkY = Math.floor(tileY / globalConfig.mapChunkSize);
         return this.getChunk(chunkX, chunkY, true);
     }
 
@@ -74,6 +77,8 @@ export class BaseMap extends BasicSerializableObject {
      * @returns {MapChunkView?}
      */
     getChunkAtTileOrNull(tileX, tileY) {
+        tileX = Math.floor(tileX);
+        tileY = Math.floor(tileY);
         const chunkX = Math.floor(tileX / globalConfig.mapChunkSize);
         const chunkY = Math.floor(tileY / globalConfig.mapChunkSize);
         return this.getChunk(chunkX, chunkY, false);
@@ -107,12 +112,11 @@ export class BaseMap extends BasicSerializableObject {
 
     /**
      * Returns the exact tile content of a given tile
-     * @param {Vector} pos
+     * @param {Vector} tile
      * @param {Layer} layer
      * @returns {Entity} Entity or null
      */
-    getExactTileContent(pos, layer) {
-        const tile = pos.toTileSpace();
+    getExactTileContent(tile, layer) {
         const chunk = this.getChunkAtTileOrNull(tile.x, tile.y);
 
         if (!chunk) {
@@ -127,7 +131,7 @@ export class BaseMap extends BasicSerializableObject {
 
         for (const content of contents) {
             const staticComp = content.components.StaticMapEntity;
-            if (!staticComp.containsPoint(pos.x, pos.y)) {
+            if (!staticComp.containsPoint(tile.x, tile.y)) {
                 continue;
             }
 
@@ -142,6 +146,8 @@ export class BaseMap extends BasicSerializableObject {
      * @returns {BaseItem=}
      */
     getLowerLayerContentXY(x, y) {
+        x = Math.floor(x);
+        y = Math.floor(y);
         return this.getOrCreateChunkAtTile(x, y).getLowerLayerFromWorldCoords(x, y);
     }
 
@@ -153,6 +159,8 @@ export class BaseMap extends BasicSerializableObject {
      * @returns {Array<Entity>} Entities or null
      */
     getLayerContentXY(x, y, layer) {
+        x = Math.floor(x);
+        y = Math.floor(y);
         const chunk = this.getChunkAtTileOrNull(x, y);
         return chunk && chunk.getLayerContentsFromWorldCoords(x, y, layer);
     }
@@ -164,6 +172,8 @@ export class BaseMap extends BasicSerializableObject {
      * @returns {Array<Entity>} Entity or null
      */
     getLayersContentsMultipleXY(x, y) {
+        x = Math.floor(x);
+        y = Math.floor(y);
         const chunk = this.getChunkAtTileOrNull(x, y);
         if (!chunk) {
             return [];
@@ -197,26 +207,26 @@ export class BaseMap extends BasicSerializableObject {
         return chunk && chunk.getLayerContentsFromWorldCoords(x, y, layer) != null;
     }
 
-    /**
-     * Sets the tiles content
-     * @param {Vector} tile
-     * @param {Entity} entity
-     */
-    setTileContent(tile, entity) {
-        if (G_IS_DEV) {
-            this.internalCheckTile(tile);
-        }
+    // /**
+    //  * Sets the tiles content
+    //  * @param {Vector} tile
+    //  * @param {Entity} entity
+    //  */
+    // setTileContent(tile, entity) {
+    //     if (G_IS_DEV) {
+    //         this.internalCheckTile(tile);
+    //     }
 
-        this.getOrCreateChunkAtTile(tile.x, tile.y).setLayerContentFromWorldCords(
-            tile.x,
-            tile.y,
-            entity.layer,
-            entity
-        );
+    //     this.getOrCreateChunkAtTile(tile.x, tile.y).setLayerContentFromWorldCords(
+    //         tile.x,
+    //         tile.y,
+    //         entity.layer,
+    //         entity
+    //     );
 
-        const staticComponent = entity.components.StaticMapEntity;
-        assert(staticComponent, "Can only place static map entities in tiles");
-    }
+    //     const staticComponent = entity.components.StaticMapEntity;
+    //     assert(staticComponent, "Can only place static map entities in tiles");
+    // }
 
     /**
      * Places an entity with the StaticMapEntity component
@@ -225,12 +235,17 @@ export class BaseMap extends BasicSerializableObject {
     placeStaticEntity(entity) {
         assert(entity.components.StaticMapEntity, "Entity is not static");
         const staticComp = entity.components.StaticMapEntity;
-        const hitBoxes = staticComp.getTileSpaceBounds();
+        const hitBoxes = staticComp.getMovedTileSpaceBounds();
         for (const rect of hitBoxes) {
-            for (let dx = 0; dx < rect.w; ++dx) {
-                for (let dy = 0; dy < rect.h; ++dy) {
-                    const x = rect.x + dx;
-                    const y = rect.y + dy;
+            for (let dx = 0; dx < rect.w + 1; ++dx) {
+                for (let dy = 0; dy < rect.h + 1; ++dy) {
+                    const x = Math.floor(rect.x) + dx;
+                    const y = Math.floor(rect.y) + dy;
+                    const tile = new Rectangle(x, y, 1, 1);
+                    if (!rect.getIntersection(tile)) {
+                        continue;
+                    }
+
                     this.getOrCreateChunkAtTile(x, y).setLayerContentFromWorldCords(
                         x,
                         y,
@@ -239,6 +254,19 @@ export class BaseMap extends BasicSerializableObject {
                     );
                 }
             }
+
+            // for (let dx = 0; dx < rect.w; ++dx) {
+            //     for (let dy = 0; dy < rect.h; ++dy) {
+            //         const x = rect.x + dx;
+            //         const y = rect.y + dy;
+            //         this.getOrCreateChunkAtTile(x, y).setLayerContentFromWorldCords(
+            //             x,
+            //             y,
+            //             entity.layer,
+            //             entity
+            //         );
+            //     }
+            // }
         }
     }
 
@@ -249,15 +277,33 @@ export class BaseMap extends BasicSerializableObject {
     removeStaticEntity(entity) {
         assert(entity.components.StaticMapEntity, "Entity is not static");
         const staticComp = entity.components.StaticMapEntity;
-        const hitBoxes = staticComp.getTileSpaceBounds();
+        const hitBoxes = staticComp.getMovedTileSpaceBounds();
         for (const rect of hitBoxes) {
-            for (let dx = 0; dx < rect.w; ++dx) {
-                for (let dy = 0; dy < rect.h; ++dy) {
-                    const x = rect.x + dx;
-                    const y = rect.y + dy;
-                    this.getOrCreateChunkAtTile(x, y).removeLayerContentFromWorldCords(x, y, entity.layer);
+            for (let dx = 0; dx < rect.w + 1; ++dx) {
+                for (let dy = 0; dy < rect.h + 1; ++dy) {
+                    const x = Math.floor(rect.x) + dx;
+                    const y = Math.floor(rect.y) + dy;
+                    const tile = new Rectangle(x, y, 1, 1);
+                    if (!rect.getIntersection(tile)) {
+                        continue;
+                    }
+
+                    this.getOrCreateChunkAtTile(x, y).removeLayerContentFromWorldCords(
+                        x,
+                        y,
+                        entity.layer,
+                        entity
+                    );
                 }
             }
+
+            // for (let dx = 0; dx < rect.w; ++dx) {
+            //     for (let dy = 0; dy < rect.h; ++dy) {
+            //         const x = rect.x + dx;
+            //         const y = rect.y + dy;
+            //         this.getOrCreateChunkAtTile(x, y).removeLayerContentFromWorldCords(x, y, entity.layer);
+            //     }
+            // }
         }
     }
 

@@ -14,13 +14,12 @@ steamPage:
 
         Oyunu Steam'de satın almak tam sürüme erişimi sağlayacak, ama herzaman shapez.io deneme sürümünü oynayıp sonradan karar verebilirsin!
     what_others_say: İnsanlar shapez.io hakkında ne düşünüyor?
-    nothernlion_comment: Bu oyun süper - Oynarken harika vakit geçiriyorum
-        ve zaman akıp gidiyor.
-    notch_comment: Hay aksi. Gerçekten uyumalıyım, ama şimdi shapez.io'da
-        nasıl bir bilgisayar yapabileceğimi çözdüm.
-    steam_review_comment: Bu oyun hayatımı çaldı ve geri istemiyorum.
-        Üretim hatlarımı daha verimli yapmamı engelleyemeyecek kadar güzel bir
-        fabrika oyunu.
+    nothernlion_comment: Bu oyun süper - Oynarken harika vakit geçiriyorum ve zaman akıp gidiyor.
+    notch_comment: Hay aksi. Gerçekten uyumalıyım, ama şimdi shapez.io'da nasıl bir
+        bilgisayar yapabileceğimi çözdüm.
+    steam_review_comment: Bu oyun hayatımı çaldı ve geri istemiyorum. Üretim
+        hatlarımı daha verimli yapmamı engelleyemeyecek kadar güzel bir fabrika
+        oyunu.
 global:
     loading: Yüklenİyor
     error: Hata
@@ -95,10 +94,8 @@ dialogs:
         text: "Oyun yükleme başarısız:"
     confirmSavegameDelete:
         title: Sİlme İşlemİnİ onayla
-        text: >-
-            Bu kaydı silmek istediğinize emin misiniz?<br><br>
-            '<savegameName>' seviyesi <savegameLevel><br><br>
-            Bu işlem geri alınamaz!
+        text: Bu kaydı silmek istediğinize emin misiniz?<br><br> '<savegameName>'
+            seviyesi <savegameLevel><br><br> Bu işlem geri alınamaz!
     savegameDeletionError:
         title: Silme başarısız
         text: "Oyun kaydı silinemedi:"
@@ -122,8 +119,8 @@ dialogs:
             için tam versiyonu satın alın.
     oneSavegameLimit:
         title: Sınırlı Oyun Kaydı
-        desc: Deneme sürümünde sadece tek bir oyun kaydınız olabilir. Lütfen mevcut kaydı
-            silin veya tam sürümü satın alın!
+        desc: Deneme sürümünde sadece tek bir oyun kaydınız olabilir. Lütfen mevcut
+            kaydı silin veya tam sürümü satın alın!
     updateSummary:
         title: Yeni güncelleme!
         desc: "Son oynadığınızdan bu yana gelen değişikler:"
@@ -150,8 +147,8 @@ dialogs:
             taşıma bantlarının yönünü ters çevirir.<br>"
     createMarker:
         title: Yeni Konum İşareti
-        desc: Anlamlı bir isim ver. Ayrıca  <strong>Şekil kodu da</strong> koyabilirsiniz
-            (<link>Buradan</link> kod yapabilirsiniz )
+        desc: Anlamlı bir isim ver. Ayrıca  <strong>Şekil kodu da</strong>
+            koyabilirsiniz (<link>Buradan</link> kod yapabilirsiniz )
         titleEdit: Konum İşaretini Düzenle
     markerDemoLimit:
         desc: Deneme sürümünde sadece iki adet yer imi oluşturabilirsiniz. Sınırsız yer
@@ -446,12 +443,12 @@ buildings:
     wire:
         default:
             name: Kablo
-            description: Eşya, renk ve ikili değerler(1 / 0) gibi sinyalleri aktarmayı sağlar.
-                Farklı renkteki kablolar bağlanamaz.
+            description: Eşya, renk ve ikili değerler(1 / 0) gibi sinyalleri aktarmayı
+                sağlar. Farklı renkteki kablolar bağlanamaz.
         second:
             name: Kablo
-            description: Eşya, renk ve ikili değerler(1 / 0) gibi sinyalleri aktarmayı sağlar.
-                Farklı renkteki kablolar bağlanamaz.
+            description: Eşya, renk ve ikili değerler(1 / 0) gibi sinyalleri aktarmayı
+                sağlar. Farklı renkteki kablolar bağlanamaz.
     wire_tunnel:
         default:
             name: Kablo Tüneli
@@ -475,8 +472,8 @@ buildings:
     storage:
         default:
             name: Depo
-            description: Belirli bir sınıra kadar fazla eşyaları depolar. Sol çıkışa öncelik verir ve taşma kapısı
-                olarak kullanılabilir.
+            description: Belirli bir sınıra kadar fazla eşyaları depolar. Sol çıkışa öncelik
+                verir ve taşma kapısı olarak kullanılabilir.
     constant_signal:
         default:
             name: Sabit Sinyal
@@ -852,8 +849,8 @@ settings:
         lowQualityMapResources:
             title: Düşük Kalİte Harİta Kaynakları
             description: Oyun performansını artırmak için haritada görünen kaynakların çizim
-                kalitesini sadeleştirir.
-                Hatta daha net bir görüntü sağlar, bu yüzden bir dene!
+                kalitesini sadeleştirir. Hatta daha net bir görüntü sağlar, bu
+                yüzden bir dene!
         disableTileGrid:
             title: Harİta Çİzgİlerİnİ Gİzle
             description: Harita çizgilerini gizlemek oyun performansına yardımcı olabilir.
@@ -965,10 +962,11 @@ keybindings:
         comparator: Karşılaştırıcı
         item_producer: Eşya Üretici (Kum Kutusu)
         copyWireValue: "Kablo: Fare altındaki değeri kopyala"
-        rotateToUp: "Yukarı Döndür"
-        rotateToDown: "Aşağı Döndür"
-        rotateToRight: "Sağa Döndür"
-        rotateToLeft: "Sola Döndür"
+        rotateToUp: Yukarı Döndür
+        rotateToDown: Aşağı Döndür
+        rotateToRight: Sağa Döndür
+        rotateToLeft: Sola Döndür
+        placeOffGrid: Allows you to place off grid
 about:
     title: Oyun Hakkında
     body: >-

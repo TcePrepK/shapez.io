@@ -36,7 +36,7 @@ export class WiredPinsSystem extends GameSystemWithFilter {
      */
     prePlacementCheck(entity, offset) {
         // Compute area of the building
-        const rect = entity.components.StaticMapEntity.getTileSpaceBounds();
+        const rect = entity.components.StaticMapEntity.getMovedTileSpaceBounds();
         if (offset) {
             rect.x += offset.x;
             rect.y += offset.y;
