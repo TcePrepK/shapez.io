@@ -309,7 +309,7 @@ export class DialogOptionChooser extends Dialog {
                 <div class='option ${value === options.active ? "active" : ""} ${
                 iconPrefix ? "hasIcon" : ""
             }' data-optionvalue='${value}'>
-                    ${iconHtml}    
+                    ${iconHtml}
                     <span class='title'>${text}</span>
                     ${descHtml}
                 </div>
@@ -444,7 +444,7 @@ export class DialogWithForm extends Dialog {
         for (let i = 0; i < this.formElements.length; ++i) {
             const elem = this.formElements[i];
             elem.bindEvents(div, this.clickDetectors);
-            elem.valueChosen.add(this.closeRequested.dispatch, this.closeRequested);
+            // elem.valueChosen.add(this.closeRequested.dispatch, this.closeRequested);
             elem.valueChosen.add(this.valueChosen.dispatch, this.valueChosen);
         }
 

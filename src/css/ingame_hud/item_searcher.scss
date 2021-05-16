@@ -1,27 +1,30 @@
 #ingame_HUD_ItemSearcher {
-    position: absolute;
+    position: fixed;
+    // top: auto;
+    right: 1%;
+    bottom: 1%;
+    // left: auto;
+    @include S(padding, 15px);
+    text-transform: uppercase;
+    border-radius: 25px;
 
-    .button {
-        position: fixed;
-        right: 1%;
-        bottom: 1%;
-        @include S(padding, 15px);
-        text-transform: uppercase;
-        border-radius: 25px;
+    @include IncreasedClickArea(0px);
+    color: #fff;
+    background-color: $colorGreenBright;
+    pointer-events: all;
 
-        @include IncreasedClickArea(0px);
-        color: #fff;
-        background-color: $colorGreenBright;
-        pointer-events: all;
+    &.overlay {
+        right: auto;
+        left: 1%;
+    }
 
-        &:hover {
-            background-color: darken($colorGreenBright, 4);
-            opacity: 0.8;
-            cursor: pointer;
-        }
+    &:hover {
+        background-color: darken($colorGreenBright, 4);
+        opacity: 0.7;
+        cursor: pointer;
+    }
 
-        h2 {
-            @include PlainText;
-        }
+    h2 {
+        @include PlainText;
     }
 }

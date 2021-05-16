@@ -1,7 +1,7 @@
 import trim from "trim";
 import { globalConfig } from "../../../core/config";
 import { DialogWithForm } from "../../../core/modal_dialog_elements";
-import { FormElementInput } from "../../../core/modal_dialog_forms";
+import { FormElementInput, FormElementItemChooser } from "../../../core/modal_dialog_forms";
 import { makeDiv } from "../../../core/utils";
 import { Vector } from "../../../core/vector";
 import { BaseItem } from "../../base_item";
@@ -10,6 +10,7 @@ import { ColorItem, COLOR_ITEM_SINGLETONS } from "../../items/color_item";
 import { ShapeItem } from "../../items/shape_item";
 import { enumSubShape, ShapeDefinition } from "../../shape_definition";
 import { BaseHUDPart } from "../base_hud_part";
+import { DynamicDomAttach } from "../dynamic_dom_attach";
 
 const availableColors = [enumColors.red, enumColors.green, enumColors.blue];
 
@@ -53,25 +54,38 @@ export class HUDItemSearcher extends BaseHUDPart {
      * @param {HTMLElement} parent
      */
     createElements(parent) {
-        this.element = makeDiv(parent, "ingame_HUD_ItemSearcher");
+        this.element = makeDiv(parent, "ingame_HUD_ItemSearcher", [], "<h2>Search Item</h2>");
     }
 
     initialize() {
-        const button = makeDiv(this.element, null, ["button"], "<h2>Search Item</h2>");
-        this.trackClicks(button, () => this.openItemSelector());
+        this.trackClicks(this.element, () => this.openItemSelector());
     }
 
     openItemSelector() {
+        const predefinedItems = new FormElementItemChooser({
+            id: "predefinedItems",
+            label: "Enter or select item short key",
+            items: [
+                COLOR_ITEM_SINGLETONS[enumColors.red],
+                COLOR_ITEM_SINGLETONS[enumColors.green],
+                COLOR_ITEM_SINGLETONS[enumColors.blue],
+                this.root.shapeDefinitionMgr.getShapeItemFromShortKey("CuCuCuCu"),
+                this.root.shapeDefinitionMgr.getShapeItemFromShortKey("RuRuRuRu"),
+                this.root.shapeDefinitionMgr.getShapeItemFromShortKey("SuSuSuSu"),
+                this.root.shapeDefinitionMgr.getShapeItemFromShortKey("RuRuWuWu"),
+            ],
+        });
+
         const itemInput = new FormElementInput({
-            id: "shapeSearcherValue",
-            label: "Enter item short key",
+            id: "itemInputValue",
+            label: "",
             placeholder: "Insert Shape Code",
             defaultValue: "",
             validator: val => this.parseItem(val),
         });
 
         const amountInput = new FormElementInput({
-            id: "shapeSearcherValue",
+            id: "amountInputValue",
             label: "Enter how much of that item you want",
             placeholder: "Insert Number",
             defaultValue: "",
@@ -82,19 +96,22 @@ export class HUDItemSearcher extends BaseHUDPart {
             app: this.root.app,
             title: "Item Searcher",
             desc: "",
-            formElements: [itemInput, amountInput],
-            buttons: ["ok:good:enter"],
+            formElements: [predefinedItems, itemInput, amountInput],
+            buttons: ["cancel:bad:escape", "ok:good:enter"],
             closeButton: false,
         });
         this.root.hud.parts.dialogs.internalShowDialog(dialog);
 
-        const closeHandler = () => {
-            this.searchingItem = itemInput.getValue();
-            this.searchingAmount = amountInput.getValue();
+        const startSearching = () => {
+            this.searchingItem = this.root.shapeDefinitionMgr.getShapeItemFromShortKey(itemInput.getValue());
+            this.searchingAmount = parseInt(amountInput.getValue());
         };
 
-        dialog.valueChosen.add(closeHandler);
-        dialog.buttonSignals.ok.add(closeHandler);
+        predefinedItems.valueChosen.add(value => {
+            itemInput.setValue(value.getAsCopyableKey());
+        });
+
+        dialog.buttonSignals.ok.add(startSearching);
     }
 
     /**
@@ -142,31 +159,28 @@ export class HUDItemSearcher extends BaseHUDPart {
                 if (corner.color !== enumColors.uncolored) return false;
             }
             if (windmillAmount > 2) return false;
-            if (windmillAmount === 2) {
-                for (const corner of corners) {
-                    if (corner.subShape !== enumSubShape.windmill && corner.subShape !== enumSubShape.rect)
-                        return false;
-                }
-            }
+            if (windmillAmount === 2 && value !== "RuRuWuWu") return false;
         }
 
         return true;
     }
 
     /**
-     * @param {string} value
      * @returns {boolean}
      */
     parseAmount(value) {
+        if (value.includes(".")) return false;
         const number = parseInt(value);
-        console.log(value, number);
-        if (!Number.isInteger(number)) return false;
-        // if (!(value instanceof intef)) return false;
+        if (isNaN(value) || isNaN(number)) return false;
+        if (number <= 0) return false;
 
         return true;
     }
 
     update() {
+        const overlay = this.root.camera.getIsMapOverlayActive();
+        this.element.classList.toggle("overlay", overlay);
+
         if (!this.searchingItem) {
             return;
         }
@@ -181,18 +195,27 @@ export class HUDItemSearcher extends BaseHUDPart {
             const chunk = this.root.map.getChunk(vector.x, vector.y, true);
             const patches = chunk.patches;
             for (const patch of patches) {
-                if (patch.item.equals(this.searchingItem)) {
-                    const pos = patch.pos
-                        .addScalars(chunk.tileX, chunk.tileY)
-                        .multiplyScalar(globalConfig.tileSize);
-                    this.root.waypoint.addWaypoint(this.searchingItem.getAsCopyableKey(), pos);
-                    this.foundAmount++;
-
-                    if (this.foundAmount === this.searchingAmount) {
-                        this.searchingItem = null;
-                    }
+                if (!patch.item.equals(this.searchingItem)) {
+                    continue;
                 }
-                return;
+
+                const pos = patch.pos
+                    .addScalars(chunk.tileX, chunk.tileY)
+                    .multiplyScalar(globalConfig.tileSize);
+
+                const waypoint = this.root.waypoint.findIntersectedWaypointWithPos(pos);
+                if (waypoint) {
+                    continue;
+                }
+
+                this.root.waypoint.addWaypoint(this.searchingItem.getAsCopyableKey(), pos);
+                this.foundAmount++;
+
+                if (this.foundAmount === this.searchingAmount) {
+                    this.searchingItem = null;
+                    this.foundAmount = 0;
+                    return;
+                }
             }
         }
     }

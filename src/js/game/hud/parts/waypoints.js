@@ -495,6 +495,21 @@ export class HUDWaypoints extends BaseHUDPart {
     }
 
     /**
+     * Finds the intersected waypoint on the map overview under the pos.
+     * @param {Vector} pos
+     * @returns {Waypoint | null}
+     */
+    findIntersectedWaypointWithPos(pos) {
+        for (let i = 0; i < this.waypoints.length; ++i) {
+            const waypoint = this.waypoints[i];
+            const params = this.getWaypointScreenParams(waypoint);
+            if (params && params.screenBounds.containsPoint(pos.x, pos.y)) {
+                return waypoint;
+            }
+        }
+    }
+
+    /**
      * Mouse-Down handler
      * @param {Vector} pos
      * @param {enumMouseButton} button

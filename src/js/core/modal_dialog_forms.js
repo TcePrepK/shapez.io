@@ -101,7 +101,6 @@ export class FormElementInput extends FormElement {
 
     bindEvents(parent, clickTrackers) {
         this.element = this.getFormElement(parent);
-        console.log(this.element);
         this.element.addEventListener("input", event => this.updateErrorState());
         this.updateErrorState();
     }
@@ -116,6 +115,11 @@ export class FormElementInput extends FormElement {
 
     getValue() {
         return this.element.value;
+    }
+
+    setValue(value) {
+        this.element.value = value;
+        this.updateErrorState();
     }
 
     focus() {
