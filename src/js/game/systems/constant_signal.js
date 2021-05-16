@@ -103,7 +103,6 @@ export class ConstantSignalSystem extends GameSystemWithFilter {
             }
 
             if (itemInput.chosenItem) {
-                console.log(itemInput.chosenItem);
                 constantComp.signal = itemInput.chosenItem;
             } else {
                 constantComp.signal = this.parseSignalCode(signalValueInput.getValue());

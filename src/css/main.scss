@@ -55,6 +55,7 @@
 @import "ingame_hud/sandbox_controller";
 @import "ingame_hud/standalone_advantages";
 @import "ingame_hud/cat_memes";
+@import "ingame_hud/item_searcher";
 
 // prettier-ignore
 $elements:
@@ -87,6 +88,7 @@ ingame_HUD_SandboxController,
 
 // Overlays
 ingame_HUD_BetaOverlay,
+ingame_HUD_ItemSearcher,
 
 // Dialogs
 ingame_HUD_Shop,

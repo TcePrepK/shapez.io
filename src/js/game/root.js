@@ -29,6 +29,7 @@ import { DynamicTickrate } from "./dynamic_tickrate";
 import { KeyActionMapper } from "./key_action_mapper";
 import { Vector } from "../core/vector";
 import { GameMode } from "./game_mode";
+import { HUDWaypoints } from "./hud/parts/waypoints";
 /* typehints:end */
 
 const logger = createLogger("game/root");
@@ -92,6 +93,9 @@ export class GameRoot {
 
         /** @type {MapView} */
         this.map = null;
+
+        /** @type {HUDWaypoints} */
+        this.waypoint = null;
 
         /** @type {GameLogic} */
         this.logic = null;

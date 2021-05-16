@@ -37,6 +37,7 @@ export class BaseMap extends BasicSerializableObject {
      * Returns the given chunk by index
      * @param {number} chunkX
      * @param {number} chunkY
+     * @param {boolean} createIfNotExistent
      */
     getChunk(chunkX, chunkY, createIfNotExistent = false) {
         const chunkIdentifier = chunkX + "|" + chunkY;

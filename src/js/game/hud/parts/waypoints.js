@@ -39,6 +39,11 @@ import { enumNotificationType } from "./notifications";
 const MAX_LABEL_LENGTH = 71;
 
 export class HUDWaypoints extends BaseHUDPart {
+    constructor(root) {
+        super(root);
+
+        this.root.waypoint = this;
+    }
     /**
      * Creates the overview of waypoints
      * @param {HTMLElement} parent

@@ -1,0 +1,27 @@
+#ingame_HUD_ItemSearcher {
+    position: absolute;
+
+    .button {
+        position: fixed;
+        right: 1%;
+        bottom: 1%;
+        @include S(padding, 15px);
+        text-transform: uppercase;
+        border-radius: 25px;
+
+        @include IncreasedClickArea(0px);
+        color: #fff;
+        background-color: $colorGreenBright;
+        pointer-events: all;
+
+        &:hover {
+            background-color: darken($colorGreenBright, 4);
+            opacity: 0.8;
+            cursor: pointer;
+        }
+
+        h2 {
+            @include PlainText;
+        }
+    }
+}
