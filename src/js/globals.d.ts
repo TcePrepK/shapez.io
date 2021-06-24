@@ -141,12 +141,16 @@ declare interface String {
 declare interface FactoryTemplate<T> {
     entries: Array<Class<T>>;
     entryIds: Array<string>;
+    scToId: any;
     idToEntry: any;
 
     getId(): string;
     getAllIds(): Array<string>;
     register(entry: Class<T>): void;
     hasId(id: string): boolean;
+    findById(id: string): Class<T>;
+    shortCodeToId(id: string): string;
+    idToShortCode(id: string): string;
     findById(id: string): Class<T>;
     getEntries(): Array<Class<T>>;
     getNumEntries(): number;

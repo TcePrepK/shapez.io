@@ -20,6 +20,8 @@ import { HUDMassSelector } from "./mass_selector";
 import { clamp } from "../../../core/utils";
 import { CHUNK_OVERLAY_RES, MapChunkView } from "../../map_chunk_view";
 import { enumHubGoalRewards } from "../../tutorial_goals";
+import { Blueprint } from "../../blueprint";
+import { HUDBlueprintPlacer } from "./blueprint_placer";
 
 const logger = createLogger("screenshot_exporter");
 
@@ -167,6 +169,7 @@ export class HUDScreenshotExporter extends BaseHUDPart {
                     overlayInput.getValue(),
                     layerInput.getValue(),
                     backgroundInput.getValue(),
+                    massSelector instanceof HUDMassSelector && massSelector.selectedUids.size > 0,
                     !!bounds,
                     bounds
                 ),
@@ -180,10 +183,11 @@ export class HUDScreenshotExporter extends BaseHUDPart {
      * @param {boolean} overlay
      * @param {boolean} wiresLayer
      * @param {boolean} hideBackground
+     * @param {boolean} isBlueprint
      * @param {boolean} allowBorder
      * @param {Rectangle?} tileBounds
      */
-    doExport(targetResolution, overlay, wiresLayer, hideBackground, allowBorder, tileBounds) {
+    doExport(targetResolution, overlay, wiresLayer, hideBackground, isBlueprint, allowBorder, tileBounds) {
         logger.log("Starting export ...");
 
         const boundsSelected = !!tileBounds;
@@ -350,9 +354,74 @@ export class HUDScreenshotExporter extends BaseHUDPart {
 
         // Offer export
         logger.log("Rendered buffer, exporting ...");
-        const image = canvas.toDataURL("image/png");
-        const link = document.createElement("a");
-        link.download = "base.png";
+        let image = canvas.toDataURL("image/png");
+        let link = document.createElement("a");
+        link.download = "vanillaImage.png";
+        link.href = image;
+        link.click();
+        logger.log("Done!");
+
+        // Serialization
+        if (isBlueprint) {
+            /** @type {HUDBlueprintPlacer} */
+            const placer = this.root.hud.parts.blueprintPlacer;
+            /** @type {HUDMassSelector} */
+            const selector = this.root.hud.parts.massSelector;
+            const uids = Array.from(selector.selectedUids);
+            const blueprint = Blueprint.fromUids(this.root, uids);
+            const compressedData = placer.compressBlueprint(blueprint);
+            const length = compressedData.length;
+
+            if (length > canvas.width * canvas.height) {
+                logger.error("Canvas size exceeded, aborting");
+                this.root.hud.parts.dialogs.showInfo(
+                    // @TODO: translation (T.dialogs.exportScreenshotFail.title)
+                    "Too small",
+                    "The region selected is too small to save blueprint in, sorry! Try selecting a bigger region."
+                );
+                return;
+            }
+
+            const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+            for (let n = 0; n < 4 * 4; n++) {
+                imageData.data[n] = (imageData.data[n] & 0xfc) + ((length >> (n * 2)) & 0x03);
+            }
+
+            for (let i = 0; i < compressedData.length; i++) {
+                const byte = compressedData[i];
+                const idx = (i + 4) * 4;
+                for (let n = 0; n < 4; n++) {
+                    imageData.data[idx + n] = (imageData.data[idx + n] & 0xfc) + (byte & (0x03 << (n * 2)));
+                }
+            }
+            context.putImageData(imageData, 0, 0);
+
+            let len = 0;
+            for (let n = 0; n < 4 * 4; n++) {
+                const bits = imageData.data[n] & 0x03;
+                len += bits << (n * 2);
+            }
+
+            const arr = new Uint8Array(len);
+            for (let i = 0; i < len; i++) {
+                const byte = compressedData[i];
+                const idx = (i + 4) * 4;
+                let num = 0;
+                for (let n = 0; n < 4; n++) {
+                    num += (imageData.data[idx + n] & 0x03) << (n * 2);
+                }
+                arr[i] = num;
+            }
+
+            console.log(compressedData);
+            console.log(arr);
+        }
+
+        // Offer export
+        logger.log("Rendered buffer, exporting ...");
+        image = canvas.toDataURL("image/png");
+        link = document.createElement("a");
+        link.download = "blueprintEncodedImage.png";
         link.href = image;
         link.click();
         logger.log("Done!");

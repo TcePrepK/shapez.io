@@ -11,6 +11,7 @@ export class Factory {
         this.entries = [];
         this.entryIds = [];
         this.idToEntry = {};
+        this.scToId = {};
     }
 
     getId() {
@@ -21,6 +22,7 @@ export class Factory {
         // Extract id
         const id = entry.getId();
         assert(id, "Factory: Invalid id for class: " + entry);
+        const sc = this.idToShortCode(id);
 
         // Check duplicates
         assert(!this.idToEntry[id], "Duplicate factory entry for " + id);
@@ -29,6 +31,7 @@ export class Factory {
         this.entries.push(entry);
         this.entryIds.push(id);
         this.idToEntry[id] = entry;
+        this.scToId[sc] = id;
     }
 
     /**
@@ -53,6 +56,30 @@ export class Factory {
             return null;
         }
         return entry;
+    }
+
+    /**
+     * Finds an instance by a given id
+     * @param {string} sc
+     * @returns {string}
+     */
+    shortCodeToId(sc) {
+        const id = this.scToId[sc];
+        if (!id) {
+            logger.error("Short code ", sc, "is not registered on factory", this.id, "!");
+            assert(false, "Factory: Short code '" + sc + "' is not registered!");
+            return null;
+        }
+        return id;
+    }
+
+    /**
+     * Finds an instance by a given id
+     * @param {string} id
+     * @returns {string}
+     */
+    idToShortCode(id) {
+        return id.replace(/(?!^)[a-z]/g, "").toLowerCase();
     }
 
     /**

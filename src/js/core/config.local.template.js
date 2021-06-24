@@ -117,7 +117,7 @@ export default {
     // disableSlowAsserts: true,
     // -----------------------------------------------------------------------------------
     // Enable copy and paste using system clipboard
-    // useClipboard: true,
+    useClipboard: true,
     // -----------------------------------------------------------------------------------
     /* dev:end */
 };

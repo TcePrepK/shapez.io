@@ -7,6 +7,7 @@ import { ACHIEVEMENTS } from "../platform/achievement_provider";
 import { GameRoot } from "./root";
 import { SerializerInternal } from "../savegame/serializer_internal";
 import { createLogger } from "../core/logging";
+import { gComponentRegistry } from "../core/global_registries";
 
 const logger = createLogger("blueprint");
 
@@ -33,12 +34,48 @@ export class Blueprint {
      * Serialize
      */
     serialize() {
-        let data = new SerializerInternal().serializeEntityArray(this.entities);
+        const data = new SerializerInternal().serializeEntityArray(this.entities);
         // Remove unneeded fields
-        for (let i = 0; i < data.length; ++i) {
-            const entry = data[i];
+        for (const entry of data) {
             delete entry.uid;
             delete entry.components.WiredPins;
+            if (entry.components.ConstantSignal) {
+                const data = entry.components.ConstantSignal.signal.data;
+                entry.components.ConstantSignal = data.replace(/:/g, "");
+            }
+            entry.components.X = entry.components.StaticMapEntity.origin.x;
+            entry.components.Y = entry.components.StaticMapEntity.origin.y;
+
+            const r = entry.components.StaticMapEntity.rotation / 90;
+            const ro = entry.components.StaticMapEntity.originalRotation / 90;
+            entry.components.rotation = r + (ro << 2);
+            delete entry.components.StaticMapEntity.rotation;
+            delete entry.components.StaticMapEntity.originalRotation;
+            delete entry.components.StaticMapEntity.origin;
+
+            for (const data in entry.components.StaticMapEntity) {
+                entry.components[data] = entry.components.StaticMapEntity[data];
+            }
+            delete entry.components.StaticMapEntity;
+
+            for (const component in entry.components) {
+                const str = component.replace(/(?!^)[a-z]/g, "").toLowerCase();
+                if (str === component) continue;
+                entry[str] = entry.components[component];
+                for (const subComponent in entry[str]) {
+                    const subStr = subComponent.replace(/(?!^)[a-z]/g, "").toLowerCase();
+                    if (subStr === subComponent) continue;
+                    entry[str][subStr] = entry[str][subComponent];
+                    delete entry[str][subComponent];
+                    for (const subSubComponent in entry[str][subStr]) {
+                        const subSubStr = subSubComponent.replace(/(?!^)[a-z]/g, "").toLowerCase();
+                        if (subSubStr === subSubComponent) continue;
+                        entry[str][subStr][subSubStr] = entry[str][subStr][subSubComponent];
+                        delete entry[str][subStr][subSubComponent];
+                    }
+                }
+            }
+            delete entry.components;
         }
         return data;
     }
@@ -62,16 +99,8 @@ export class Blueprint {
             /** @type {Array<Entity>} */
             const entityArray = [];
             for (let i = 0; i < json.length; ++i) {
-                /** @type {Entity?} */
                 const value = json[i];
-                if (value.components == undefined || value.components.StaticMapEntity == undefined) {
-                    return;
-                }
-                const staticData = value.components.StaticMapEntity;
-                if (staticData.code == undefined || staticData.origin == undefined) {
-                    return;
-                }
-                const result = serializer.deserializeEntity(root, value);
+                const result = serializer.deserializeCompressedEntity(root, value);
                 if (typeof result === "string") {
                     throw new Error(result);
                 }

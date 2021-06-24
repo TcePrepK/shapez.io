@@ -13,7 +13,8 @@ import { BaseHUDPart } from "../base_hud_part";
 import { DynamicDomAttach } from "../dynamic_dom_attach";
 import { globalConfig } from "../../../core/config";
 import { paste } from "../../../core/clipboard_paste";
-import { compressX64, decompressX64 } from "../../../core/lzstring";
+import { compressU8, compressX64, decompressX64 } from "../../../core/lzstring";
+import { HUDScreenshotExporter } from "./screenshot_exporter";
 
 const copy = require("clipboard-copy");
 
@@ -217,13 +218,22 @@ export class HUDBlueprintPlacer extends BaseHUDPart {
     }
 
     /**
+     * @param {Blueprint} bp
+     * @returns
+     */
+    compressBlueprint(bp) {
+        if (!bp) return null;
+        const serializedBP = bp.serialize();
+        const json = JSON.stringify(serializedBP);
+        return compressU8(json);
+    }
+
+    /**
      * Copy blueprint to clipboard
      */
     async copyToClipboard() {
-        const serializedBP = this.currentBlueprint.get().serialize();
         try {
-            const json = JSON.stringify(serializedBP);
-            await copy(compressX64(json));
+            // await copy(this.compressBlueprint(this.currentBlueprint.get()));
             this.root.soundProxy.playUi(SOUNDS.copy);
             logger.debug("Copied blueprint to clipboard");
         } catch (e) {
