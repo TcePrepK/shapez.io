@@ -13,7 +13,7 @@ import { BaseHUDPart } from "../base_hud_part";
 import { DynamicDomAttach } from "../dynamic_dom_attach";
 import { globalConfig } from "../../../core/config";
 import { paste } from "../../../core/clipboard_paste";
-import { compressU8, compressX64, decompressX64 } from "../../../core/lzstring";
+import { compressU8, compressU8WHeader, compressX64, decompressX64 } from "../../../core/lzstring";
 import { HUDScreenshotExporter } from "./screenshot_exporter";
 
 const copy = require("clipboard-copy");
@@ -215,17 +215,6 @@ export class HUDBlueprintPlacer extends BaseHUDPart {
         const worldPos = this.root.camera.screenToWorld(mousePosition);
         const tile = worldPos.toTileSpace();
         blueprint.draw(parameters, tile);
-    }
-
-    /**
-     * @param {Blueprint} bp
-     * @returns
-     */
-    compressBlueprint(bp) {
-        if (!bp) return null;
-        const serializedBP = bp.serialize();
-        const json = JSON.stringify(serializedBP);
-        return compressU8(json);
     }
 
     /**

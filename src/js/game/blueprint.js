@@ -7,7 +7,8 @@ import { ACHIEVEMENTS } from "../platform/achievement_provider";
 import { GameRoot } from "./root";
 import { SerializerInternal } from "../savegame/serializer_internal";
 import { createLogger } from "../core/logging";
-import { gComponentRegistry } from "../core/global_registries";
+import { compressU8WHeader, decompressU8WHeader } from "../core/lzstring";
+import { StaticMapEntityComponent } from "./components/static_map_entity";
 
 const logger = createLogger("blueprint");
 
@@ -35,49 +36,12 @@ export class Blueprint {
      */
     serialize() {
         const data = new SerializerInternal().serializeEntityArray(this.entities);
-        // Remove unneeded fields
-        for (const entry of data) {
-            delete entry.uid;
-            delete entry.components.WiredPins;
-            if (entry.components.ConstantSignal) {
-                const data = entry.components.ConstantSignal.signal.data;
-                entry.components.ConstantSignal = data.replace(/:/g, "");
-            }
-            entry.components.X = entry.components.StaticMapEntity.origin.x;
-            entry.components.Y = entry.components.StaticMapEntity.origin.y;
-
-            const r = entry.components.StaticMapEntity.rotation / 90;
-            const ro = entry.components.StaticMapEntity.originalRotation / 90;
-            entry.components.rotation = r + (ro << 2);
-            delete entry.components.StaticMapEntity.rotation;
-            delete entry.components.StaticMapEntity.originalRotation;
-            delete entry.components.StaticMapEntity.origin;
-
-            for (const data in entry.components.StaticMapEntity) {
-                entry.components[data] = entry.components.StaticMapEntity[data];
-            }
-            delete entry.components.StaticMapEntity;
-
-            for (const component in entry.components) {
-                const str = component.replace(/(?!^)[a-z]/g, "").toLowerCase();
-                if (str === component) continue;
-                entry[str] = entry.components[component];
-                for (const subComponent in entry[str]) {
-                    const subStr = subComponent.replace(/(?!^)[a-z]/g, "").toLowerCase();
-                    if (subStr === subComponent) continue;
-                    entry[str][subStr] = entry[str][subComponent];
-                    delete entry[str][subComponent];
-                    for (const subSubComponent in entry[str][subStr]) {
-                        const subSubStr = subSubComponent.replace(/(?!^)[a-z]/g, "").toLowerCase();
-                        if (subSubStr === subSubComponent) continue;
-                        entry[str][subStr][subSubStr] = entry[str][subStr][subSubComponent];
-                        delete entry[str][subStr][subSubComponent];
-                    }
-                }
-            }
-            delete entry.components;
-        }
-        return data;
+        // Compress data
+        const compressedData = Blueprint.compressSerializedData(data);
+        // Stringfy
+        const json = JSON.stringify(compressedData);
+        // Return compressed json
+        return compressU8WHeader(json, 0);
     }
 
     /**
@@ -98,9 +62,16 @@ export class Blueprint {
             const serializer = new SerializerInternal();
             /** @type {Array<Entity>} */
             const entityArray = [];
-            for (let i = 0; i < json.length; ++i) {
-                const value = json[i];
-                const result = serializer.deserializeCompressedEntity(root, value);
+            for (const /** @type {Entity?} */ value of json) {
+                console.log(value);
+                if (value.components == undefined || value.components.StaticMapEntity == undefined) {
+                    return;
+                }
+                const staticData = value.components.StaticMapEntity;
+                if (staticData.code == undefined || staticData.origin == undefined) {
+                    return;
+                }
+                const result = serializer.deserializeEntity(root, value);
                 if (typeof result === "string") {
                     throw new Error(result);
                 }
@@ -110,6 +81,152 @@ export class Blueprint {
         } catch (e) {
             logger.error("Invalid blueprint data:", e.message);
         }
+    }
+
+    /**
+     * Compresses serialized blueprint
+     * @param {Array<Object>} data
+     */
+    static compressSerializedData(data) {
+        console.log(data);
+        for (const entry of data) {
+            // Remove useless data
+            delete entry.uid;
+            delete entry.components.WiredPins;
+
+            // Move code to components
+            entry.c = entry.components.StaticMapEntity.code;
+
+            // Move origin to components
+            entry.x = entry.components.StaticMapEntity.origin.x;
+            entry.y = entry.components.StaticMapEntity.origin.y;
+
+            // Move rotations to components with mixing them
+            const r = entry.components.StaticMapEntity.rotation / 90;
+            const ro = entry.components.StaticMapEntity.originalRotation / 90;
+            entry.r = r + (ro << 2);
+            delete entry.components.StaticMapEntity;
+
+            // Remove useless data within constant signal
+            if (entry.components.ConstantSignal) {
+                const data = entry.components.ConstantSignal.signal.data;
+                entry.s = data.replace(/:/g, "");
+            }
+
+            for (const component in entry.components) {
+                if (!component.match(/(?!^)[a-z]/g)) continue;
+                const str = component.replace(/(?!^)[a-z]/g, "").toLowerCase();
+                entry[str] = entry.components[component];
+
+                for (const subComponent in entry[str]) {
+                    if (!subComponent.match(/(?!^)[a-z]/g)) continue;
+                    const subStr = subComponent.replace(/(?!^)[a-z]/g, "").toLowerCase();
+                    entry[str][subStr] = entry[str][subComponent];
+                    delete entry[str][subComponent];
+
+                    for (const subSubComponent in entry[str][subStr]) {
+                        if (!subSubComponent.match(/(?!^)[a-z]/g)) continue;
+                        const subSubStr = subSubComponent.replace(/(?!^)[a-z]/g, "").toLowerCase();
+                        entry[str][subStr][subSubStr] = entry[str][subStr][subSubComponent];
+                        delete entry[str][subStr][subSubComponent];
+                    }
+                }
+            }
+
+            delete entry.components;
+        }
+
+        return data;
+    }
+
+    /**
+     * Compresses serialized blueprint
+     * @param {Array<Object>} data
+     * @returns {Array<Object>}
+     */
+    static decompressSerializedData(data) {
+        for (const entry of data) {
+            entry.uid = 0;
+            entry.components = {};
+
+            const r = (entry.r & 0x0011) * 90;
+            const or = ((entry.r & 0b1100) >> 2) * 90;
+            entry.components.StaticMapEntity = {
+                origin: { x: entry.x, y: entry.y },
+                rotation: r,
+                originalRotation: or,
+                code: entry.c,
+            };
+
+            delete entry.x;
+            delete entry.y;
+            delete entry.c;
+            delete entry.r;
+        }
+
+        return data;
+    }
+
+    /**
+     * Serializes blueprint and writes it on image and returns new data
+     * @param {ImageData} image
+     * @returns {ImageData}
+     */
+    serializeToImage(image) {
+        const compressedData = this.serialize();
+        const len = compressedData.length;
+        const size = image.width * image.height;
+        if (len + 4 > size) return null;
+
+        for (let n = 0; n < 4 * 4; n++) {
+            image.data[n] = (image.data[n] & 0xfc) + ((len >> (n * 2)) & 0x03);
+        }
+
+        for (let i = 0; i < len; i++) {
+            const byte = compressedData[i];
+            const idx = (i + 4) * 4;
+
+            for (let n = 0; n < 4; n++) {
+                image.data[idx + n] = (image.data[idx + n] & 0xfc) + ((byte >> (n * 2)) & 0x03);
+            }
+        }
+
+        return image;
+    }
+
+    /**
+     * Reads and deserializes the data within image
+     * @param {GameRoot} root
+     * @param {ImageData} image
+     * @returns {Blueprint}
+     */
+    static deserializeFromImage(root, image) {
+        let len = 0;
+        for (let n = 0; n < 4 * 4; n++) {
+            const bits = image.data[n] & 0x03;
+            len += bits << (n * 2);
+        }
+
+        const size = image.width * image.height;
+        assert(
+            len + 4 < size,
+            "Written length is bigger than image. Image could be corrupted or written badly!"
+        );
+
+        const arr = new Uint8Array(len);
+        for (let i = 0; i < len; i++) {
+            const idx = (i + 4) * 4;
+            let num = 0;
+            num += (image.data[idx + 0] & 0x03) << 0;
+            num += (image.data[idx + 1] & 0x03) << 2;
+            num += (image.data[idx + 2] & 0x03) << 4;
+            num += (image.data[idx + 3] & 0x03) << 6;
+            arr[i] = num;
+        }
+
+        const compressedData = JSON.parse(decompressU8WHeader(arr));
+        const serializedData = Blueprint.decompressSerializedData(compressedData);
+        return Blueprint.deserialize(root, serializedData);
     }
 
     /**
