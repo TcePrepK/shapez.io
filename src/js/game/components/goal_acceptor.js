@@ -14,6 +14,21 @@ export class GoalAcceptorComponent extends Component {
         };
     }
 
+    static compressData(entry) {
+        entry.ga = entry.components.GoalAcceptor.item.replace(/:/g, "");
+    }
+
+    static decompressData(entry) {
+        const itemD = [];
+        for (let i = 0, len = entry.ga.length; i < len; i += 8) {
+            itemD.push(entry.ga.substr(i, 8));
+        }
+        const item = itemD.join(":");
+        entry.components.GoalAcceptor = {
+            item,
+        };
+    }
+
     /**
      * @param {object} param0
      * @param {BaseItem=} param0.item

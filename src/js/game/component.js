@@ -18,6 +18,24 @@ export class Component extends BasicSerializableObject {
     }
 
     /**
+     * Returns a object representing the compressed components data
+     * @param {Component} entry
+     * @returns {Array<Object>|Object}
+     */
+    static compressData(entry) {
+        return {};
+    }
+
+    /**
+     * Returns a object representing the decompressed components data
+     * @param {Array<Object>|Object} entry
+     * @returns {Array<Object>|Object}
+     */
+    static decompressData(entry) {
+        return {};
+    }
+
+    /**
      * Copy the current state to another component
      * @param {Component} otherComponent
      */

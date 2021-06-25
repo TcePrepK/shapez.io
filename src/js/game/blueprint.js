@@ -9,6 +9,8 @@ import { SerializerInternal } from "../savegame/serializer_internal";
 import { createLogger } from "../core/logging";
 import { compressU8WHeader, decompressU8WHeader } from "../core/lzstring";
 import { StaticMapEntityComponent } from "./components/static_map_entity";
+import { gComponentRegistry } from "../core/global_registries";
+import { Component } from "./component";
 
 const logger = createLogger("blueprint");
 
@@ -63,7 +65,6 @@ export class Blueprint {
             /** @type {Array<Entity>} */
             const entityArray = [];
             for (const /** @type {Entity?} */ value of json) {
-                console.log(value);
                 if (value.components == undefined || value.components.StaticMapEntity == undefined) {
                     return;
                 }
@@ -88,11 +89,9 @@ export class Blueprint {
      * @param {Array<Object>} data
      */
     static compressSerializedData(data) {
-        console.log(data);
         for (const entry of data) {
             // Remove useless data
             delete entry.uid;
-            delete entry.components.WiredPins;
 
             // Move code to components
             entry.c = entry.components.StaticMapEntity.code;
@@ -107,30 +106,17 @@ export class Blueprint {
             entry.r = r + (ro << 2);
             delete entry.components.StaticMapEntity;
 
-            // Remove useless data within constant signal
-            if (entry.components.ConstantSignal) {
-                const data = entry.components.ConstantSignal.signal.data;
-                entry.s = data.replace(/:/g, "");
-            }
+            // // Remove useless data within constant signal
+            // if (entry.components.ConstantSignal) {
+            //     const data = entry.components.ConstantSignal.signal.data;
+            //     entry.s = data.replace(/:/g, "");
+            // }
 
-            for (const component in entry.components) {
-                if (!component.match(/(?!^)[a-z]/g)) continue;
-                const str = component.replace(/(?!^)[a-z]/g, "").toLowerCase();
-                entry[str] = entry.components[component];
-
-                for (const subComponent in entry[str]) {
-                    if (!subComponent.match(/(?!^)[a-z]/g)) continue;
-                    const subStr = subComponent.replace(/(?!^)[a-z]/g, "").toLowerCase();
-                    entry[str][subStr] = entry[str][subComponent];
-                    delete entry[str][subComponent];
-
-                    for (const subSubComponent in entry[str][subStr]) {
-                        if (!subSubComponent.match(/(?!^)[a-z]/g)) continue;
-                        const subSubStr = subSubComponent.replace(/(?!^)[a-z]/g, "").toLowerCase();
-                        entry[str][subStr][subSubStr] = entry[str][subStr][subSubComponent];
-                        delete entry[str][subStr][subSubComponent];
-                    }
-                }
+            for (const id in entry.components) {
+                const comp = gComponentRegistry.findById(id);
+                // @ts-ignore
+                comp.compressData(entry);
+                delete entry.components[id];
             }
 
             delete entry.components;
@@ -146,12 +132,9 @@ export class Blueprint {
      */
     static decompressSerializedData(data) {
         for (const entry of data) {
-            entry.uid = 0;
-            entry.components = {};
-
             const r = (entry.r & 0x0011) * 90;
             const or = ((entry.r & 0b1100) >> 2) * 90;
-            entry.components.StaticMapEntity = {
+            const staticComp = {
                 origin: { x: entry.x, y: entry.y },
                 rotation: r,
                 originalRotation: or,
@@ -162,6 +145,19 @@ export class Blueprint {
             delete entry.y;
             delete entry.c;
             delete entry.r;
+
+            entry.components = {};
+            for (const shortKey in entry) {
+                if (shortKey == "components") continue;
+                const componentID = gComponentRegistry.shortCodeToId(shortKey);
+                const comp = gComponentRegistry.findById(componentID);
+                // @ts-ignore
+                comp.decompressData(entry);
+                delete entry[shortKey];
+            }
+
+            entry.components.StaticMapEntity = staticComp;
+            entry.uid = 0;
         }
 
         return data;
