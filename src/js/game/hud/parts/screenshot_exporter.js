@@ -353,15 +353,6 @@ export class HUDScreenshotExporter extends BaseHUDPart {
         this.root.currentLayer = currentLayer;
         this.root.hud.parts.wiresOverlay.currentAlpha = currentAlpha;
 
-        // Offer export
-        logger.log("Rendered buffer, exporting ...");
-        let image = canvas.toDataURL("image/png");
-        let link = document.createElement("a");
-        link.download = "vanillaImage.png";
-        link.href = image;
-        link.click();
-        logger.log("Done!");
-
         // Serialization
         if (isBlueprint) {
             /** @type {HUDMassSelector} */
@@ -381,15 +372,13 @@ export class HUDScreenshotExporter extends BaseHUDPart {
             }
 
             context.putImageData(imageData, 0, 0);
-
-            console.log(Blueprint.deserializeFromImage(this.root, imageData));
         }
 
         // Offer export
         logger.log("Rendered buffer, exporting ...");
-        image = canvas.toDataURL("image/png");
-        link = document.createElement("a");
-        link.download = "blueprintEncodedImage.png";
+        const image = canvas.toDataURL("image/png");
+        const link = document.createElement("a");
+        link.download = isBlueprint ? "blueprint.png" : "image.png";
         link.href = image;
         link.click();
         logger.log("Done!");

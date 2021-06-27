@@ -15,6 +15,7 @@ import { globalConfig } from "../../../core/config";
 import { paste } from "../../../core/clipboard_paste";
 import { compressU8, compressU8WHeader, compressX64, decompressX64 } from "../../../core/lzstring";
 import { HUDScreenshotExporter } from "./screenshot_exporter";
+import { GameRoot } from "../../root";
 
 const copy = require("clipboard-copy");
 
@@ -48,6 +49,17 @@ export class HUDBlueprintPlacer extends BaseHUDPart {
         keyActionMapper.getBinding(KEYMAPPINGS.placement.pipette).add(this.abortPlacement, this);
         keyActionMapper.getBinding(KEYMAPPINGS.placement.rotateWhilePlacing).add(this.rotateBlueprint, this);
         keyActionMapper.getBinding(KEYMAPPINGS.massSelect.pasteLastBlueprint).add(this.pasteBlueprint, this);
+
+        if (G_IS_DEV && globalConfig.debug.useClipboard) {
+            window.addEventListener(
+                "paste",
+                (/** @type {Event} */ e) => {
+                    const blueprint = this.pasteFromClipboard(this.root, e);
+                    if (blueprint) this.currentBlueprint.set(blueprint);
+                },
+                false
+            );
+        }
 
         this.root.camera.downPreHandler.add(this.onMouseDown, this);
         this.root.camera.movePreHandler.add(this.onMouseMove, this);
@@ -158,9 +170,6 @@ export class HUDBlueprintPlacer extends BaseHUDPart {
             return;
         }
         this.currentBlueprint.set(Blueprint.fromUids(this.root, uids));
-        if (G_IS_DEV && globalConfig.debug.useClipboard) {
-            this.copyToClipboard();
-        }
     }
 
     /**
@@ -179,11 +188,8 @@ export class HUDBlueprintPlacer extends BaseHUDPart {
     /**
      * Attempts to paste the last blueprint
      */
-    async pasteBlueprint() {
+    pasteBlueprint() {
         let blueprint = null;
-        if (G_IS_DEV && globalConfig.debug.useClipboard) {
-            blueprint = await this.pasteFromClipboard();
-        }
         blueprint = blueprint || this.lastBlueprintUsed;
         if (blueprint !== null) {
             if (blueprint.layer !== this.root.currentLayer) {
@@ -218,31 +224,58 @@ export class HUDBlueprintPlacer extends BaseHUDPart {
     }
 
     /**
-     * Copy blueprint to clipboard
+     * Returns image data from paste event if there is any
+     * @param {GameRoot} root
+     * @returns {Blueprint}
      */
-    async copyToClipboard() {
-        try {
-            // await copy(this.compressBlueprint(this.currentBlueprint.get()));
-            this.root.soundProxy.playUi(SOUNDS.copy);
-            logger.debug("Copied blueprint to clipboard");
-        } catch (e) {
-            logger.error("Copy to clipboard failed:", e.message);
-        }
-    }
+    pasteFromClipboard(root, pasteEvent) {
+        if (!pasteEvent.clipboardData) return;
 
-    /**
-     * Attempt to get Blueprint from clipboard
-     * @returns {Promise<Blueprint|void>}
-     */
-    async pasteFromClipboard() {
-        let json;
-        try {
-            let data = await paste();
-            json = JSON.parse(decompressX64(data.trim()));
-            logger.debug("Received data from clipboard");
-        } catch (e) {
-            logger.error("Paste from clipboard failed:", e.message);
+        // Retrive items from clipboard
+        const items = pasteEvent.clipboardData.items;
+
+        if (!items) return;
+
+        // Loop over items
+        for (let i = 0; i < items.length; i++) {
+            const item = items[i];
+            // Skip content if not image
+            if (item.type.indexOf("image") == -1) continue;
+
+            // Retrieve image on clipboard as blob
+            const blob = item.getAsFile();
+
+            // Create an abstract canvas and get context
+            const canvas = document.createElement("canvas");
+            const context = canvas.getContext("2d");
+
+            // Create an image
+            const image = new Image();
+
+            // Once the image loads, render the img on the canvas
+            image.onload = function () {
+                // Update dimensions of the canvas with the dimensions of the image
+                canvas.width = image.width;
+                canvas.height = image.height;
+
+                // Draw the image
+                context.drawImage(image, 0, 0);
+
+                // Get data
+                const data = context.getImageData(0, 0, image.width, image.height);
+
+                // Deserialize
+                console.log("Starting Serializing");
+                const blueprint = Blueprint.deserializeFromImage(root, data);
+                console.log(blueprint);
+            };
+
+            // Crossbrowser support for URL
+            const URLObj = window.URL || window.webkitURL;
+
+            // Creates a DOMString containing a URL representing the object given in the parameter
+            // namely the original Blob
+            image.src = URLObj.createObjectURL(blob);
         }
-        return Blueprint.deserialize(this.root, json);
     }
 }

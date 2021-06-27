@@ -50,7 +50,7 @@ export class Blueprint {
      * Deserialize
      * @param {GameRoot} root
      * @param {Object} json
-     * @retruns {Blueprint|void}
+     * @returns {Blueprint}
      */
     static deserialize(root, json) {
         try {
@@ -76,6 +76,7 @@ export class Blueprint {
                 if (typeof result === "string") {
                     throw new Error(result);
                 }
+                // root.entityMgr.registerEntity(result);
                 entityArray.push(result);
             }
             return new Blueprint(entityArray);
@@ -105,12 +106,6 @@ export class Blueprint {
             const ro = entry.components.StaticMapEntity.originalRotation / 90;
             entry.r = r + (ro << 2);
             delete entry.components.StaticMapEntity;
-
-            // // Remove useless data within constant signal
-            // if (entry.components.ConstantSignal) {
-            //     const data = entry.components.ConstantSignal.signal.data;
-            //     entry.s = data.replace(/:/g, "");
-            // }
 
             for (const id in entry.components) {
                 const comp = gComponentRegistry.findById(id);
@@ -197,32 +192,38 @@ export class Blueprint {
      * @returns {Blueprint}
      */
     static deserializeFromImage(root, image) {
-        let len = 0;
-        for (let n = 0; n < 4 * 4; n++) {
-            const bits = image.data[n] & 0x03;
-            len += bits << (n * 2);
+        try {
+            let len = 0;
+            for (let n = 0; n < 4 * 4; n++) {
+                const bits = image.data[n] & 0x03;
+                len += bits << (n * 2);
+            }
+
+            const size = image.width * image.height;
+            assert(
+                len + 4 < size,
+                "Written length is bigger than image. Image could be corrupted or written badly!"
+            );
+
+            const arr = new Uint8Array(len);
+            for (let i = 0; i < len; i++) {
+                const idx = (i + 4) * 4;
+                let num = 0;
+                num += (image.data[idx + 0] & 0x03) << 0;
+                num += (image.data[idx + 1] & 0x03) << 2;
+                num += (image.data[idx + 2] & 0x03) << 4;
+                num += (image.data[idx + 3] & 0x03) << 6;
+                arr[i] = num;
+            }
+
+            const compressedData = JSON.parse(decompressU8WHeader(arr));
+            const serializedData = Blueprint.decompressSerializedData(compressedData);
+            logger.debug("Received data from clipboard");
+
+            return Blueprint.deserialize(root, serializedData);
+        } catch (e) {
+            logger.error("Paste from clipboard failed:", e.message);
         }
-
-        const size = image.width * image.height;
-        assert(
-            len + 4 < size,
-            "Written length is bigger than image. Image could be corrupted or written badly!"
-        );
-
-        const arr = new Uint8Array(len);
-        for (let i = 0; i < len; i++) {
-            const idx = (i + 4) * 4;
-            let num = 0;
-            num += (image.data[idx + 0] & 0x03) << 0;
-            num += (image.data[idx + 1] & 0x03) << 2;
-            num += (image.data[idx + 2] & 0x03) << 4;
-            num += (image.data[idx + 3] & 0x03) << 6;
-            arr[i] = num;
-        }
-
-        const compressedData = JSON.parse(decompressU8WHeader(arr));
-        const serializedData = Blueprint.decompressSerializedData(compressedData);
-        return Blueprint.deserialize(root, serializedData);
     }
 
     /**
@@ -273,6 +274,7 @@ export class Blueprint {
      * @param {DrawParameters} parameters
      */
     draw(parameters, tile) {
+        console.log(this.entities);
         parameters.context.globalAlpha = 0.8;
         for (let i = 0; i < this.entities.length; ++i) {
             const entity = this.entities[i];
