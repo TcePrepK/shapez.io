@@ -46,7 +46,7 @@ export class MapChunkView extends MapChunk {
         }
 
         if (this.root.gameMode.hasResources()) {
-            systems.mapResources.drawChunk(parameters, this);
+            // systems.mapResources.drawChunk(parameters, this);
         }
 
         systems.beltUnderlays.drawChunk(parameters, this);

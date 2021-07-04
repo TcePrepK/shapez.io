@@ -27,7 +27,7 @@ import { EntityManager } from "./entity_manager";
 import { GameSystemManager } from "./game_system_manager";
 import { HubGoals } from "./hub_goals";
 import { GameHUD } from "./hud/hud";
-import { KeyActionMapper } from "./key_action_mapper";
+import { KeyActionMapper, KEYMAPPINGS } from "./key_action_mapper";
 import { GameLogic } from "./logic";
 import { MapView } from "./map_view";
 import { defaultBuildingVariant } from "./meta_building";
@@ -208,6 +208,18 @@ export class GameCore {
             return false;
         }
         this.root.gameIsFresh = false;
+
+        // /** @type {Array<Array<Array<number>>>} */
+        // // @ts-ignore
+        // const data = require("./meme1.json");
+        // for (let i = 0; i < data[0].length; i++) {
+        //     for (let j = 0; j < data[0][i].length; j++) {
+        //         const elem = data[0][i][j];
+        //         console.log(elem);
+        //         break;
+        //     }
+        // }
+
         return true;
     }
 
@@ -451,8 +463,8 @@ export class GameCore {
             // Miner & Static map entities etc.
             root.map.drawForeground(params);
 
-            // HUB Overlay
-            systems.hub.draw(params);
+            // // HUB Overlay
+            // systems.hub.draw(params);
 
             // Green wires overlay
             if (root.hud.parts.wiresOverlay) {
@@ -464,6 +476,40 @@ export class GameCore {
                 root.map.drawWiresForegroundLayer(params);
             }
         }
+
+        if (!this.ctick) {
+            this.ctick = 0;
+            root.keyMapper.getBinding(KEYMAPPINGS.ingame.toggleHud).signal.dispatch();
+        }
+
+        root.hubGoals.level = 30;
+        root.camera.desiredZoom = 1;
+        root.camera.centerOnMap();
+        /** @type {Array<Array<Array<number>>>} */
+        // @ts-ignore
+        const data = require("./meme1.json");
+        const t = Math.floor(this.ctick / 5);
+
+        const w = 32;
+        const off = w;
+        const height = data[t].length * off;
+        const width = data[t][0].length * off;
+
+        for (let j = 0; j < data[t].length; j++) {
+            for (let i = 0; i < data[t][j].length; i++) {
+                const elem = data[t][j][i];
+
+                const x = i * off;
+                const y = j * off;
+
+                context.fillStyle = elem == 1 ? "black" : "white";
+                context.fillRect(x - width / 2, y - height / 2, w, w);
+
+                // break;
+            }
+        }
+
+        this.ctick++;
 
         if (this.overlayAlpha > 0.01) {
             // Map overview

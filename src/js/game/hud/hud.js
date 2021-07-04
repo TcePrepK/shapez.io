@@ -155,7 +155,7 @@ export class GameHUD {
      * Toggles the ui
      */
     toggleUi() {
-        document.body.classList.toggle("uiHidden");
+        document.body.classList.toggle("uiHidden", true);
     }
 
     /**
