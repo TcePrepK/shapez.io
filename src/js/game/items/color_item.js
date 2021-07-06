@@ -36,6 +36,13 @@ export class ColorItem extends BaseItem {
     }
 
     /**
+     * @returns {string}
+     */
+    getData() {
+        return this.color;
+    }
+
+    /**
      * @param {BaseItem} other
      */
     equalsImpl(other) {

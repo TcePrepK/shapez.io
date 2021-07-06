@@ -39,6 +39,15 @@ export class BaseItem extends BasicSerializableObject {
     }
 
     /**
+     * Returns a string id of the item
+     * @returns {any}
+     */
+    getData() {
+        abstract;
+        return "";
+    }
+
+    /**
      * Returns if the item equals the other itme
      * @param {BaseItem} other
      * @returns {boolean}

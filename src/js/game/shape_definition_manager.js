@@ -5,6 +5,8 @@ import { ShapeItem } from "./items/shape_item";
 import { GameRoot } from "./root";
 import { enumSubShape, ShapeDefinition } from "./shape_definition";
 import { ACHIEVEMENTS } from "../platform/achievement_provider";
+import { ColorItem } from "./items/color_item";
+import { ShapeziedColorItem } from "./items/shapezied_color_item";
 
 const logger = createLogger("shape_definition_manager");
 
@@ -31,6 +33,11 @@ export class ShapeDefinitionManager extends BasicSerializableObject {
          * Store a cache from key -> item
          */
         this.shapeKeyToItem = {};
+
+        /**
+         * Store a cache from key -> item
+         */
+        this.shapeziedColorKeyToItem = {};
 
         // Caches operations in the form of 'operation/def1[/def2]'
         /** @type {Object.<string, Array<ShapeDefinition>|ShapeDefinition>} */
@@ -62,6 +69,20 @@ export class ShapeDefinitionManager extends BasicSerializableObject {
         }
         const definition = this.getShapeFromShortKey(hash);
         return (this.shapeKeyToItem[hash] = new ShapeItem(definition));
+    }
+
+    /**
+     * Returns a item instance from a given short key
+     * @param {string} hash
+     * @returns {ShapeziedColorItem}
+     */
+    getShapeziedColorItemFromShortKey(hash) {
+        const cached = this.shapeziedColorKeyToItem[hash];
+        if (cached) {
+            return cached;
+        }
+        const definition = this.getShapeFromShortKey(hash);
+        return (this.shapeziedColorKeyToItem[hash] = new ShapeziedColorItem(definition));
     }
 
     /**
@@ -205,22 +226,35 @@ export class ShapeDefinitionManager extends BasicSerializableObject {
 
     /**
      * Generates a definition for painting it with the given color
-     * @param {ShapeDefinition} definition
-     * @param {enumColors} color
-     * @returns {ShapeDefinition}
+     * @param {ShapeDefinition|enumColors} item1
+     * @param {ShapeDefinition|enumColors} item2
+     * @returns {ShapeDefinition|ShapeziedColorItem}
      */
-    shapeActionPaintWith(definition, color) {
-        const key = "paint/" + definition.getHash() + "/" + color;
+    shapeActionPaintWith(item1, item2) {
+        const isPaint = item1 instanceof ShapeDefinition;
+        /** @type {ShapeDefinition} */
+        // @ts-ignore
+        const shapeItem = isPaint ? item1 : item2;
+        /** @type {String} */
+        // @ts-ignore
+        const colorItem = isPaint ? item2 : item1;
+
+        const key = (isPaint ? "paint/" : "shapezy/") + shapeItem.getHash() + "/" + colorItem;
+
         if (this.operationCache[key]) {
             return /** @type {ShapeDefinition} */ (this.operationCache[key]);
         }
 
         this.root.signals.achievementCheck.dispatch(ACHIEVEMENTS.paintShape, null);
 
-        const colorized = definition.cloneAndPaintWith(color);
-        return /** @type {ShapeDefinition} */ (this.operationCache[key] = this.registerOrReturnHandle(
-            colorized
-        ));
+        const colorized = shapeItem.cloneAndPaintWith(colorItem);
+        if (isPaint) {
+            return /** @type {ShapeDefinition} */ (this.operationCache[key] = this.registerOrReturnHandle(
+                colorized
+            ));
+        } else {
+            return this.getShapeziedColorItemFromShortKey(colorized.getHash());
+        }
     }
 
     /**

@@ -109,6 +109,9 @@ export class ShapeDefinition extends BasicSerializableObject {
         /** @type {string} */
         this.cachedHash = null;
 
+        /** @type {boolean} */
+        this.hideCircle = false;
+
         // Set on demand
         this.bufferGenerator = null;
     }
@@ -338,9 +341,11 @@ export class ShapeDefinition extends BasicSerializableObject {
         const quadrantSize = 10;
         const quadrantHalfSize = quadrantSize / 2;
 
-        context.fillStyle = THEME.items.circleBackground;
-        context.beginCircle(0, 0, quadrantSize * 1.15);
-        context.fill();
+        if (!this.hideCircle) {
+            context.fillStyle = THEME.items.circleBackground;
+            context.beginCircle(0, 0, quadrantSize * 1.15);
+            context.fill();
+        }
 
         for (let layerIndex = 0; layerIndex < this.layers.length; ++layerIndex) {
             const quadrants = this.layers[layerIndex];

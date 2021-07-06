@@ -88,7 +88,7 @@ export class DynamicTickrate {
      * Call whenever a tick began
      */
     beginTick() {
-        assert(this.currentTickStart === null, "BeginTick called twice");
+        // assert(this.currentTickStart === null, "BeginTick called twice");
         this.currentTickStart = performance.now();
 
         if (this.capturedTicks.length > this.currentTickRate * 2) {

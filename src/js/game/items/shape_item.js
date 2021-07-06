@@ -35,6 +35,13 @@ export class ShapeItem extends BaseItem {
     }
 
     /**
+     * @returns {ShapeDefinition}
+     */
+    getData() {
+        return this.definition;
+    }
+
+    /**
      * @param {BaseItem} other
      */
     equalsImpl(other) {

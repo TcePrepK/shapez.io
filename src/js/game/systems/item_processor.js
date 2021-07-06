@@ -11,6 +11,7 @@ import { GameSystemWithFilter } from "../game_system_with_filter";
 import { BOOL_TRUE_SINGLETON, isTruthyItem } from "../items/boolean_item";
 import { ColorItem, COLOR_ITEM_SINGLETONS } from "../items/color_item";
 import { ShapeItem } from "../items/shape_item";
+import { ShapeDefinition } from "../shape_definition";
 
 /**
  * We need to allow queuing charges, otherwise the throughput will stall
@@ -467,17 +468,22 @@ export class ItemProcessorSystem extends GameSystemWithFilter {
      * @param {ProcessorImplementationPayload} payload
      */
     process_PAINTER(payload) {
-        const shapeItem = /** @type {ShapeItem} */ (payload.itemsBySlot[0]);
-        const colorItem = /** @type {ColorItem} */ (payload.itemsBySlot[1]);
+        const item1 = payload.itemsBySlot[0];
+        const item2 = payload.itemsBySlot[1];
 
+        if (item1 instanceof ShapeItem && item2 instanceof ShapeItem) return;
+        if (item1 instanceof ColorItem && item2 instanceof ColorItem) return;
+        // if (item1 instanceof ShapeItem && item2 instanceof ColorItem) {
         const colorizedDefinition = this.root.shapeDefinitionMgr.shapeActionPaintWith(
-            shapeItem.definition,
-            colorItem.color
+            item1.getData(),
+            item2.getData()
         );
 
-        payload.outItems.push({
-            item: this.root.shapeDefinitionMgr.getShapeItemFromDefinition(colorizedDefinition),
-        });
+        const item =
+            colorizedDefinition instanceof ShapeDefinition
+                ? this.root.shapeDefinitionMgr.getShapeItemFromDefinition(colorizedDefinition)
+                : colorizedDefinition;
+        payload.outItems.push({ item });
     }
 
     /**

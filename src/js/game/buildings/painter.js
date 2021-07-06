@@ -108,12 +108,12 @@ export class MetaPainterBuilding extends MetaBuilding {
                     {
                         pos: new Vector(0, 0),
                         directions: [enumDirection.left],
-                        filter: "shape",
+                        // filter: "shape",
                     },
                     {
                         pos: new Vector(1, 0),
                         directions: [enumDirection.top],
-                        filter: "color",
+                        // filter: "color",
                     },
                 ],
             })
@@ -140,14 +140,14 @@ export class MetaPainterBuilding extends MetaBuilding {
                     {
                         pos: new Vector(0, 0),
                         directions: [enumDirection.left],
-                        filter: "shape",
+                        // filter: "shape",
                     },
                     {
                         pos: new Vector(1, 0),
                         directions: [
                             variant === defaultBuildingVariant ? enumDirection.top : enumDirection.bottom,
                         ],
-                        filter: "color",
+                        // filter: "color",
                     },
                 ]);
 

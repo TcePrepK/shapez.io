@@ -34,6 +34,13 @@ export class BooleanItem extends BaseItem {
     }
 
     /**
+     * @returns {string}
+     */
+    getData() {
+        return this.value ? "1" : "0";
+    }
+
+    /**
      * @param {number} value
      */
     constructor(value) {
