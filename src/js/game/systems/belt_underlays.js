@@ -237,9 +237,7 @@ export class BeltUnderlaysSystem extends GameSystemWithFilter {
 
             const staticComp = entity.components.StaticMapEntity;
 
-            if (staticComp.isBlueprint) {
-                continue;
-            }
+            if (staticComp.isBlueprint) continue;
 
             const underlays = underlayComp.underlays;
             for (let i = 0; i < underlays.length; ++i) {

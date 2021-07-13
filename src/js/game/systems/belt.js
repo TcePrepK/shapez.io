@@ -517,9 +517,7 @@ export class BeltSystem extends GameSystemWithFilter {
                 const entity = contents[i];
                 if (entity.components.Belt) {
                     const staticComp = entity.components.StaticMapEntity;
-                    if (staticComp.isBlueprint) {
-                        continue;
-                    }
+                    if (staticComp.isBlueprint) continue;
 
                     const direction = entity.components.Belt.direction;
                     let sprite = this.beltAnimations[direction][0];
@@ -537,9 +535,7 @@ export class BeltSystem extends GameSystemWithFilter {
                 const entity = contents[i];
                 if (entity.components.Belt) {
                     const staticComp = entity.components.StaticMapEntity;
-                    if (staticComp.isBlueprint) {
-                        continue;
-                    }
+                    if (staticComp.isBlueprint) continue;
 
                     const direction = entity.components.Belt.direction;
                     const sprite = this.beltAnimations[direction][animationIndex % BELT_ANIM_COUNT];

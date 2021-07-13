@@ -61,9 +61,7 @@ export class StaticMapEntityComponent extends Component {
      * @returns {AtlasSprite}
      */
     getSprite() {
-        return this.isBlueprint
-            ? getBuildingDataFromCode(this.code).blueprintSprite
-            : getBuildingDataFromCode(this.code).sprite;
+        return getBuildingDataFromCode(this.code).sprite;
     }
 
     /**
