@@ -36,15 +36,18 @@ export class StaticMapEntitySystem extends GameSystem {
             const entity = contents[i];
 
             const staticComp = entity.components.StaticMapEntity;
-            const sprite = staticComp.isBlueprint ? staticComp.getBlueprintSprite() : staticComp.getSprite();
+            const isBelt = entity.components.Belt;
+            const isBlueprint = staticComp.isBlueprint;
+            const sprite = isBlueprint ? staticComp.getBlueprintSprite() : staticComp.getSprite();
             if (!sprite) continue;
 
             // Avoid drawing an entity twice which has been drawn for
             // another chunk already
             if (this.drawnUids.has(entity.uid)) continue;
-
             this.drawnUids.add(entity.uid);
-            staticComp.drawSpriteOnBoundsClipped(parameters, sprite, -0.1);
+
+            const extrudeEdges = isBlueprint && isBelt ? 0 : 2;
+            staticComp.drawSpriteOnBoundsClipped(parameters, sprite, extrudeEdges);
         }
     }
 
