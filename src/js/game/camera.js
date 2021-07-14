@@ -6,6 +6,7 @@ import { Signal, STOP_PROPAGATION } from "../core/signal";
 import { clamp } from "../core/utils";
 import { mixVector, Vector } from "../core/vector";
 import { BasicSerializableObject, types } from "../savegame/serialization";
+import { Yopez } from "./components/builder";
 import { KEYMAPPINGS } from "./key_action_mapper";
 import { GameRoot } from "./root";
 

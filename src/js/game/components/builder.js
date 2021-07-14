@@ -7,7 +7,7 @@ import { GameRoot } from "../root";
 import { ShapeDefinition } from "../shape_definition";
 import { StaticMapEntityComponent } from "./static_map_entity";
 
-class Yopez extends Vector {
+export class Yopez extends Vector {
     /**
      * @param {GameRoot} root
      * @param {number} x
