@@ -111,6 +111,9 @@ export class ShapeDefinition extends BasicSerializableObject {
 
         // Set on demand
         this.bufferGenerator = null;
+
+        // Should it draw circle underneath it or not
+        this.drawCircle = true;
     }
 
     /**
@@ -338,9 +341,11 @@ export class ShapeDefinition extends BasicSerializableObject {
         const quadrantSize = 10;
         const quadrantHalfSize = quadrantSize / 2;
 
-        context.fillStyle = THEME.items.circleBackground;
-        context.beginCircle(0, 0, quadrantSize * 1.15);
-        context.fill();
+        if (this.drawCircle) {
+            context.fillStyle = THEME.items.circleBackground;
+            context.beginCircle(0, 0, quadrantSize * 1.15);
+            context.fill();
+        }
 
         for (let layerIndex = 0; layerIndex < this.layers.length; ++layerIndex) {
             const quadrants = this.layers[layerIndex];

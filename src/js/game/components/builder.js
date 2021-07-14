@@ -7,7 +7,7 @@ import { GameRoot } from "../root";
 import { ShapeDefinition } from "../shape_definition";
 import { StaticMapEntityComponent } from "./static_map_entity";
 
-class Builder extends Vector {
+class Yopez extends Vector {
     /**
      * @param {GameRoot} root
      * @param {number} x
@@ -19,20 +19,33 @@ class Builder extends Vector {
         super(x, y);
         this.root = root;
 
+        /**
+         * This position in needed because if we are not tracing anything,
+         * we need yopez to go back to its starting pos (aka builder)
+         */
         this.startingPos = new Vector(x, y);
 
         /**
+         * Yopez will try to trace this entity
          * @type {Entity}
          */
         this.tracing;
 
         /**
+         * Yopezs will try to trace this position
          * @type {Vector}
          */
         this.tracingPos;
 
-        // Shape that we use for drawing
+        /**
+         * Shape that we use for drawing
+         */
         this.definition = definition;
+
+        /**
+         * Don't draw circle underneath :)
+         */
+        this.definition.drawCircle = false;
 
         this.vel = new Vector();
         this.acc = new Vector();
@@ -156,7 +169,7 @@ export class BuilderComponent extends Component {
 
         /**
          * Array of builders
-         * @type {Array<Builder>}
+         * @type {Array<Yopez>}
          */
         this.builders = [];
     }
@@ -172,7 +185,7 @@ export class BuilderComponent extends Component {
         const tileSize = staticComp.getTileSize().toWorldSpace();
         const center = origin.addScalars(tileSize.x / 2, tileSize.y / 2);
         const bugprint = root.shapeDefinitionMgr.getShapeFromShortKey("Sb----Sb:CbCbCbCb:--CwCw--");
-        this.builders.push(new Builder(root, center.x, center.y, 0.4, bugprint));
+        this.builders.push(new Yopez(root, center.x, center.y, 0.4, bugprint));
     }
 
     updateBuilders() {
