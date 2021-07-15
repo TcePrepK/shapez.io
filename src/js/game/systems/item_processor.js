@@ -417,19 +417,31 @@ export class ItemProcessorSystem extends GameSystemWithFilter {
      * @param {ProcessorImplementationPayload} payload
      */
     process_STACKER(payload) {
-        const lowerItem = /** @type {ShapeItem} */ (payload.itemsBySlot[0]);
-        const upperItem = /** @type {ShapeItem} */ (payload.itemsBySlot[1]);
+        const lowerItem = payload.itemsBySlot[0];
+        const upperItem = payload.itemsBySlot[1];
 
-        assert(lowerItem instanceof ShapeItem, "Input for lower stack is not a shape");
-        assert(upperItem instanceof ShapeItem, "Input for upper stack is not a shape");
+        if (lowerItem instanceof ShapeItem && upperItem instanceof ShapeItem) {
+            // assert(lowerItem instanceof ShapeItem, "Input for lower stack is not a shape");
+            // assert(upperItem instanceof ShapeItem, "Input for upper stack is not a shape");
 
-        const stackedDefinition = this.root.shapeDefinitionMgr.shapeActionStack(
-            lowerItem.definition,
-            upperItem.definition
-        );
-        payload.outItems.push({
-            item: this.root.shapeDefinitionMgr.getShapeItemFromDefinition(stackedDefinition),
-        });
+            const stackedDefinition = this.root.shapeDefinitionMgr.shapeActionStack(
+                lowerItem.definition,
+                upperItem.definition
+            );
+            payload.outItems.push({
+                item: this.root.shapeDefinitionMgr.getShapeItemFromDefinition(stackedDefinition),
+            });
+        } else if (lowerItem instanceof ColorItem && upperItem instanceof ColorItem) {
+            const size1 = lowerItem.size;
+            const size2 = upperItem.size;
+            const biggerOne = size1 > size2 ? size1 : size2;
+            const fixSize = biggerOne + (size1 + size2) * 0.1;
+            const item = new ColorItem(lowerItem.color);
+            item.size = fixSize;
+            payload.outItems.push({
+                item,
+            });
+        }
     }
 
     /**

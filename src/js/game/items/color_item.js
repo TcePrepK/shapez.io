@@ -48,6 +48,8 @@ export class ColorItem extends BaseItem {
     constructor(color) {
         super();
         this.color = color;
+
+        this.size = globalConfig.defaultItemDiameter;
     }
 
     getBackgroundColorAsResource() {
@@ -73,7 +75,7 @@ export class ColorItem extends BaseItem {
      * @param {DrawParameters} parameters
      */
     drawItemCenteredClipped(x, y, parameters, diameter = globalConfig.defaultItemDiameter) {
-        const realDiameter = diameter * 0.6;
+        const realDiameter = this.size * 0.6;
         if (!this.cachedSprite) {
             this.cachedSprite = Loader.getSprite("sprites/colors/" + this.color + ".png");
         }
