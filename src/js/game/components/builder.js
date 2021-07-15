@@ -38,6 +38,18 @@ export class Yopez extends Vector {
         this.tracingPos;
 
         /**
+         * Yopezs current rotation
+         * @type {number}
+         */
+        this.currentRotation;
+
+        /**
+         * Yopezs will try to turn into this angle
+         * @type {number}
+         */
+        this.desiredRotation;
+
+        /**
          * Shape that we use for drawing
          */
         this.definition = definition;
@@ -51,6 +63,20 @@ export class Yopez extends Vector {
         this.acc = new Vector();
 
         this.mag = mag;
+    }
+
+    updateRotation() {
+        if (this.currentRotation == this.desiredRotation) return;
+
+        let diff = this.desiredRotation - this.currentRotation;
+        if (diff > 180) diff -= 360;
+
+        if (diff < -180) diff += 360;
+
+        this.currentRotation += diff / 18;
+
+        this.currentRotation = (this.currentRotation + 360) % 360;
+        this.desiredRotation = (this.desiredRotation + 360) % 360;
     }
 
     update() {
@@ -137,10 +163,14 @@ export class Yopez extends Vector {
      * @param {DrawParameters} parameters
      */
     draw(parameters) {
-        const tracing = this.tracing ? this.tracingPos : this.startingPos;
+        const tracing = this.tracingPos ? this.tracingPos : this.startingPos;
         const path = tracing.sub(this);
 
-        const angle = !this.equals(tracing) ? path.multiplyScalar(-1).angle() : 0;
+        const angle = !this.currentRotation
+            ? !this.equals(tracing)
+                ? path.multiplyScalar(-1).angle()
+                : 0
+            : Math.radians(this.currentRotation);
 
         const ctx = parameters.context;
         ctx.translate(this.x, this.y);

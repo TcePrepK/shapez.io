@@ -16,6 +16,7 @@ import { HUDDebugInfo } from "./parts/debug_info";
 import { HUDEntityDebugger } from "./parts/entity_debugger";
 import { HUDModalDialogs } from "./parts/modal_dialogs";
 import { enumNotificationType } from "./parts/notifications";
+import { HUDPlayerHandler } from "./parts/player_handler";
 import { HUDSettingsMenu } from "./parts/settings_menu";
 import { HUDVignetteOverlay } from "./parts/vignette_overlay";
 import { TrailerMaker } from "./trailer_maker";
@@ -55,6 +56,7 @@ export class GameHUD {
             debugInfo: new HUDDebugInfo(this.root),
             dialogs: new HUDModalDialogs(this.root),
             blueprintHandler: new HUDBlueprintHandler(this.root),
+            playerHandler: new HUDPlayerHandler(this.root),
 
             // Typing hints
             /* typehints:start */
