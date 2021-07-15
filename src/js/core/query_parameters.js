@@ -3,8 +3,8 @@ const options = queryString.parse(location.search);
 
 export let queryParamOptions = {
     embedProvider: null,
-    fullVersion: false,
-    sandboxMode: false,
+    fullVersion: true,
+    sandboxMode: true,
 };
 
 if (options.embed) {

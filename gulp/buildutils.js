@@ -29,7 +29,7 @@ module.exports = {
         try {
             return execSync("git describe --tag --exact-match").toString("ascii");
         } catch (e) {
-            throw new Error('Current git HEAD is not a version tag');
+            throw new Error("Current git HEAD is not a version tag");
         }
     },
 
@@ -42,6 +42,7 @@ module.exports = {
      * @param {string} commitHash
      */
     cachebust(url, commitHash) {
-        return "/v/" + commitHash + "/" + url;
+        // return "/v/" + commitHash + "/" + url;
+        return url + "?v=" + commitHash;
     },
 };
