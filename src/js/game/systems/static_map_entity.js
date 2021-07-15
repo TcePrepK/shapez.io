@@ -46,7 +46,7 @@ export class StaticMapEntitySystem extends GameSystem {
             if (this.drawnUids.has(entity.uid)) continue;
             this.drawnUids.add(entity.uid);
 
-            const extrudeEdges = isBlueprint && isBelt ? 0 : 2;
+            const extrudeEdges = isBlueprint && isBelt ? -0.1 : 2;
             staticComp.drawSpriteOnBoundsClipped(parameters, sprite, extrudeEdges);
         }
     }

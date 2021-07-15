@@ -1,12 +1,12 @@
 import { BaseHUDPart } from "../base_hud_part";
 import { DrawParameters } from "../../../core/draw_parameters";
-import { Yopez } from "../../components/builder";
+import { PlayerYopez } from "../../Yopezes/player";
 
 export class HUDPlayerHandler extends BaseHUDPart {
     initialize() {
         const lvl17 = this.root.shapeDefinitionMgr.getShapeFromShortKey("WrRgWrRg:CwCrCwCr:SgSgSgSg");
         const camPos = this.root.camera.center.copy();
-        this.player = new Yopez(this.root, camPos.x, camPos.y, 0, lvl17);
+        this.player = new PlayerYopez(this.root, camPos.x, camPos.y, lvl17);
         this.player.currentRotation = 0;
         this.player.desiredRotation = 0;
     }
@@ -25,7 +25,7 @@ export class HUDPlayerHandler extends BaseHUDPart {
         const desiredRot = Math.degrees(path.angle());
         this.player.desiredRotation = desiredRot;
 
-        this.player.updateRotation();
+        this.player.update();
     }
 
     /**
